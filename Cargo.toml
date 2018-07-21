@@ -1,0 +1,6 @@
+[package]
+name = "argmin-core"
+version = "0.1.0"
+authors = ["Stefan Kroboth <stefan.kroboth@gmail.com>"]
+
+[dependencies]
