@@ -1,6 +1,23 @@
 [package]
-name = "argmin-core"
-version = "0.1.0"
+name = "argmin_core"
+version = "0.0.0"
 authors = ["Stefan Kroboth <stefan.kroboth@gmail.com>"]
+license = "MIT OR Apache-2.0"
+description = "WIP optimization toolbox for Rust"
+documentation = "https://stefan-k.github.io/argmin-rs/TODO/"
+homepage = "https://github.com/stefan-k/TODO"
+repository = "https://github.com/stefan-k/TODO"
+readme = "README.md"
+keywords = ["optimization", "math", "science", "HPC"]
+categories = ["science"]
+#license-file = "LICENSE-APACHE"
+exclude = [ 
+	".travis.yml",
+	"push_docs",
+]
 
 [dependencies]
+# num = "*"
+# ndarray = "*"
+# rand = "*"
+# ndarray-linalg = { version = "*", features = ["openblas"] }
