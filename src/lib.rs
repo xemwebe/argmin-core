@@ -21,6 +21,10 @@ pub trait ArgminGetResult {
     fn get_result(&self) -> ArgminResult;
 }
 
+pub trait ArgminRun {
+    fn run(&mut self) -> ArgminResult;
+}
+
 // extern crate ndarray;
 // extern crate ndarray_linalg;
 // extern crate num;
