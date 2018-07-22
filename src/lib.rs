@@ -12,6 +12,10 @@ pub mod result;
 
 pub mod problem;
 
+pub trait ArgminNextIter {
+    fn next_iter(&mut self);
+}
+
 // extern crate ndarray;
 // extern crate ndarray_linalg;
 // extern crate num;
