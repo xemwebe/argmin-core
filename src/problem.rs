@@ -39,7 +39,7 @@
 //#[derive(Clone)]
 pub struct ArgminProblem<'a> {
     /// reference to a function which computes the cost/fitness for a given parameter vector
-    pub cost_function: &'a Fn(Vec<f64>) -> f64,
+    pub cost_function: &'a Fn(&Vec<f64>) -> f64,
     // /// optional reference to a function which provides the gradient at a given point in parameter
     // /// space
     // pub gradient: Option<Box<Fn(Vec<f64>) -> Vec<f64>>>,
@@ -64,7 +64,7 @@ impl<'a> ArgminProblem<'a> {
     /// evaluates to `true` everywhere. This can be overwritten with the `constraint` function.
     ///
     /// `cost_function`: Reference to a cost function
-    pub fn new(cost_function: &'a Fn(Vec<f64>) -> f64) -> Self {
+    pub fn new(cost_function: &'a Fn(&Vec<f64>) -> f64) -> Self {
         ArgminProblem {
             cost_function: cost_function,
             // gradient: None,
