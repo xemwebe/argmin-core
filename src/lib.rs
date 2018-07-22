@@ -7,13 +7,18 @@
 
 //! Argmin Optimizaton toolbox
 
+pub mod problem;
 /// Definition of the return type of the solvers
 pub mod result;
 
-pub mod problem;
+use result::ArgminResult;
 
 pub trait ArgminNextIter {
     fn next_iter(&mut self);
+}
+
+pub trait ArgminGetResult {
+    fn get_result(&self) -> ArgminResult;
 }
 
 // extern crate ndarray;
