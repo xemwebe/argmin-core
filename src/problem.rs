@@ -35,6 +35,19 @@
 // use prelude::*;
 // use parameter::ArgminParameter;
 
+// pub trait ArgminProb {
+//     type Param;
+//     type Gradient;
+//     type Hessian;
+//     type Cost;
+//
+//     fn cost(&Self::Param) -> Self::Cost;
+//     fn gradient(&Self::Param) -> Option<Self::Gradient>;
+//     fn hessian(&Self::Param) -> Option<Self::Hessian>;
+//     fn target_cost() -> Self::Cost;
+//     fn feasible(&Self::Param) -> bool;
+// }
+
 /// This struct hold all information that describes the optimization problem.
 //#[derive(Clone)]
 pub struct ArgminProblem<'a> {
