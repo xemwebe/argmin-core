@@ -12,9 +12,9 @@
 
 /// Return struct for all solvers.
 #[derive(Debug, Clone)]
-pub struct ArgminResult {
+pub struct ArgminResult<T> {
     /// Final parameter vector
-    pub param: Vec<f64>,
+    pub param: T,
     /// Final cost value
     pub cost: f64,
     /// Number of iterations
@@ -25,13 +25,13 @@ pub struct ArgminResult {
     // pub termination_reason: TerminationReason,
 }
 
-impl ArgminResult {
+impl<T> ArgminResult<T> {
     /// Constructor
     ///
     /// `param`: Final (best) parameter vector
     /// `cost`: Final (best) cost function value
     /// `iters`: Number of iterations
-    pub fn new(param: Vec<f64>, cost: f64, iters: u64) -> Self {
+    pub fn new(param: T, cost: f64, iters: u64) -> Self {
         ArgminResult {
             param,
             cost,

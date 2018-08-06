@@ -18,11 +18,13 @@ pub trait ArgminNextIter {
 }
 
 pub trait ArgminGetResult {
-    fn get_result(&self) -> ArgminResult;
+    type ParamVec;
+    fn get_result(&self) -> ArgminResult<Self::ParamVec>;
 }
 
 pub trait ArgminRun {
-    fn run(&mut self) -> ArgminResult;
+    type ParamVec;
+    fn run(&mut self) -> ArgminResult<Self::ParamVec>;
 }
 
 // extern crate ndarray;
