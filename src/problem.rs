@@ -59,10 +59,10 @@ pub struct ArgminProblem<'a, T: 'a> {
     // /// optional reference to a function which provides the Hessian at a given point in parameter
     // /// space
     // pub hessian: Option<Box<Fn(Vec<f64>) -> Vec<Vec<f64>>>>,
-    /// lower bound of the parameter vector
-    pub lower_bound: Option<Vec<f64>>,
-    /// upper bound of the parameter vector
-    pub upper_bound: Option<Vec<f64>>,
+    // /// lower bound of the parameter vector
+    // pub lower_bound: Option<Vec<f64>>,
+    // /// upper bound of the parameter vector
+    // pub upper_bound: Option<Vec<f64>>,
     // /// (non)linear constraint which is `true` if a parameter vector lies within the bounds
     // pub constraint: &'a Fn(&T) -> bool,
     /// Target cost function value. The optimization will stop once this value is reached.
@@ -82,23 +82,23 @@ impl<'a, T> ArgminProblem<'a, T> {
             cost_function: cost_function,
             // gradient: None,
             // hessian: None,
-            lower_bound: None,
-            upper_bound: None,
+            // lower_bound: None,
+            // upper_bound: None,
             // constraint: &|_x: &T| true,
             // target_cost: std::f64::min_value(),
             target_cost: 0.0,
         }
     }
 
-    /// Set lower and upper bounds
-    ///
-    /// `lower_bound`: lower bound for the parameter vector
-    /// `upper_bound`: upper bound for the parameter vector
-    pub fn bounds(&mut self, lower_bound: Vec<f64>, upper_bound: Vec<f64>) -> &mut Self {
-        self.lower_bound = Some(lower_bound);
-        self.upper_bound = Some(upper_bound);
-        self
-    }
+    // /// Set lower and upper bounds
+    // ///
+    // /// `lower_bound`: lower bound for the parameter vector
+    // /// `upper_bound`: upper bound for the parameter vector
+    // pub fn bounds(&mut self, lower_bound: Vec<f64>, upper_bound: Vec<f64>) -> &mut Self {
+    //     self.lower_bound = Some(lower_bound);
+    //     self.upper_bound = Some(upper_bound);
+    //     self
+    // }
 
     // /// Provide the gradient
     // ///
