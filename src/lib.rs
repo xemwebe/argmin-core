@@ -7,7 +7,7 @@
 
 //! Argmin Optimizaton toolbox
 
-pub mod problem;
+// pub mod problem;
 /// Definition of the return type of the solvers
 pub mod result;
 
