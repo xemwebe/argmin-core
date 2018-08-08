@@ -9,6 +9,7 @@
 //!
 //! TODO: Documentation.
 
+pub mod macros;
 /// Definition of the return type of the solvers
 pub mod result;
 /// Definition of termination reasons
