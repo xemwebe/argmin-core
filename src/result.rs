@@ -10,6 +10,8 @@
 //! Return type of the solvers. Includes the final parameter vector, the final cost, the number of
 //! iterations, whether it terminated and the reason of termination.
 
+use termination::TerminationReason;
+
 /// Return struct for all solvers.
 #[derive(Debug, Clone)]
 pub struct ArgminResult<T> {
@@ -19,10 +21,10 @@ pub struct ArgminResult<T> {
     pub cost: f64,
     /// Number of iterations
     pub iters: u64,
-    // /// Indicated whether it terminated or not
-    // pub terminated: bool,
-    // /// Reason of termination
-    // pub termination_reason: TerminationReason,
+    /// Indicated whether it terminated or not
+    pub terminated: bool,
+    /// Reason of termination
+    pub termination_reason: TerminationReason,
 }
 
 impl<T> ArgminResult<T> {
@@ -31,27 +33,14 @@ impl<T> ArgminResult<T> {
     /// `param`: Final (best) parameter vector
     /// `cost`: Final (best) cost function value
     /// `iters`: Number of iterations
-    pub fn new(param: T, cost: f64, iters: u64) -> Self {
+    /// `termination_reason`: Reason of termination
+    pub fn new(param: T, cost: f64, iters: u64, termination_reason: TerminationReason) -> Self {
         ArgminResult {
             param,
             cost,
             iters,
-            // terminated: false,
-            // termination_reason: TerminationReason::NotTerminated,
+            terminated: termination_reason.terminated(),
+            termination_reason: termination_reason,
         }
     }
-
-    //     /// Set the termination reason
-    //     ///
-    //     /// In case of `NotTerminated`, the field `terminated` is set to `false` and `true` otherwise.
-    //     ///
-    //     /// `termination_reason`: Termination reason of type `TerminationReason`
-    //     pub fn set_termination_reason(&mut self, termination_reason: TerminationReason) -> &mut Self {
-    //         self.termination_reason = termination_reason;
-    //         self.terminated = match self.termination_reason {
-    //             TerminationReason::NotTerminated => false,
-    //             _ => true,
-    //         };
-    //         self
-    //     }
 }
