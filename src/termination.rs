@@ -30,4 +30,16 @@ impl TerminationReason {
             _ => true,
         }
     }
+
+    /// Returns a texual representation of what happened
+    ///
+    /// TODO: I am not sure if this is the best way to solve this.
+    pub fn text(&self) -> &str {
+        match *self {
+            TerminationReason::NotTerminated => "Not terminated",
+            TerminationReason::MaxItersReached => "Maximum number of iterations reached",
+            TerminationReason::TargetCostReached => "Target cost value reached",
+            TerminationReason::TargetPrecisionReached => "Target precision reached",
+        }
+    }
 }
