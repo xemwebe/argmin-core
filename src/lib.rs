@@ -22,6 +22,19 @@ pub use kv::ArgminKV;
 pub use result::ArgminResult;
 pub use termination::TerminationReason;
 
+// pub trait ArgminSolver {
+//     type Parameters;
+//     fn next_iter(&mut self) -> ArgminKV;
+//     fn get_result(&self) -> ArgminResult<Self::Parameters>;
+//     fn run(&mut self) -> ArgminResult<Self::Parameters>;
+//     fn init_log(&self);
+//
+//     fn set_termination_reason(&mut self, TerminationReason);
+//     fn get_termination_reason(&self) -> TerminationReason;
+//     fn terminated(&self) -> bool;
+//     fn termination_text(&self) -> &str;
+// }
+
 pub trait ArgminNextIter {
     fn next_iter(&mut self) -> ArgminKV;
 }
@@ -36,11 +49,18 @@ pub trait ArgminRun {
     fn run(&mut self) -> ArgminResult<Self::Parameters>;
 }
 
+pub trait ArgminInitLog {
+    fn init_log(&self);
+}
+
+pub trait ArgminTermination {
+    fn set_termination_reason(&mut self, TerminationReason);
+    fn get_termination_reason(&self) -> TerminationReason;
+    fn terminated(&self) -> bool;
+    fn termination_text(&self) -> &str;
+}
+
 pub trait ArgminLog {
     fn log_info(&self, &str, &ArgminKV);
     fn log_iter(&self, &ArgminKV);
-}
-
-pub trait ArgminInitLog {
-    fn init_log(&self);
 }

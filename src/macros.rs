@@ -7,44 +7,23 @@
 
 //! # Macros
 
-// /// This macro generates the `run` function for every solver which implements `ArgminSolver`.
-// #[macro_export]
-// macro_rules! make_run {
-//     ( $ProblemDefinition:ty, $StartingPoints:ty, $Parameter:ty, $CostValue:ty ) => {
-//         fn run(
-//             &mut self,
-//             operator: $ProblemDefinition,
-//             init_param: &$StartingPoints,
-//         ) -> Result<ArgminResult<$Parameter, $CostValue>> {
-//             self.init(operator, init_param)?;
-//
-//             let mut res;
-//             loop {
-//                 res = self.next_iter()?;
-//                 if res.terminated {
-//                     break;
-//                 }
-//             }
-//             Ok(res)
-//         }
-//     }
-// }
-
 /// This macro generates the `terminate` function for every solver which implements `ArgminSolver`.
 #[macro_export]
 macro_rules! make_terminate {
-    ($condition:expr, $reason:path;) => {
+    ($self:ident => $condition:expr, $reason:path;) => {
         if $condition {
+            $self.set_termination_reason($reason);
             return $reason;
         }
     };
-    ($condition:expr, $reason:path ; $($x: expr, $y:path;)*) => {
-            make_terminate!( $condition, $reason; );
-            make_terminate!( $($x, $y;)* );
+    ($self:ident => $condition:expr, $reason:path ; $($x: expr, $y:path;)*) => {
+            make_terminate!($self => $condition, $reason;);
+            make_terminate!($self => $($x, $y;)*);
     };
     ($self:ident, $($x: expr, $y:path;)*) => {
-        fn terminate(&$self) -> TerminationReason {
-            make_terminate!( $($x, $y;)* );
+        fn terminate(&mut $self) -> TerminationReason {
+            make_terminate!($self => $($x, $y;)*);
+            $self.set_termination_reason(TerminationReason::NotTerminated);
             TerminationReason::NotTerminated
         }
     };
