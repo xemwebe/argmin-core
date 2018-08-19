@@ -9,11 +9,16 @@
 //!
 //! TODO: Documentation.
 
+/// Key value datastructure
+pub mod kv;
+/// Macros
 pub mod macros;
 /// Definition of the return type of the solvers
 pub mod result;
 /// Definition of termination reasons
 pub mod termination;
+
+pub use kv::ArgminKV;
 
 use result::ArgminResult;
 
