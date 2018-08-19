@@ -113,3 +113,10 @@ macro_rules! make_logging {
         }
     };
 }
+
+#[macro_export]
+macro_rules! make_kv {
+    ($($k:expr =>  $v:expr;)*) => {
+        ArgminKV { kv: vec![ $(($k, format!("{}", $v))),* ] }
+    };
+}
