@@ -23,7 +23,7 @@ pub use kv::ArgminKV;
 use result::ArgminResult;
 
 pub trait ArgminNextIter {
-    fn next_iter(&mut self);
+    fn next_iter(&mut self) -> ArgminKV;
 }
 
 pub trait ArgminGetResult {
