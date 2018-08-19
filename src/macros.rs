@@ -90,10 +90,10 @@ macro_rules! make_terminate {
 
 #[macro_export]
 macro_rules! make_logging {
-    ($self:ident, $($k:expr =>  $v:expr;)*) => {
+    ($self:ident, $msg:expr, $($k:expr =>  $v:expr;)*) => {
         fn init_log(&$self) {
             let logs = make_kv!($($k => $v;)*);
-            $self.logger.log_info("blah", &logs);
+            $self.logger.log_info($msg, &logs);
         }
 
         fn log_iter(&$self, kv: &ArgminKV) {
