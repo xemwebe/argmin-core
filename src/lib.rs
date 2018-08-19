@@ -25,9 +25,12 @@ pub use termination::TerminationReason;
 pub trait ArgminSolver {
     type Parameters;
     fn next_iter(&mut self) -> ArgminKV;
-    fn get_result(&self) -> ArgminResult<Self::Parameters>;
     fn run(&mut self) -> ArgminResult<Self::Parameters>;
+    fn get_result(&self) -> ArgminResult<Self::Parameters>;
+
     fn init_log(&self);
+    fn log_iter(&self, &ArgminKV);
+    fn log_info(&self, &str, &ArgminKV);
 
     fn set_termination_reason(&mut self, TerminationReason);
     fn get_termination_reason(&self) -> TerminationReason;
