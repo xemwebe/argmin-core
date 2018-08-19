@@ -26,5 +26,21 @@ macro_rules! make_terminate {
             $self.set_termination_reason(TerminationReason::NotTerminated);
             TerminationReason::NotTerminated
         }
+
+        fn set_termination_reason(&mut $self, termination_reason: TerminationReason) {
+            $self.termination_reason = termination_reason;
+        }
+
+        fn get_termination_reason(&$self) -> TerminationReason {
+            $self.termination_reason.clone()
+        }
+
+        fn terminated(&$self) -> bool {
+            $self.termination_reason.terminated()
+        }
+
+        fn termination_text(&$self) -> &str {
+            $self.termination_reason.text()
+        }
     };
 }
