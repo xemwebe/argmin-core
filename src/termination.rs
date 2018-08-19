@@ -20,6 +20,8 @@ pub enum TerminationReason {
     TargetCostReached,
     /// Target precision reached
     TargetPrecisionReached,
+    /// Aborted
+    Aborted,
 }
 
 impl TerminationReason {
@@ -40,6 +42,7 @@ impl TerminationReason {
             TerminationReason::MaxItersReached => "Maximum number of iterations reached",
             TerminationReason::TargetCostReached => "Target cost value reached",
             TerminationReason::TargetPrecisionReached => "Target precision reached",
+            TerminationReason::Aborted => "Optimized aborted",
         }
     }
 }
