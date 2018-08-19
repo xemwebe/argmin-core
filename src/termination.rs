@@ -10,7 +10,7 @@
 //! Defines reasons for termination.
 
 /// Indicates why the optimization algorithm stopped
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum TerminationReason {
     /// In case it has not terminated yet
     NotTerminated,
