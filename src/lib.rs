@@ -10,17 +10,17 @@
 //! TODO: Documentation.
 
 /// Key value datastructure
-pub mod kv;
+mod kv;
 /// Macros
 pub mod macros;
 /// Definition of the return type of the solvers
-pub mod result;
+mod result;
 /// Definition of termination reasons
-pub mod termination;
+mod termination;
 
 pub use kv::ArgminKV;
-
-use result::ArgminResult;
+pub use result::ArgminResult;
+pub use termination::TerminationReason;
 
 pub trait ArgminNextIter {
     fn next_iter(&mut self) -> ArgminKV;
@@ -34,6 +34,11 @@ pub trait ArgminGetResult {
 pub trait ArgminRun {
     type Parameters;
     fn run(&mut self) -> ArgminResult<Self::Parameters>;
+}
+
+pub trait ArgminLog {
+    fn log_info(&self, &str, &ArgminKV);
+    fn log_iter(&self, &ArgminKV);
 }
 
 pub trait ArgminInitLog {
