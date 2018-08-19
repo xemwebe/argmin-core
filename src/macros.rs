@@ -7,6 +7,7 @@
 
 //! # Macros
 
+/// Creates the `run` function which should work when `ArgminSolver` is properly implemented.
 #[macro_export]
 macro_rules! make_run {
     () => {
@@ -48,6 +49,7 @@ macro_rules! make_run {
         }
     }
 }
+
 /// This macro generates the `terminate` function for every solver which implements `ArgminSolver`.
 #[macro_export]
 macro_rules! make_terminate {
