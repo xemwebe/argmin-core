@@ -59,7 +59,7 @@ macro_rules! make_terminate {
             return $reason;
         }
     };
-    ($self:ident; $condition:expr, $reason:path; $($x:expr  $y:path;)*) => {
+    ($self:ident; $condition:expr, $reason:path; $($x:expr, $y:path;)*) => {
             make_terminate!($self; $condition, $reason;);
             make_terminate!($self; $($x, $y;)*);
     };
