@@ -35,3 +35,7 @@ pub trait ArgminRun {
     type Parameters;
     fn run(&mut self) -> ArgminResult<Self::Parameters>;
 }
+
+pub trait ArgminInitLog {
+    fn init_log(&self);
+}
