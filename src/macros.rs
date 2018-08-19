@@ -7,6 +7,47 @@
 
 //! # Macros
 
+#[macro_export]
+macro_rules! make_run {
+    () => {
+        fn run(&mut self) -> ArgminResult<Self::Parameters> {
+            self.init_log();
+
+            let running = Arc::new(AtomicBool::new(true));
+            let r = running.clone();
+
+            ctrlc::set_handler(move || {
+                r.store(false, Ordering::SeqCst);
+            }).expect("Error setting Ctrl-C handler!");
+
+            while running.load(Ordering::SeqCst) {
+                let log = self.next_iter();
+
+                self.log_iter(&log);
+
+                self.terminate();
+
+                if self.terminated() {
+                    break;
+                }
+            }
+
+            // in case it stopped prematurely and `termination_reason` is still `NotTerminated`,
+            // someone must have pulled the handbrake
+            if self.iter < self.max_iters && self.termination_reason == TerminationReason::NotTerminated
+            {
+                self.set_termination_reason(TerminationReason::Aborted);
+            }
+
+            self.log_info(
+                &format!("Terminated: {reason}", reason = self.termination_text(),),
+                &ArgminKV::new(),
+            );
+
+            self.get_result()
+        }
+    }
+}
 /// This macro generates the `terminate` function for every solver which implements `ArgminSolver`.
 #[macro_export]
 macro_rules! make_terminate {
