@@ -53,19 +53,19 @@ macro_rules! make_run {
 /// This macro generates the `terminate` function for every solver which implements `ArgminSolver`.
 #[macro_export]
 macro_rules! make_terminate {
-    ($self:ident => $condition:expr, $reason:path;) => {
+    ($self:ident; $condition:expr, $reason:path;) => {
         if $condition {
             $self.set_termination_reason($reason);
             return $reason;
         }
     };
-    ($self:ident => $condition:expr, $reason:path ; $($x:expr, $y:path;)*) => {
-            make_terminate!($self => $condition, $reason;);
-            make_terminate!($self => $($x, $y;)*);
+    ($self:ident; $condition:expr, $reason:path; $($x:expr  $y:path;)*) => {
+            make_terminate!($self; $condition, $reason;);
+            make_terminate!($self; $($x, $y;)*);
     };
-    ($self:ident, $($x:expr, $y:path;)*) => {
+    ($self:ident, $($x:expr => $y:path;)*) => {
         fn terminate(&mut $self) -> TerminationReason {
-            make_terminate!($self => $($x, $y;)*);
+            make_terminate!($self; $($x, $y;)*);
             $self.set_termination_reason(TerminationReason::NotTerminated);
             TerminationReason::NotTerminated
         }
