@@ -59,11 +59,11 @@ macro_rules! make_terminate {
             return $reason;
         }
     };
-    ($self:ident => $condition:expr, $reason:path ; $($x: expr, $y:path;)*) => {
+    ($self:ident => $condition:expr, $reason:path ; $($x:expr, $y:path;)*) => {
             make_terminate!($self => $condition, $reason;);
             make_terminate!($self => $($x, $y;)*);
     };
-    ($self:ident, $($x: expr, $y:path;)*) => {
+    ($self:ident, $($x:expr, $y:path;)*) => {
         fn terminate(&mut $self) -> TerminationReason {
             make_terminate!($self => $($x, $y;)*);
             $self.set_termination_reason(TerminationReason::NotTerminated);
@@ -84,6 +84,32 @@ macro_rules! make_terminate {
 
         fn termination_text(&$self) -> &str {
             $self.termination_reason.text()
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! make_logging {
+    ($l:ident; $kk:expr => $vv:expr;) => {
+        $l.push($kk, $vv);
+    };
+    ($l:ident; $kk:expr => $vv:expr; $($k:expr =>  $v:expr;)*) => {
+            make_logging!($l; $kk => $vv;);
+            make_logging!($l; $($k => $v;)*);
+    };
+    ($self:ident, $($k:expr =>  $v:expr;)*) => {
+        fn init_log(&$self) {
+            let mut logs = ArgminKV::new();
+            make_logging!(logs; $($k => $v;)*);
+            $self.logger.log_info("blah", &logs);
+        }
+
+        fn log_iter(&$self, kv: &ArgminKV) {
+            $self.logger.log_iter(kv)
+        }
+
+        fn log_info(&$self, msg: &str, kv: &ArgminKV) {
+            $self.logger.log_info(msg, kv)
         }
     };
 }
