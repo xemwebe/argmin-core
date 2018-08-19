@@ -90,17 +90,9 @@ macro_rules! make_terminate {
 
 #[macro_export]
 macro_rules! make_logging {
-    ($l:ident; $kk:expr => $vv:expr;) => {
-        $l.push($kk, $vv);
-    };
-    ($l:ident; $kk:expr => $vv:expr; $($k:expr =>  $v:expr;)*) => {
-            make_logging!($l; $kk => $vv;);
-            make_logging!($l; $($k => $v;)*);
-    };
     ($self:ident, $($k:expr =>  $v:expr;)*) => {
         fn init_log(&$self) {
-            let mut logs = ArgminKV::new();
-            make_logging!(logs; $($k => $v;)*);
+            let logs = make_kv!($($k => $v;)*);
             $self.logger.log_info("blah", &logs);
         }
 
