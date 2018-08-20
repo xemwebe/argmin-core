@@ -20,6 +20,10 @@ pub enum TerminationReason {
     TargetCostReached,
     /// Target precision reached
     TargetPrecisionReached,
+    /// Acceped stall iter exceeded
+    AcceptedStallIterExceeded,
+    /// Best stall iter exceeded
+    BestStallIterExceeded,
     /// Aborted
     Aborted,
 }
@@ -42,6 +46,8 @@ impl TerminationReason {
             TerminationReason::MaxItersReached => "Maximum number of iterations reached",
             TerminationReason::TargetCostReached => "Target cost value reached",
             TerminationReason::TargetPrecisionReached => "Target precision reached",
+            TerminationReason::AcceptedStallIterExceeded => "Accepted stall iterations exceeded",
+            TerminationReason::BestStallIterExceeded => "Best stall iterations exceeded",
             TerminationReason::Aborted => "Optimized aborted",
         }
     }
