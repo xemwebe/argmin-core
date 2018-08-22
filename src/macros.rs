@@ -22,12 +22,14 @@ macro_rules! make_run {
             }).expect("Error setting Ctrl-C handler!");
 
             while running.load(Ordering::SeqCst) {
-                let log = self.next_iter();
+                let data = self.next_iter();
 
-                self.log_iter(&log);
+                // only log if there is something to log
+                if let &Some(ref log) = data.get_kv() {
+                    self.log_iter(&log);
+                }
 
                 self.terminate();
-
                 if self.terminated() {
                     break;
                 }

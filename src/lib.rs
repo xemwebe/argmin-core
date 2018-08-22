@@ -24,7 +24,7 @@ pub use termination::TerminationReason;
 
 pub trait ArgminSolver {
     type Parameters;
-    fn next_iter(&mut self) -> ArgminKV;
+    fn next_iter(&mut self) -> ArgminIterationData<Self::Parameters>;
     fn run(&mut self) -> ArgminResult<Self::Parameters>;
     fn get_result(&self) -> ArgminResult<Self::Parameters>;
 
@@ -42,4 +42,36 @@ pub trait ArgminSolver {
 pub trait ArgminLog {
     fn log_info(&self, &str, &ArgminKV);
     fn log_iter(&self, &ArgminKV);
+}
+
+pub struct ArgminIterationData<T> {
+    param: Option<T>,
+    kv: Option<ArgminKV>,
+}
+
+impl<T: Clone> ArgminIterationData<T> {
+    pub fn new() -> Self {
+        ArgminIterationData {
+            param: None,
+            kv: None,
+        }
+    }
+
+    pub fn param(&mut self, param: T) -> &mut Self {
+        self.param = Some(param);
+        self
+    }
+
+    pub fn kv(&mut self, kv: ArgminKV) -> &mut Self {
+        self.kv = Some(kv);
+        self
+    }
+
+    pub fn get_param(&self) -> &Option<T> {
+        &self.param
+    }
+
+    pub fn get_kv(&self) -> &Option<ArgminKV> {
+        &self.kv
+    }
 }
