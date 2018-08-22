@@ -52,10 +52,8 @@ pub trait ArgminLog {
     fn log_iter(&self, &ArgminKV);
 }
 
-// pub trait ArgminOutput<T: Clone> {
-//     fn param(&mut self, T);
-//     fn iter(&mut self, u64);
-//     fn write(&mut self);
+// pub trait ArgminWrite {
+//     fn write<T>(&self, T);
 // }
 
 pub struct ArgminIterationData {
