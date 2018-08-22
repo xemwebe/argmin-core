@@ -9,6 +9,7 @@
 
 use std;
 
+#[derive(Clone)]
 pub struct ArgminKV {
     pub kv: Vec<(&'static str, String)>,
 }

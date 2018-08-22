@@ -32,7 +32,8 @@ pub trait ArgminSolver {
     fn log_iter(&self, &ArgminKV);
     fn log_info(&self, &str, &ArgminKV);
 
-    // fn output(&self);
+    fn get_current_param(&self) -> Self::Parameters;
+    fn get_best_param(&self) -> Self::Parameters;
 
     fn set_termination_reason(&mut self, TerminationReason);
     fn get_termination_reason(&self) -> TerminationReason;
@@ -42,7 +43,7 @@ pub trait ArgminSolver {
 }
 
 #[derive(Clone)]
-pub enum ArgminPostIterationAction {
+pub enum ArgminParameterOutputTrigger {
     OutputCurrent,
     OutputBest,
 }
@@ -53,25 +54,25 @@ pub trait ArgminLog {
 }
 
 pub struct ArgminIterationData {
-    output_param: Vec<ArgminPostIterationAction>,
+    triggers: Vec<ArgminParameterOutputTrigger>,
     kv: Option<ArgminKV>,
 }
 
 impl ArgminIterationData {
     pub fn new() -> Self {
         ArgminIterationData {
-            output_param: vec![],
+            triggers: vec![],
             kv: None,
         }
     }
 
-    pub fn push_output(&mut self, out: ArgminPostIterationAction) -> &mut Self {
-        self.output_param.push(out);
+    pub fn add_trigger(&mut self, trigger: ArgminParameterOutputTrigger) -> &mut Self {
+        self.triggers.push(trigger);
         self
     }
 
-    pub fn output_flags(&self) -> Vec<ArgminPostIterationAction> {
-        self.output_param.clone()
+    pub fn triggers(&self) -> Vec<ArgminParameterOutputTrigger> {
+        self.triggers.clone()
     }
 
     pub fn kv(&mut self, kv: ArgminKV) -> &mut Self {
@@ -82,4 +83,8 @@ impl ArgminIterationData {
     pub fn get_kv(&self) -> &Option<ArgminKV> {
         &self.kv
     }
+}
+
+pub trait ArgminOutput<T: Clone> {
+    fn output(&mut self, T, ArgminKV);
 }

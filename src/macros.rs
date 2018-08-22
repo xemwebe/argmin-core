@@ -29,10 +29,14 @@ macro_rules! make_run {
                     self.log_iter(&log);
                 }
 
-                for f in data.output_flags() {
+                for f in data.triggers() {
                     match f {
-                        ArgminPostIterationAction::OutputCurrent => unimplemented!(),
-                        ArgminPostIterationAction::OutputBest => unimplemented!(),
+                        ArgminParameterOutputTrigger::OutputCurrent => {
+                            self.output_handlers[0].output(self.param.clone(), ArgminKV::new())
+                        },
+                        ArgminParameterOutputTrigger::OutputBest => {
+                            self.output_handlers[0].output(self.best_param.clone(), ArgminKV::new())
+                        },
                     }
                 }
 
