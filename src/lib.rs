@@ -53,29 +53,22 @@ pub trait ArgminLog {
     fn log_iter(&self, &ArgminKV);
 }
 
+// pub trait ArgminOutput<T: Clone> {
+//     fn param(&mut self, T);
+//     fn iter(&mut self, u64);
+//     fn write(&mut self);
+// }
+
 pub struct ArgminIterationData {
-    triggers: Vec<ArgminParameterOutputTrigger>,
     kv: Option<ArgminKV>,
 }
 
 impl ArgminIterationData {
     pub fn new() -> Self {
-        ArgminIterationData {
-            triggers: vec![],
-            kv: None,
-        }
+        ArgminIterationData { kv: None }
     }
 
-    pub fn add_trigger(&mut self, trigger: ArgminParameterOutputTrigger) -> &mut Self {
-        self.triggers.push(trigger);
-        self
-    }
-
-    pub fn triggers(&self) -> Vec<ArgminParameterOutputTrigger> {
-        self.triggers.clone()
-    }
-
-    pub fn kv(&mut self, kv: ArgminKV) -> &mut Self {
+    pub fn add_kv(&mut self, kv: ArgminKV) -> &mut Self {
         self.kv = Some(kv);
         self
     }
@@ -83,8 +76,4 @@ impl ArgminIterationData {
     pub fn get_kv(&self) -> &Option<ArgminKV> {
         &self.kv
     }
-}
-
-pub trait ArgminOutput<T: Clone> {
-    fn output(&mut self, T, ArgminKV);
 }
