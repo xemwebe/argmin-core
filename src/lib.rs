@@ -32,8 +32,7 @@ pub trait ArgminSolver {
     fn log_iter(&self, &ArgminKV);
     fn log_info(&self, &str, &ArgminKV);
 
-    fn get_current_param(&self) -> Self::Parameters;
-    fn get_best_param(&self) -> Self::Parameters;
+    fn get_param(&self) -> Self::Parameters;
 
     fn set_termination_reason(&mut self, TerminationReason);
     fn get_termination_reason(&self) -> TerminationReason;
