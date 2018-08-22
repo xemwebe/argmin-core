@@ -29,6 +29,13 @@ macro_rules! make_run {
                     self.log_iter(&log);
                 }
 
+                for f in data.output_flags() {
+                    match f {
+                        ArgminPostIterationAction::OutputCurrent => unimplemented!(),
+                        ArgminPostIterationAction::OutputBest => unimplemented!(),
+                    }
+                }
+
                 self.terminate();
                 if self.terminated() {
                     break;
