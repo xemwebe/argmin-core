@@ -70,7 +70,7 @@ impl ArgminIterationData {
         self
     }
 
-    pub fn get_kv(&self) -> &Option<ArgminKV> {
-        &self.kv
+    pub fn get_kv(&self) -> Option<ArgminKV> {
+        self.kv.clone()
     }
 }

@@ -12,6 +12,8 @@
 macro_rules! make_run {
     () => {
         fn run(&mut self) -> ArgminResult<Self::Parameters> {
+            let total_time = std::time::Instant::now();
+
             self.init_log();
 
             let running = Arc::new(AtomicBool::new(true));
@@ -22,10 +24,13 @@ macro_rules! make_run {
             }).expect("Error setting Ctrl-C handler!");
 
             while running.load(Ordering::SeqCst) {
-                let data = self.next_iter();
+                let start = std::time::Instant::now();
+                let mut data = self.next_iter();
+                let duration = start.elapsed();
 
                 // only log if there is something to log
-                if let &Some(ref log) = data.get_kv() {
+                if let Some(ref mut log) = data.get_kv() {
+                    log.push("time", duration.as_secs() as f64 + duration.subsec_nanos() as f64 * 1e-9);
                     self.log_iter(&log);
                 }
 
@@ -42,9 +47,18 @@ macro_rules! make_run {
                 self.set_termination_reason(TerminationReason::Aborted);
             }
 
+            let duration = total_time.elapsed();
+
+            let mut kv = ArgminKV::new();
+            let kv = make_kv!(
+                "termination_reason" => self.get_termination_reason();
+                "total_time" => duration.as_secs() as f64 + duration.subsec_nanos() as f64 * 1e-9;
+            );
+            // kv.push("total_time", duration.as_secs() as f64 + duration.subsec_nanos() as f64 * 1e-9);
+
             self.log_info(
                 &format!("Terminated: {reason}", reason = self.termination_text(),),
-                &ArgminKV::new(),
+                &kv,
             );
 
             self.get_result()
@@ -111,6 +125,6 @@ macro_rules! make_logging {
 #[macro_export]
 macro_rules! make_kv {
     ($($k:expr =>  $v:expr;)*) => {
-        ArgminKV { kv: vec![ $(($k, format!("{}", $v))),* ] }
+        ArgminKV { kv: vec![ $(($k, format!("{:?}", $v))),* ] }
     };
 }
