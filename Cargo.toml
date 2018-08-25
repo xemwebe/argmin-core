@@ -17,7 +17,7 @@ exclude = [
 ]
 
 [dependencies]
-# num = "*"
+# num-traits = "*"
 # ndarray = "*"
 # rand = "*"
 # ndarray-linalg = { version = "*", features = ["openblas"] }

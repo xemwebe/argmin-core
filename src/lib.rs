@@ -13,12 +13,15 @@
 mod kv;
 /// Macros
 pub mod macros;
+/// Math utilities
+mod math;
 /// Definition of the return type of the solvers
 mod result;
 /// Definition of termination reasons
 mod termination;
 
 pub use kv::ArgminKV;
+pub use math::*;
 pub use result::ArgminResult;
 pub use termination::TerminationReason;
 
