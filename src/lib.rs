@@ -9,6 +9,13 @@
 //!
 //! TODO: Documentation.
 
+pub extern crate failure;
+#[macro_use]
+pub extern crate failure_derive;
+// pub use failure::format_err;
+
+// /// Errors
+mod errors;
 /// Key value datastructure
 mod kv;
 /// Macros
@@ -20,6 +27,8 @@ mod result;
 /// Definition of termination reasons
 mod termination;
 
+pub use errors::*;
+pub use failure::Error;
 pub use kv::ArgminKV;
 pub use math::*;
 pub use result::ArgminResult;
