@@ -36,8 +36,9 @@ pub use termination::TerminationReason;
 
 pub trait ArgminSolver {
     type Parameters;
-    fn next_iter(&mut self) -> ArgminIterationData;
-    fn run(&mut self) -> ArgminResult<Self::Parameters>;
+
+    fn next_iter(&mut self) -> Result<ArgminIterationData, Error>;
+    fn run(&mut self) -> Result<ArgminResult<Self::Parameters>, Error>;
     fn get_result(&self) -> ArgminResult<Self::Parameters>;
 
     fn init_log(&self);

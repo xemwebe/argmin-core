@@ -11,7 +11,7 @@
 #[macro_export]
 macro_rules! make_run {
     () => {
-        fn run(&mut self) -> ArgminResult<Self::Parameters> {
+        fn run(&mut self) -> Result<ArgminResult<Self::Parameters>, Error> {
             let total_time = std::time::Instant::now();
 
             self.init_log();
@@ -25,7 +25,9 @@ macro_rules! make_run {
 
             while running.load(Ordering::SeqCst) {
                 let start = std::time::Instant::now();
-                let mut data = self.next_iter();
+
+                let mut data = self.next_iter()?;
+
                 let duration = start.elapsed();
 
                 // only log if there is something to log
@@ -61,7 +63,7 @@ macro_rules! make_run {
                 &kv,
             );
 
-            self.get_result()
+            Ok(self.get_result())
         }
     }
 }
