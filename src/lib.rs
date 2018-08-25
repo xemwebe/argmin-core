@@ -41,9 +41,9 @@ pub trait ArgminSolver {
     fn run(&mut self) -> Result<ArgminResult<Self::Parameters>, Error>;
     fn get_result(&self) -> ArgminResult<Self::Parameters>;
 
-    fn init_log(&self);
-    fn log_iter(&self, &ArgminKV);
-    fn log_info(&self, &str, &ArgminKV);
+    fn init_log(&self) -> Result<(), Error>;
+    fn log_iter(&self, &ArgminKV) -> Result<(), Error>;
+    fn log_info(&self, &str, &ArgminKV) -> Result<(), Error>;
 
     fn get_param(&self) -> Self::Parameters;
 
@@ -61,8 +61,8 @@ pub enum ArgminParameterOutputTrigger {
 }
 
 pub trait ArgminLog {
-    fn log_info(&self, &str, &ArgminKV);
-    fn log_iter(&self, &ArgminKV);
+    fn log_info(&self, &str, &ArgminKV) -> Result<(), Error>;
+    fn log_iter(&self, &ArgminKV) -> Result<(), Error>;
 }
 
 // pub trait ArgminWrite {

@@ -14,14 +14,14 @@ macro_rules! make_run {
         fn run(&mut self) -> Result<ArgminResult<Self::Parameters>, Error> {
             let total_time = std::time::Instant::now();
 
-            self.init_log();
+            self.init_log()?;
 
             let running = Arc::new(AtomicBool::new(true));
             let r = running.clone();
 
             ctrlc::set_handler(move || {
                 r.store(false, Ordering::SeqCst);
-            }).expect("Error setting Ctrl-C handler!");
+            })?;
 
             while running.load(Ordering::SeqCst) {
                 let start = std::time::Instant::now();
@@ -33,7 +33,7 @@ macro_rules! make_run {
                 // only log if there is something to log
                 if let Some(ref mut log) = data.get_kv() {
                     log.push("time", duration.as_secs() as f64 + duration.subsec_nanos() as f64 * 1e-9);
-                    self.log_iter(&log);
+                    self.log_iter(&log)?;
                 }
 
                 self.terminate();
@@ -61,7 +61,7 @@ macro_rules! make_run {
             self.log_info(
                 &format!("Terminated: {reason}", reason = self.termination_text(),),
                 &kv,
-            );
+            )?;
 
             Ok(self.get_result())
         }
@@ -109,16 +109,16 @@ macro_rules! make_terminate {
 #[macro_export]
 macro_rules! make_logging {
     ($self:ident, $msg:expr, $($k:expr =>  $v:expr;)*) => {
-        fn init_log(&$self) {
+        fn init_log(&$self) -> Result<(), Error> {
             let logs = make_kv!($($k => $v;)*);
-            $self.logger.log_info($msg, &logs);
+            $self.logger.log_info($msg, &logs)
         }
 
-        fn log_iter(&$self, kv: &ArgminKV) {
+        fn log_iter(&$self, kv: &ArgminKV) -> Result<(), Error> {
             $self.logger.log_iter(kv)
         }
 
-        fn log_info(&$self, msg: &str, kv: &ArgminKV) {
+        fn log_info(&$self, msg: &str, kv: &ArgminKV) -> Result<(), Error> {
             $self.logger.log_info(msg, kv)
         }
     };
