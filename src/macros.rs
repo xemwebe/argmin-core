@@ -13,6 +13,8 @@ macro_rules! make_run {
     () => {
         fn run(&mut self) -> Result<ArgminResult<Self::Parameters>, Error> {
             use ctrlc;
+            use std::sync::atomic::{AtomicBool, Ordering};
+            use std::sync::Arc;
 
             let total_time = std::time::Instant::now();
 
