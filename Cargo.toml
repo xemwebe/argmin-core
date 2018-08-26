@@ -19,6 +19,7 @@ exclude = [
 [dependencies]
 failure = "*"
 failure_derive = "*"
+ctrlc = "*"
 # num-traits = "*"
 # ndarray = "*"
 # rand = "*"

@@ -9,6 +9,7 @@
 //!
 //! TODO: Documentation.
 
+pub extern crate ctrlc;
 pub extern crate failure;
 #[macro_use]
 pub extern crate failure_derive;
