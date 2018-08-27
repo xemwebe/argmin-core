@@ -40,6 +40,8 @@ macro_rules! make_run {
                     self.log_iter(&log)?;
                 }
 
+                self.write(&self.param);
+
                 self.terminate();
                 if self.terminated() {
                     break;
@@ -108,6 +110,16 @@ macro_rules! make_terminate {
             $self.termination_reason.text()
         }
     };
+}
+
+#[macro_export]
+macro_rules! make_write {
+    () => {
+        fn write(&self, param: &T) -> Result<(), Error> {
+            self.writer.write(param)?;
+            Ok(())
+        }
+    }
 }
 
 #[macro_export]

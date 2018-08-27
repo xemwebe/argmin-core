@@ -46,6 +46,8 @@ pub trait ArgminSolver {
     fn log_iter(&self, &ArgminKV) -> Result<(), Error>;
     fn log_info(&self, &str, &ArgminKV) -> Result<(), Error>;
 
+    fn write(&self, &Self::Parameters) -> Result<(), Error>;
+
     fn get_param(&self) -> Self::Parameters;
 
     fn set_termination_reason(&mut self, TerminationReason);
@@ -55,20 +57,15 @@ pub trait ArgminSolver {
     fn terminate(&mut self) -> TerminationReason;
 }
 
-#[derive(Clone)]
-pub enum ArgminParameterOutputTrigger {
-    OutputCurrent,
-    OutputBest,
-}
-
 pub trait ArgminLog {
     fn log_info(&self, &str, &ArgminKV) -> Result<(), Error>;
     fn log_iter(&self, &ArgminKV) -> Result<(), Error>;
 }
 
-// pub trait ArgminWrite {
-//     fn write<T>(&self, T);
-// }
+pub trait ArgminWrite {
+    type Param;
+    fn write(&self, &Self::Param) -> Result<(), Error>;
+}
 
 pub struct ArgminIterationData {
     kv: Option<ArgminKV>,
