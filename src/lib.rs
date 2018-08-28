@@ -20,6 +20,8 @@ extern crate slog_json;
 extern crate slog_term;
 // pub use failure::format_err;
 
+/// base struct
+mod base;
 /// Error handling
 mod errors;
 /// Key value datastructure
@@ -37,17 +39,15 @@ mod result;
 /// Definition of termination reasons
 mod termination;
 
+// TODO: Maybe leave logging/output stuff in its namespace
+pub use base::ArgminBase;
 pub use errors::*;
 pub use failure::Error;
 pub use kv::ArgminKV;
-// TODO: Maybe leave this in its namespace
 pub use logging::slog_logger::ArgminSlogLogger;
-// TODO: Maybe leave this in its namespace
 pub use logging::ArgminLogger;
 pub use math::*;
-// TODO: Maybe leave this in its namespace
 pub use output::file::WriteToFile;
-// TODO: Maybe leave this in its namespace
 pub use output::ArgminWriter;
 pub use result::ArgminResult;
 pub use termination::TerminationReason;
