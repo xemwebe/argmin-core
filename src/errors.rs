@@ -9,6 +9,7 @@
 
 #[derive(Debug, Fail)]
 pub enum ArgminError {
+    /// Indicates and invalid parameter
     #[fail(display = "Invalid parameter: {}", parameter)]
     InvalidParameter { parameter: String },
 }
