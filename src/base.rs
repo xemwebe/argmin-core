@@ -25,7 +25,7 @@ pub struct ArgminBase<T> {
     cost_func_count: u64,
     grad_func_count: u64,
     termination_reason: TerminationReason,
-    total_time: u64,
+    total_time: std::time::Duration,
     logger: ArgminLogger,
     writer: ArgminWriter<T>,
 }
@@ -42,7 +42,7 @@ impl<T: Clone> ArgminBase<T> {
             cost_func_count: 0,
             grad_func_count: 0,
             termination_reason: TerminationReason::NotTerminated,
-            total_time: 0,
+            total_time: std::time::Duration::new(0, 0),
             logger: ArgminLogger::new(),
             writer: ArgminWriter::new(),
         }
@@ -116,7 +116,7 @@ impl<T: Clone> ArgminBase<T> {
         self
     }
 
-    pub fn max_iters(&mut self) -> u64 {
+    pub fn max_iters(&self) -> u64 {
         self.max_iters
     }
 
@@ -129,8 +129,12 @@ impl<T: Clone> ArgminBase<T> {
         self.termination_reason.clone()
     }
 
-    pub fn termination_reason_test(&self) -> &str {
+    pub fn termination_reason_text(&self) -> &str {
         self.termination_reason.text()
+    }
+
+    pub fn terminated(&self) -> bool {
+        self.termination_reason.terminated()
     }
 
     pub fn result(&self) -> ArgminResult<T> {
@@ -142,7 +146,7 @@ impl<T: Clone> ArgminBase<T> {
         )
     }
 
-    pub fn set_total_time(&mut self, time: u64) -> &mut Self {
+    pub fn set_total_time(&mut self, time: std::time::Duration) -> &mut Self {
         self.total_time = time;
         self
     }
@@ -163,5 +167,9 @@ impl<T: Clone> ArgminBase<T> {
 
     pub fn log_info(&self, msg: &str, kv: &ArgminKV) -> Result<(), Error> {
         self.logger.log_info(msg, kv)
+    }
+
+    pub fn write(&self, param: &T) -> Result<(), Error> {
+        self.writer.write(param)
     }
 }

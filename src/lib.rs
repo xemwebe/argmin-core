@@ -67,43 +67,12 @@ pub trait ArgminSolver {
     fn get_result(&self) -> ArgminResult<Self::Parameters>;
 
     /// Logs the info about the solver. Implemented by the `make_logging!` macro
+    /// TODO: NEEDS TO GO AWAY -> CAN BE PART OF RUN
     fn init_log(&self) -> Result<(), Error>;
-
-    /// Logs key-value data after each iteration. Take care that the key-value stores structure
-    /// does not change inbetween iterations, as this can be used to write to rather rigid
-    /// formats/storages such as CSV and Databases.
-    /// Implemented by the `make_logging!` macro.
-    fn log_iter(&self, &ArgminKV) -> Result<(), Error>;
-
-    /// Logs any general information you may have.
-    /// Implemented by the `make_logging!` macro.
-    fn log_info(&self, &str, &ArgminKV) -> Result<(), Error>;
-
-    /// Export the parameter vector.
-    /// Implemented by the `make_write!` macro.
-    fn write(&self, &Self::Parameters) -> Result<(), Error>;
-
-    /// Return the current parameter vector
-    fn get_param(&self) -> Self::Parameters;
-
-    /// Set the termination reason
-    /// Implemented by the `make_terminate!` macro.
-    fn set_termination_reason(&mut self, TerminationReason);
-
-    /// Get the termination reaseon
-    /// Implemented by the `make_terminate!` macro.
-    fn get_termination_reason(&self) -> TerminationReason;
-
-    /// Checks if the algorithm has terminated
-    /// Implemented by the `make_terminate!` macro.
-    fn terminated(&self) -> bool;
-
-    /// Returns the textual representation of `TerminationReason`
-    /// Implemented by the `make_terminate!` macro.
-    fn termination_text(&self) -> &str;
 
     /// Evaluate all stopping criterions and return the `TerminationReason`
     /// Implemented by the `make_terminate!` macro.
+    /// TODO: NEEDS TO GO AWAY -> CAN BE PART OF RUN
     fn terminate(&mut self) -> TerminationReason;
 }
 

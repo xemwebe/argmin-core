@@ -37,39 +37,43 @@ macro_rules! make_run {
                 // only log if there is something to log
                 if let Some(ref mut log) = data.get_kv() {
                     log.push("time", duration.as_secs() as f64 + duration.subsec_nanos() as f64 * 1e-9);
-                    self.log_iter(&log)?;
+                    self.base.log_iter(&log)?;
                 }
 
-                self.write(&self.param);
+                self.base.write(&self.base.cur_param());
 
                 self.terminate();
-                if self.terminated() {
+                if self.base.terminated() {
                     break;
                 }
             }
 
             // in case it stopped prematurely and `termination_reason` is still `NotTerminated`,
             // someone must have pulled the handbrake
-            if self.iter < self.max_iters && self.termination_reason == TerminationReason::NotTerminated
+            if self.base.cur_iter() < self.base.max_iters() && !self.base.terminated()
             {
-                self.set_termination_reason(TerminationReason::Aborted);
+                self.base.set_termination_reason(TerminationReason::Aborted);
             }
 
             let duration = total_time.elapsed();
+            self.base.set_total_time(duration);
 
             let mut kv = ArgminKV::new();
             let kv = make_kv!(
-                "termination_reason" => self.get_termination_reason();
+                "termination_reason" => self.base.termination_reason();
                 "total_time" => duration.as_secs() as f64 + duration.subsec_nanos() as f64 * 1e-9;
             );
-            // kv.push("total_time", duration.as_secs() as f64 + duration.subsec_nanos() as f64 * 1e-9);
 
-            self.log_info(
-                &format!("Terminated: {reason}", reason = self.termination_text(),),
+            self.base.log_info(
+                &format!("Terminated: {reason}", reason = self.base.termination_reason_text(),),
                 &kv,
             )?;
 
-            Ok(self.get_result())
+            Ok(self.base.result())
+        }
+
+        fn get_result(&self) -> ArgminResult<Self::Parameters> {
+            self.base.result()
         }
     }
 }
@@ -79,7 +83,7 @@ macro_rules! make_run {
 macro_rules! make_terminate {
     ($self:ident; $condition:expr, $reason:path;) => {
         if $condition {
-            $self.set_termination_reason($reason);
+            $self.base.set_termination_reason($reason);
             return $reason;
         }
     };
@@ -90,36 +94,10 @@ macro_rules! make_terminate {
     ($self:ident, $($x:expr => $y:path;)*) => {
         fn terminate(&mut $self) -> TerminationReason {
             make_terminate!($self; $($x, $y;)*);
-            $self.set_termination_reason(TerminationReason::NotTerminated);
+            $self.base.set_termination_reason(TerminationReason::NotTerminated);
             TerminationReason::NotTerminated
         }
-
-        fn set_termination_reason(&mut $self, termination_reason: TerminationReason) {
-            $self.termination_reason = termination_reason;
-        }
-
-        fn get_termination_reason(&$self) -> TerminationReason {
-            $self.termination_reason.clone()
-        }
-
-        fn terminated(&$self) -> bool {
-            $self.termination_reason.terminated()
-        }
-
-        fn termination_text(&$self) -> &str {
-            $self.termination_reason.text()
-        }
     };
-}
-
-#[macro_export]
-macro_rules! make_write {
-    () => {
-        fn write(&self, param: &T) -> Result<(), Error> {
-            self.writer.write(param)?;
-            Ok(())
-        }
-    }
 }
 
 #[macro_export]
@@ -127,15 +105,7 @@ macro_rules! make_logging {
     ($self:ident, $msg:expr, $($k:expr =>  $v:expr;)*) => {
         fn init_log(&$self) -> Result<(), Error> {
             let logs = make_kv!($($k => $v;)*);
-            $self.logger.log_info($msg, &logs)
-        }
-
-        fn log_iter(&$self, kv: &ArgminKV) -> Result<(), Error> {
-            $self.logger.log_iter(kv)
-        }
-
-        fn log_info(&$self, msg: &str, kv: &ArgminKV) -> Result<(), Error> {
-            $self.logger.log_info(msg, kv)
+            $self.base.log_info($msg, &logs)
         }
     };
 }
