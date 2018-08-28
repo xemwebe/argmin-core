@@ -20,7 +20,7 @@ exclude = [
 failure = "*"
 failure_derive = "*"
 ctrlc = "*"
-# num-traits = "*"
-# ndarray = "*"
-# rand = "*"
-# ndarray-linalg = { version = "*", features = ["openblas"] }
+slog = "*"
+slog-term = "*"
+slog-async = "*"
+slog-json = "*"

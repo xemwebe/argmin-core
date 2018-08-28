@@ -13,16 +13,25 @@ pub extern crate ctrlc;
 pub extern crate failure;
 #[macro_use]
 pub extern crate failure_derive;
+#[macro_use]
+extern crate slog;
+extern crate slog_async;
+extern crate slog_json;
+extern crate slog_term;
 // pub use failure::format_err;
 
 /// Error handling
 mod errors;
 /// Key value datastructure
 mod kv;
+/// Logging
+mod logging;
 /// Macros
 pub mod macros;
 /// Math utilities
 mod math;
+/// Output
+mod output;
 /// Definition of the return type of the solvers
 mod result;
 /// Definition of termination reasons
@@ -31,7 +40,15 @@ mod termination;
 pub use errors::*;
 pub use failure::Error;
 pub use kv::ArgminKV;
+// TODO: Maybe leave this in its namespace
+pub use logging::slog_logger::ArgminSlogLogger;
+// TODO: Maybe leave this in its namespace
+pub use logging::ArgminLogger;
 pub use math::*;
+// TODO: Maybe leave this in its namespace
+pub use output::file::WriteToFile;
+// TODO: Maybe leave this in its namespace
+pub use output::ArgminWriter;
 pub use result::ArgminResult;
 pub use termination::TerminationReason;
 

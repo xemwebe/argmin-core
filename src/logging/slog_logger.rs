@@ -1,0 +1,109 @@
+// Copyright 2018 Stefan Kroboth
+//
+// Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0> or the MIT license <LICENSE-MIT or
+// http://opensource.org/licenses/MIT>, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
+
+//! # slog
+
+use slog;
+use slog::{Drain, Record, Serializer, KV};
+use slog_async;
+use slog_async::OverflowStrategy;
+use slog_json;
+use slog_term;
+use std::fs::OpenOptions;
+use std::sync::Mutex;
+use {ArgminKV, ArgminLog, Error};
+
+pub struct ArgminSlogLogger {
+    logger: slog::Logger,
+}
+
+impl ArgminSlogLogger {
+    pub fn term() -> Box<Self> {
+        ArgminSlogLogger::term_internal(OverflowStrategy::Block)
+    }
+
+    pub fn term_noblock() -> Box<Self> {
+        ArgminSlogLogger::term_internal(OverflowStrategy::Drop)
+    }
+
+    fn term_internal(overflow_strategy: OverflowStrategy) -> Box<Self> {
+        // Logging to terminal
+        let decorator = slog_term::TermDecorator::new().build();
+        let drain = slog_term::FullFormat::new(decorator)
+            .use_original_order()
+            .build()
+            .fuse();
+        let drain = slog_async::Async::new(drain)
+            .overflow_strategy(overflow_strategy)
+            .build()
+            .fuse();
+        Box::new(ArgminSlogLogger {
+            logger: slog::Logger::root(drain, o!()),
+        })
+    }
+
+    pub fn file(file: &str) -> Result<Box<Self>, Error> {
+        ArgminSlogLogger::file_internal(file, OverflowStrategy::Block)
+    }
+
+    pub fn file_noblock(file: &str) -> Result<Box<Self>, Error> {
+        ArgminSlogLogger::file_internal(file, OverflowStrategy::Drop)
+    }
+
+    /// Log JSON to file
+    fn file_internal(file: &str, overflow_strategy: OverflowStrategy) -> Result<Box<Self>, Error> {
+        // Logging to file
+        let file = OpenOptions::new()
+            .create(true)
+            .write(true)
+            .truncate(true)
+            .open(file)?;
+        let drain = Mutex::new(slog_json::Json::new(file).build()).map(slog::Fuse);
+        let drain = slog_async::Async::new(drain)
+            .overflow_strategy(overflow_strategy)
+            .build()
+            .fuse();
+        Ok(Box::new(ArgminSlogLogger {
+            logger: slog::Logger::root(drain, o!()),
+        }))
+    }
+}
+
+/// This type is necessary in order to be able to implement `slog::KV` on `ArgminKV`
+pub struct ArgminSlogKV {
+    pub kv: Vec<(&'static str, String)>,
+}
+
+impl KV for ArgminSlogKV {
+    fn serialize(&self, _record: &Record, serializer: &mut Serializer) -> slog::Result {
+        for idx in self.kv.clone().iter().rev() {
+            serializer.emit_str(idx.0, &format!("{}", idx.1))?;
+        }
+        Ok(())
+    }
+}
+
+impl<'a> From<&'a ArgminKV> for ArgminSlogKV {
+    fn from(i: &'a ArgminKV) -> ArgminSlogKV {
+        ArgminSlogKV { kv: i.kv.clone() }
+    }
+}
+
+impl ArgminLog for ArgminSlogLogger {
+    /// Log general info
+    fn log_info(&self, msg: &str, kv: &ArgminKV) -> Result<(), Error> {
+        info!(self.logger, "{}", msg; ArgminSlogKV::from(kv));
+        Ok(())
+    }
+
+    /// This should be used to log iteration data only (because this is what may be saved in a CSV
+    /// file or a database)
+    fn log_iter(&self, kv: &ArgminKV) -> Result<(), Error> {
+        info!(self.logger, ""; ArgminSlogKV::from(kv));
+        Ok(())
+    }
+}
