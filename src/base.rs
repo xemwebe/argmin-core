@@ -151,6 +151,10 @@ impl<T: Clone> ArgminBase<T> {
         self
     }
 
+    pub fn total_time(&self) -> std::time::Duration {
+        self.total_time
+    }
+
     pub fn add_logger(&mut self, logger: Box<ArgminLog>) -> &mut Self {
         self.logger.push(logger);
         self

@@ -18,21 +18,34 @@ macro_rules! make_run {
 
             let total_time = std::time::Instant::now();
 
+            // do the inital logging
             self.init_log()?;
 
+            // Set up the Ctrl-C handler
             let running = Arc::new(AtomicBool::new(true));
             let r = running.clone();
-
             ctrlc::set_handler(move || {
                 r.store(false, Ordering::SeqCst);
             })?;
 
             while running.load(Ordering::SeqCst) {
+                // execute iteration
                 let start = std::time::Instant::now();
-
                 let mut data = self.next_iter()?;
-
                 let duration = start.elapsed();
+
+                // increment iteration number
+                self.base.increment_iter();
+
+                // Set new current parameter
+                self.base.set_cur_param(data.param())
+                         .set_cur_cost(data.cost());
+
+                // check if parameters are the best so far
+                if data.cost() < self.base.best_cost() {
+                    self.base.set_best_param(data.param())
+                             .set_best_cost(data.cost());
+                }
 
                 // only log if there is something to log
                 if let Some(ref mut log) = data.get_kv() {
@@ -40,6 +53,7 @@ macro_rules! make_run {
                     self.base.log_iter(&log)?;
                 }
 
+                // Write to file or something
                 self.base.write(&self.base.cur_param());
 
                 self.terminate();
@@ -50,18 +64,17 @@ macro_rules! make_run {
 
             // in case it stopped prematurely and `termination_reason` is still `NotTerminated`,
             // someone must have pulled the handbrake
-            if self.base.cur_iter() < self.base.max_iters() && !self.base.terminated()
-            {
+            if self.base.cur_iter() < self.base.max_iters() && !self.base.terminated() {
                 self.base.set_termination_reason(TerminationReason::Aborted);
             }
 
-            let duration = total_time.elapsed();
-            self.base.set_total_time(duration);
+            self.base.set_total_time(total_time.elapsed());
 
             let mut kv = ArgminKV::new();
             let kv = make_kv!(
                 "termination_reason" => self.base.termination_reason();
-                "total_time" => duration.as_secs() as f64 + duration.subsec_nanos() as f64 * 1e-9;
+                "total_time" => self.base.total_time().as_secs() as f64 +
+                                self.base.total_time().subsec_nanos() as f64 * 1e-9;
             );
 
             self.base.log_info(
@@ -72,8 +85,20 @@ macro_rules! make_run {
             Ok(self.base.result())
         }
 
-        fn get_result(&self) -> ArgminResult<Self::Parameters> {
+        fn result(&self) -> ArgminResult<Self::Parameters> {
             self.base.result()
+        }
+
+        fn set_max_iters(&mut self, iters: u64) {
+            self.base.set_max_iters(iters);
+        }
+
+        fn add_logger(&mut self, logger: Box<ArgminLog>) {
+            self.base.add_logger(logger);
+        }
+
+        fn add_writer(&mut self, writer: Box<ArgminWrite<Param = Self::Parameters>>) {
+            self.base.add_writer(writer);
         }
     }
 }

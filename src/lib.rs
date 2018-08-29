@@ -55,16 +55,16 @@ pub use termination::TerminationReason;
 /// Every solver must implement this trait
 pub trait ArgminSolver {
     /// Type of the parameter vector
-    type Parameters;
+    type Parameters: Clone;
 
     /// Computes one iteration of the algorithm.
-    fn next_iter(&mut self) -> Result<ArgminIterationData, Error>;
+    fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error>;
 
     /// Runs the algorithm. Created by the `make_run!` macro.
     fn run(&mut self) -> Result<ArgminResult<Self::Parameters>, Error>;
 
     /// Returns the result.
-    fn get_result(&self) -> ArgminResult<Self::Parameters>;
+    fn result(&self) -> ArgminResult<Self::Parameters>;
 
     /// Logs the info about the solver. Implemented by the `make_logging!` macro
     /// TODO: NEEDS TO GO AWAY -> CAN BE PART OF RUN
@@ -74,6 +74,14 @@ pub trait ArgminSolver {
     /// Implemented by the `make_terminate!` macro.
     /// TODO: NEEDS TO GO AWAY -> CAN BE PART OF RUN
     fn terminate(&mut self) -> TerminationReason;
+
+    /// Set max number of iterations.
+    /// I'd like to return `&mut Self` but then `ArgminSolver` cannot be turned into a trait object
+    /// anymore... :/
+    fn set_max_iters(&mut self, u64);
+
+    fn add_logger(&mut self, Box<ArgminLog>);
+    fn add_writer(&mut self, Box<ArgminWrite<Param = Self::Parameters>>);
 }
 
 /// This trait needs to be implemented by all loggers
@@ -97,13 +105,27 @@ pub trait ArgminWrite {
 }
 
 /// TODO: think about removing this.
-pub struct ArgminIterationData {
+pub struct ArgminIterationData<T: Clone> {
+    param: T,
+    cost: f64,
     kv: Option<ArgminKV>,
 }
 
-impl ArgminIterationData {
-    pub fn new() -> Self {
-        ArgminIterationData { kv: None }
+impl<T: Clone> ArgminIterationData<T> {
+    pub fn new(param: T, cost: f64) -> Self {
+        ArgminIterationData {
+            param: param,
+            cost: cost,
+            kv: None,
+        }
+    }
+
+    pub fn param(&self) -> T {
+        self.param.clone()
+    }
+
+    pub fn cost(&self) -> f64 {
+        self.cost
     }
 
     pub fn add_kv(&mut self, kv: ArgminKV) -> &mut Self {
