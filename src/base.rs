@@ -11,15 +11,18 @@ use std;
 use termination::TerminationReason;
 use ArgminKV;
 use ArgminLog;
+use ArgminOperator;
 use ArgminResult;
 use ArgminWrite;
 use Error;
 
-pub struct ArgminBase<T> {
+pub struct ArgminBase<T, U> {
+    operator: Box<ArgminOperator<Input = T, Output = U>>,
     cur_param: T,
     best_param: T,
     cur_cost: f64,
     best_cost: f64,
+    target_cost: f64,
     cur_iter: u64,
     max_iters: u64,
     cost_func_count: u64,
@@ -30,13 +33,15 @@ pub struct ArgminBase<T> {
     writer: ArgminWriter<T>,
 }
 
-impl<T: Clone> ArgminBase<T> {
-    pub fn new(param: T) -> Self {
+impl<T: Clone, U> ArgminBase<T, U> {
+    pub fn new(operator: Box<ArgminOperator<Input = T, Output = U>>, param: T) -> Self {
         ArgminBase {
+            operator: operator,
             cur_param: param.clone(),
             best_param: param,
-            cur_cost: std::f64::NAN,
-            best_cost: std::f64::NAN,
+            cur_cost: std::f64::INFINITY,
+            best_cost: std::f64::INFINITY,
+            target_cost: std::f64::NEG_INFINITY,
             cur_iter: 0,
             max_iters: std::u64::MAX,
             cost_func_count: 0,
@@ -46,6 +51,11 @@ impl<T: Clone> ArgminBase<T> {
             logger: ArgminLogger::new(),
             writer: ArgminWriter::new(),
         }
+    }
+
+    pub fn apply(&mut self, param: &T) -> Result<U, Error> {
+        self.increment_cost_func_count();
+        self.operator.apply(param)
     }
 
     pub fn set_cur_param(&mut self, param: T) -> &mut Self {
@@ -82,6 +92,15 @@ impl<T: Clone> ArgminBase<T> {
 
     pub fn best_cost(&self) -> f64 {
         self.best_cost
+    }
+
+    pub fn set_target_cost(&mut self, cost: f64) -> &mut Self {
+        self.target_cost = cost;
+        self
+    }
+
+    pub fn target_cost(&self) -> f64 {
+        self.target_cost
     }
 
     pub fn increment_iter(&mut self) -> &mut Self {

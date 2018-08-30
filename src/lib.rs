@@ -56,6 +56,10 @@ pub use termination::TerminationReason;
 pub trait ArgminSolver {
     /// Type of the parameter vector
     type Parameters: Clone;
+    type ApplyOutput: Clone;
+
+    /// apply cost function or operator to parameter
+    fn apply(&mut self, &Self::Parameters) -> Result<Self::ApplyOutput, Error>;
 
     /// Computes one iteration of the algorithm.
     fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error>;
@@ -79,6 +83,8 @@ pub trait ArgminSolver {
     /// I'd like to return `&mut Self` but then `ArgminSolver` cannot be turned into a trait object
     /// anymore... :/
     fn set_max_iters(&mut self, u64);
+
+    fn set_target_cost(&mut self, f64);
 
     fn add_logger(&mut self, Box<ArgminLog>);
     fn add_writer(&mut self, Box<ArgminWrite<Param = Self::Parameters>>);
@@ -136,4 +142,11 @@ impl<T: Clone> ArgminIterationData<T> {
     pub fn get_kv(&self) -> Option<ArgminKV> {
         self.kv.clone()
     }
+}
+
+pub trait ArgminOperator {
+    type Input;
+    type Output;
+
+    fn apply(&self, &Self::Input) -> Result<Self::Output, Error>;
 }

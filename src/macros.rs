@@ -85,12 +85,20 @@ macro_rules! make_run {
             Ok(self.base.result())
         }
 
+        fn apply(&mut self, param: &Self::Parameters) -> Result<Self::ApplyOutput, Error> {
+            self.base.apply(param)
+        }
+
         fn result(&self) -> ArgminResult<Self::Parameters> {
             self.base.result()
         }
 
         fn set_max_iters(&mut self, iters: u64) {
             self.base.set_max_iters(iters);
+        }
+
+        fn set_target_cost(&mut self, cost: f64) {
+            self.base.set_target_cost(cost);
         }
 
         fn add_logger(&mut self, logger: Box<ArgminLog>) {
