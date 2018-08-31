@@ -15,6 +15,7 @@ pub extern crate failure;
 pub extern crate failure_derive;
 #[macro_use]
 extern crate slog;
+extern crate rand;
 extern crate slog_async;
 extern crate slog_json;
 extern crate slog_term;
@@ -149,4 +150,19 @@ pub trait ArgminOperator {
     type Output;
 
     fn apply(&self, &Self::Input) -> Result<Self::Output, Error>;
+}
+
+pub trait ArgminGradient {
+    type Parameters;
+
+    fn gradient(&self, &Self::Parameters) -> Self::Parameters;
+}
+
+pub trait ArgminModification {
+    type Parameters;
+
+    // Modifies a parameter vector. Comes with a variable that indicates the "degree" of the
+    // modification and a random number generator.
+    // TODO: These two parameters  should probably be replaced with a generic struct...
+    fn modify(&self, &Self::Parameters, f64, &mut rand::ThreadRng) -> Self::Parameters;
 }
