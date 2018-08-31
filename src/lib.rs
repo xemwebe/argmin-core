@@ -54,22 +54,17 @@ pub use result::ArgminResult;
 pub use termination::TerminationReason;
 
 /// Every solver must implement this trait
-pub trait ArgminSolver {
-    /// Type of the parameter vector
-    type Parameters: Clone;
+pub trait ArgminSolver: ArgminNextIter {
     type ApplyOutput: Clone;
 
     /// apply cost function or operator to parameter
-    fn apply(&mut self, &Self::Parameters) -> Result<Self::ApplyOutput, Error>;
-
-    /// Computes one iteration of the algorithm.
-    fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error>;
+    fn apply(&mut self, &<Self as ArgminNextIter>::Parameters) -> Result<Self::ApplyOutput, Error>;
 
     /// Runs the algorithm. Created by the `make_run!` macro.
-    fn run(&mut self) -> Result<ArgminResult<Self::Parameters>, Error>;
+    fn run(&mut self) -> Result<ArgminResult<<Self as ArgminNextIter>::Parameters>, Error>;
 
     /// Returns the result.
-    fn result(&self) -> ArgminResult<Self::Parameters>;
+    fn result(&self) -> ArgminResult<<Self as ArgminNextIter>::Parameters>;
 
     /// Logs the info about the solver. Implemented by the `make_logging!` macro
     /// TODO: NEEDS TO GO AWAY -> CAN BE PART OF RUN
@@ -89,6 +84,13 @@ pub trait ArgminSolver {
 
     fn add_logger(&mut self, Box<ArgminLog>);
     fn add_writer(&mut self, Box<ArgminWrite<Param = Self::Parameters>>);
+}
+
+pub trait ArgminNextIter {
+    type Parameters: Clone;
+
+    /// Computes one iteration of the algorithm.
+    fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error>;
 }
 
 /// This trait needs to be implemented by all loggers
