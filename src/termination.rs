@@ -51,7 +51,7 @@ impl TerminationReason {
             TerminationReason::AcceptedStallIterExceeded => "Accepted stall iterations exceeded",
             TerminationReason::BestStallIterExceeded => "Best stall iterations exceeded",
             TerminationReason::LineSearchConditionMet => "Line search condition met",
-            TerminationReason::Aborted => "Optimized aborted",
+            TerminationReason::Aborted => "Optimization aborted",
         }
     }
 }
