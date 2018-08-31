@@ -17,7 +17,7 @@ use ArgminWrite;
 use Error;
 
 pub struct ArgminBase<T, U, V: ArgminOperator<Input = T, Output = U>> {
-    pub operator: Box<V>,
+    operator: Box<V>,
     cur_param: T,
     best_param: T,
     cur_cost: f64,
@@ -51,6 +51,10 @@ impl<T: Clone, U, V: ArgminOperator<Input = T, Output = U>> ArgminBase<T, U, V> 
             logger: ArgminLogger::new(),
             writer: ArgminWriter::new(),
         }
+    }
+
+    pub fn operator(&self) -> &Box<V> {
+        &self.operator
     }
 
     pub fn apply(&mut self, param: &T) -> Result<U, Error> {
