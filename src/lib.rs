@@ -55,13 +55,11 @@ pub use termination::TerminationReason;
 
 /// Every solver must implement this trait
 pub trait ArgminSolver: ArgminNextIter {
-    type OperatorOutput: Clone;
-
     /// apply cost function or operator to parameter
     fn apply(
         &mut self,
         &<Self as ArgminNextIter>::Parameters,
-    ) -> Result<Self::OperatorOutput, Error>;
+    ) -> Result<<Self as ArgminNextIter>::OperatorOutput, Error>;
 
     /// Runs the algorithm. Created by the `make_run!` macro.
     fn run(&mut self) -> Result<ArgminResult<<Self as ArgminNextIter>::Parameters>, Error>;
@@ -86,6 +84,7 @@ pub trait ArgminSolver: ArgminNextIter {
 
 pub trait ArgminNextIter {
     type Parameters: Clone;
+    type OperatorOutput;
 
     /// Computes one iteration of the algorithm.
     fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error>;
