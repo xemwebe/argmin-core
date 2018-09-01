@@ -62,6 +62,11 @@ impl<T: Clone, U, V: ArgminOperator<Parameters = T, OperatorOutput = U>> ArgminB
         self.operator.apply(param)
     }
 
+    pub fn gradient(&mut self, param: &T) -> Result<T, Error> {
+        self.increment_grad_func_count();
+        self.operator.gradient(param)
+    }
+
     pub fn set_cur_param(&mut self, param: T) -> &mut Self {
         self.cur_param = param;
         self
