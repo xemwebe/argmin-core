@@ -150,7 +150,7 @@ pub trait ArgminOperator {
 
     fn apply(&self, &Self::Parameters) -> Result<Self::OperatorOutput, Error>;
 
-    fn graddient(&self, &Self::Parameters) -> Self::Parameters {
+    fn gradient(&self, &Self::Parameters) -> Self::Parameters {
         unimplemented!()
     }
 
