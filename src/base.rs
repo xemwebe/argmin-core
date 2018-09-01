@@ -16,8 +16,8 @@ use ArgminResult;
 use ArgminWrite;
 use Error;
 
-pub struct ArgminBase<T, U, V: ArgminOperator<Parameters = T, OperatorOutput = U>> {
-    operator: Box<V>,
+pub struct ArgminBase<T, U> {
+    operator: Box<ArgminOperator<Parameters = T, OperatorOutput = U>>,
     cur_param: T,
     best_param: T,
     cur_cost: f64,
@@ -33,8 +33,11 @@ pub struct ArgminBase<T, U, V: ArgminOperator<Parameters = T, OperatorOutput = U
     writer: ArgminWriter<T>,
 }
 
-impl<T: Clone, U, V: ArgminOperator<Parameters = T, OperatorOutput = U>> ArgminBase<T, U, V> {
-    pub fn new(operator: Box<V>, param: T) -> Self {
+impl<T: Clone, U> ArgminBase<T, U> {
+    pub fn new(
+        operator: Box<ArgminOperator<Parameters = T, OperatorOutput = U>>,
+        param: T,
+    ) -> Self {
         ArgminBase {
             operator: operator,
             cur_param: param.clone(),
@@ -53,7 +56,7 @@ impl<T: Clone, U, V: ArgminOperator<Parameters = T, OperatorOutput = U>> ArgminB
         }
     }
 
-    pub fn operator(&self) -> &Box<V> {
+    pub fn operator(&self) -> &Box<ArgminOperator<Parameters = T, OperatorOutput = U>> {
         &self.operator
     }
 
