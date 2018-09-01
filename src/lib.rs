@@ -69,11 +69,10 @@ pub trait ArgminSolver: ArgminNextIter {
 
     /// modify parameter vector
     fn modify(
-        &self,
-        &Self::Parameters,
+        &mut self,
+        &<Self as ArgminNextIter>::Parameters,
         f64,
-        &mut rand::ThreadRng,
-    ) -> Result<Self::Parameters, Error>;
+    ) -> Result<<Self as ArgminNextIter>::Parameters, Error>;
 
     /// Runs the algorithm. Created by the `make_run!` macro.
     fn run(&mut self) -> Result<ArgminResult<<Self as ArgminNextIter>::Parameters>, Error>;
@@ -171,12 +170,7 @@ pub trait ArgminOperator {
     // Modifies a parameter vector. Comes with a variable that indicates the "degree" of the
     // modification and a random number generator.
     // TODO: These two parameters  should probably be replaced with a generic struct...
-    fn modify(
-        &self,
-        &Self::Parameters,
-        f64,
-        &mut rand::ThreadRng,
-    ) -> Result<Self::Parameters, Error> {
+    fn modify(&mut self, &Self::Parameters, f64) -> Result<Self::Parameters, Error> {
         unimplemented!()
     }
 }
