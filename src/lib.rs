@@ -145,23 +145,19 @@ impl<T: Clone> ArgminIterationData<T> {
 }
 
 pub trait ArgminOperator {
-    type Input;
-    type Output;
-
-    fn apply(&self, &Self::Input) -> Result<Self::Output, Error>;
-}
-
-pub trait ArgminGradient {
     type Parameters;
+    type OperatorOutput;
 
-    fn gradient(&self, &Self::Parameters) -> Self::Parameters;
-}
+    fn apply(&self, &Self::Parameters) -> Result<Self::OperatorOutput, Error>;
 
-pub trait ArgminModification {
-    type Parameters;
+    fn graddient(&self, &Self::Parameters) -> Self::Parameters {
+        unimplemented!()
+    }
 
     // Modifies a parameter vector. Comes with a variable that indicates the "degree" of the
     // modification and a random number generator.
     // TODO: These two parameters  should probably be replaced with a generic struct...
-    fn modify(&self, &Self::Parameters, f64, &mut rand::ThreadRng) -> Self::Parameters;
+    fn modify(&self, &Self::Parameters, f64, &mut rand::ThreadRng) -> Self::Parameters {
+        unimplemented!()
+    }
 }
