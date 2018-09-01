@@ -67,6 +67,14 @@ pub trait ArgminSolver: ArgminNextIter {
         &<Self as ArgminNextIter>::Parameters,
     ) -> Result<<Self as ArgminNextIter>::Parameters, Error>;
 
+    /// modify parameter vector
+    fn modify(
+        &self,
+        &Self::Parameters,
+        f64,
+        &mut rand::ThreadRng,
+    ) -> Result<Self::Parameters, Error>;
+
     /// Runs the algorithm. Created by the `make_run!` macro.
     fn run(&mut self) -> Result<ArgminResult<<Self as ArgminNextIter>::Parameters>, Error>;
 

@@ -7,6 +7,7 @@
 
 use logging::ArgminLogger;
 use output::ArgminWriter;
+use rand::ThreadRng;
 use std;
 use termination::TerminationReason;
 use ArgminKV;
@@ -65,6 +66,10 @@ impl<T: Clone, U, V: ArgminOperator<Parameters = T, OperatorOutput = U>> ArgminB
     pub fn gradient(&mut self, param: &T) -> Result<T, Error> {
         self.increment_grad_func_count();
         self.operator.gradient(param)
+    }
+
+    pub fn modify(&self, param: &T, factor: f64, rng: &mut ThreadRng) -> Result<T, Error> {
+        self.operator.modify(&param, factor, rng)
     }
 
     pub fn set_cur_param(&mut self, param: T) -> &mut Self {
