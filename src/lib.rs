@@ -164,13 +164,16 @@ pub trait ArgminOperator {
     fn apply(&self, &Self::Parameters) -> Result<Self::OperatorOutput, Error>;
 
     fn gradient(&self, &Self::Parameters) -> Result<Self::Parameters, Error> {
-        unimplemented!()
+        Err(ArgminError::NotImplemented {
+            text: "Method `gradient` of ArgminOperator trait not implemented!".to_string(),
+        }.into())
     }
 
     // Modifies a parameter vector. Comes with a variable that indicates the "degree" of the
-    // modification and a random number generator.
-    // TODO: These two parameters  should probably be replaced with a generic struct...
+    // modification.
     fn modify(&mut self, &Self::Parameters, f64) -> Result<Self::Parameters, Error> {
-        unimplemented!()
+        Err(ArgminError::NotImplemented {
+            text: "Method `modify` of ArgminOperator trait not implemented!".to_string(),
+        }.into())
     }
 }

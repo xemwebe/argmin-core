@@ -12,4 +12,8 @@ pub enum ArgminError {
     /// Indicates and invalid parameter
     #[fail(display = "Invalid parameter: {}", parameter)]
     InvalidParameter { parameter: String },
+
+    /// Indicates that a function is not implemented
+    #[fail(display = "Not implemented: {}", text)]
+    NotImplemented { text: String },
 }
