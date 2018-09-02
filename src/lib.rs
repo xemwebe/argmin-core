@@ -74,8 +74,11 @@ pub trait ArgminSolver: ArgminNextIter {
         f64,
     ) -> Result<<Self as ArgminNextIter>::Parameters, Error>;
 
-    /// Runs the algorithm. Created by the `make_run!` macro.
+    /// Runs the algorithm.
     fn run(&mut self) -> Result<ArgminResult<<Self as ArgminNextIter>::Parameters>, Error>;
+
+    /// RUN FAST!
+    fn run_fast(&mut self) -> Result<ArgminResult<<Self as ArgminNextIter>::Parameters>, Error>;
 
     /// Returns the result.
     fn result(&self) -> ArgminResult<<Self as ArgminNextIter>::Parameters>;
@@ -179,6 +182,7 @@ pub trait ArgminOperator {
         }.into())
     }
 
+    /// allows to clone the trait object. Let's look for a better way to do this...
     fn box_clone(
         &self,
     ) -> Box<ArgminOperator<Parameters = Self::Parameters, OperatorOutput = Self::OperatorOutput>>;

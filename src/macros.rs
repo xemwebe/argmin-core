@@ -8,6 +8,15 @@
 //! # Macros
 
 #[macro_export]
+macro_rules! box_clone {
+    () => {
+        fn box_clone(&self) -> Box<ArgminOperator<Parameters = Self::Parameters, OperatorOutput = Self::OperatorOutput>> {
+            Box::new((*self).clone())
+        }
+    };
+}
+
+#[macro_export]
 macro_rules! make_kv {
     ($($k:expr =>  $v:expr;)*) => {
         ArgminKV { kv: vec![ $(($k, format!("{:?}", $v))),* ] }
