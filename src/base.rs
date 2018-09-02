@@ -71,9 +71,9 @@ where
 
     pub fn kv_for_iter(&self) -> ArgminKV {
         make_kv!(
-            "cur_cost" => self.cur_cost;
+            "iter" => self.cur_iter;
             "best_cost" => self.best_cost;
-            "cur_iter" => self.cur_iter;
+            "cur_cost" => self.cur_cost;
             "cost_func_count" => self.cost_func_count;
             "grad_func_count" => self.grad_func_count;
         )
