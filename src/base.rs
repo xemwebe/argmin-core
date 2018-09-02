@@ -61,6 +61,24 @@ where
         }
     }
 
+    pub fn kv_for_logs(&self) -> ArgminKV {
+        make_kv!(
+            "target_cost" => self.target_cost;
+            "max_iters" => self.max_iters;
+            "termination_reason" => self.termination_reason;
+        )
+    }
+
+    pub fn kv_for_iter(&self) -> ArgminKV {
+        make_kv!(
+            "cur_cost" => self.cur_cost;
+            "best_cost" => self.best_cost;
+            "cur_iter" => self.cur_iter;
+            "cost_func_count" => self.cost_func_count;
+            "grad_func_count" => self.grad_func_count;
+        )
+    }
+
     pub fn reset(&mut self) {
         self.cur_iter = 0;
         self.cur_cost = std::f64::INFINITY;
