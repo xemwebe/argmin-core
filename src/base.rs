@@ -23,6 +23,7 @@ pub struct ArgminBase<T, U> {
     cur_cost: f64,
     best_cost: f64,
     target_cost: f64,
+    cur_grad: T,
     cur_iter: u64,
     max_iters: u64,
     cost_func_count: u64,
@@ -33,7 +34,10 @@ pub struct ArgminBase<T, U> {
     writer: ArgminWriter<T>,
 }
 
-impl<T: Clone, U> ArgminBase<T, U> {
+impl<T, U> ArgminBase<T, U>
+where
+    T: Clone + std::default::Default,
+{
     pub fn new(
         operator: Box<ArgminOperator<Parameters = T, OperatorOutput = U>>,
         param: T,
@@ -45,6 +49,7 @@ impl<T: Clone, U> ArgminBase<T, U> {
             cur_cost: std::f64::INFINITY,
             best_cost: std::f64::INFINITY,
             target_cost: std::f64::NEG_INFINITY,
+            cur_grad: T::default(),
             cur_iter: 0,
             max_iters: std::u64::MAX,
             cost_func_count: 0,
@@ -54,6 +59,16 @@ impl<T: Clone, U> ArgminBase<T, U> {
             logger: ArgminLogger::new(),
             writer: ArgminWriter::new(),
         }
+    }
+
+    pub fn reset(&mut self) {
+        self.cur_iter = 0;
+        self.cur_cost = std::f64::INFINITY;
+        self.best_cost = std::f64::INFINITY;
+        self.cost_func_count = 0;
+        self.grad_func_count = 0;
+        self.termination_reason = TerminationReason::NotTerminated;
+        self.total_time = std::time::Duration::new(0, 0);
     }
 
     pub fn operator(&self) -> &Box<ArgminOperator<Parameters = T, OperatorOutput = U>> {
@@ -108,6 +123,15 @@ impl<T: Clone, U> ArgminBase<T, U> {
 
     pub fn best_cost(&self) -> f64 {
         self.best_cost
+    }
+
+    pub fn set_cur_grad(&mut self, grad: T) -> &mut Self {
+        self.cur_grad = grad;
+        self
+    }
+
+    pub fn cur_grad(&self) -> T {
+        self.cur_grad.clone()
     }
 
     pub fn set_target_cost(&mut self, cost: f64) -> &mut Self {
