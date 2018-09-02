@@ -29,6 +29,14 @@ pub trait ArgminScaledSub<T, U> {
     fn scaled_sub(&self, U, T) -> Self;
 }
 
+pub trait ArgminScale<U> {
+    fn scale(&self, U) -> Self;
+}
+
+pub trait ArgminNorm<U> {
+    fn norm(&self) -> U;
+}
+
 macro_rules! make_math {
     ($t:ty, $u:ty, $v:ty) => {
         impl<'a> ArgminDot<$t, $u> for $v {
@@ -69,6 +77,26 @@ macro_rules! make_math {
     };
 }
 
+macro_rules! make_math2 {
+    ($u:ty, $v:ty) => {
+        impl<'a> ArgminScale<$u> for $v {
+            fn scale(&self, scale: $u) -> $v {
+                self.iter().map(|a| scale * a).collect()
+            }
+        }
+    };
+}
+
+macro_rules! make_math3 {
+    ($u:ty, $v:ty) => {
+        impl<'a> ArgminNorm<$u> for $v {
+            fn norm(&self) -> $u {
+                self.iter().map(|a| a.powi(2)).sum::<$u>().sqrt()
+            }
+        }
+    };
+}
+
 // Not sure if all of this makes any sense...
 make_math!(Vec<f32>, f32, Vec<f32>);
 make_math!(Vec<f64>, f64, Vec<f64>);
@@ -94,3 +122,19 @@ make_math!(&'a Vec<u32>, u32, Vec<u32>);
 make_math!(&'a Vec<u64>, u64, Vec<u64>);
 make_math!(&'a Vec<isize>, isize, Vec<isize>);
 make_math!(&'a Vec<usize>, usize, Vec<usize>);
+
+make_math2!(f32, Vec<f32>);
+make_math2!(f64, Vec<f64>);
+make_math2!(i8, Vec<i8>);
+make_math2!(i16, Vec<i16>);
+make_math2!(i32, Vec<i32>);
+make_math2!(i64, Vec<i64>);
+make_math2!(u8, Vec<u8>);
+make_math2!(u16, Vec<u16>);
+make_math2!(u32, Vec<u32>);
+make_math2!(u64, Vec<u64>);
+make_math2!(isize, Vec<isize>);
+make_math2!(usize, Vec<usize>);
+
+make_math3!(f32, Vec<f32>);
+make_math3!(f64, Vec<f64>);
