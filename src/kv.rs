@@ -23,4 +23,11 @@ impl ArgminKV {
         self.kv.push((key, format!("{}", val)));
         self
     }
+
+    pub fn merge(&self, other: &ArgminKV) -> ArgminKV {
+        // there must be a way which requires less cloning
+        let mut kv = self.kv.clone();
+        kv.append(&mut other.kv.clone());
+        ArgminKV { kv }
+    }
 }
