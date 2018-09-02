@@ -93,6 +93,8 @@ pub trait ArgminSolver: ArgminNextIter {
 
     fn add_logger(&mut self, Box<ArgminLog>);
     fn add_writer(&mut self, Box<ArgminWrite<Param = Self::Parameters>>);
+
+    fn reset(&mut self);
 }
 
 pub trait ArgminNextIter {
@@ -175,5 +177,15 @@ pub trait ArgminOperator {
         Err(ArgminError::NotImplemented {
             text: "Method `modify` of ArgminOperator trait not implemented!".to_string(),
         }.into())
+    }
+
+    fn box_clone(
+        &self,
+    ) -> Box<ArgminOperator<Parameters = Self::Parameters, OperatorOutput = Self::OperatorOutput>>;
+}
+
+impl<T, U> Clone for Box<ArgminOperator<Parameters = T, OperatorOutput = U>> {
+    fn clone(&self) -> Box<ArgminOperator<Parameters = T, OperatorOutput = U>> {
+        self.box_clone()
     }
 }
