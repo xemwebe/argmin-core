@@ -19,8 +19,10 @@ extern crate rand;
 extern crate slog_async;
 extern crate slog_json;
 extern crate slog_term;
-// pub use failure::format_err;
 
+/// Macros
+#[macro_use]
+pub mod macros;
 /// base struct
 mod base;
 /// Error handling
@@ -29,8 +31,6 @@ mod errors;
 mod kv;
 /// Logging
 mod logging;
-/// Macros
-pub mod macros;
 /// Math utilities
 mod math;
 /// Output
