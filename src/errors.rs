@@ -20,4 +20,8 @@ pub enum ArgminError {
     /// Indicates that a function is not implemented
     #[fail(display = "Not initialized: {}", text)]
     NotInitialized { text: String },
+
+    /// Indicates that a function is not implemented
+    #[fail(display = "Condition violated: {}", text)]
+    ConditionViolated { text: String },
 }
