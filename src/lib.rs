@@ -106,6 +106,11 @@ pub trait ArgminNextIter {
 
     /// Computes one iteration of the algorithm.
     fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error>;
+
+    /// Initializes the algorithm
+    fn init(&mut self) -> Result<(), Error> {
+        Ok(())
+    }
 }
 
 /// This trait needs to be implemented by all loggers
