@@ -198,3 +198,15 @@ impl<T, U> Clone for Box<ArgminOperator<Parameters = T, OperatorOutput = U>> {
         self.box_clone()
     }
 }
+
+pub trait ArgminLineSearch {
+    type Parameters;
+
+    fn set_initial_parameter(&mut self, Self::Parameters);
+    fn set_initial_gradient(&mut self, Self::Parameters);
+    fn set_search_direction(&mut self, Self::Parameters);
+    fn set_initial_cost(&mut self, f64);
+    fn set_initial_alpha(&mut self, f64) -> Result<(), Error>;
+    fn calc_initial_cost(&mut self) -> Result<(), Error>;
+    fn calc_initial_gradient(&mut self) -> Result<(), Error>;
+}
