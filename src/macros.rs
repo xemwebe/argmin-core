@@ -7,6 +7,8 @@
 
 //! # Macros
 
+/// Implements the `box_clone` method of the `ArgminOperator` trait in order to be able to clone a
+/// `Box<ArgminOperator>`.
 #[macro_export]
 macro_rules! box_clone {
     () => {
@@ -16,6 +18,7 @@ macro_rules! box_clone {
     };
 }
 
+/// Creates an `ArgminKV` at compile time in order to avoid pushing to the `kv` vector.
 #[macro_export]
 macro_rules! make_kv {
     ($($k:expr =>  $v:expr;)*) => {
@@ -23,6 +26,8 @@ macro_rules! make_kv {
     };
 }
 
+/// Release an `T` from an `Option<T>` if it is not `None`. If it is `None`, return an
+/// `ArgminError` with a message that needs to be provided.
 #[macro_export]
 macro_rules! check_param {
     ($param:expr, $msg:expr, $error:ident) => {
