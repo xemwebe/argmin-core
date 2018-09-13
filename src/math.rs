@@ -5,38 +5,59 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! Math
+//! # Math
 //!
-//! TODO: Documentation.
+//! Mathematics related traits which some solvers require. This provides an abstraction over
+//! different types of parameter vectors. The idea is, that it does not matter whether you would
+//! like to use simple `Vec`s, `ndarray`, `nalgebra` or custom defined types: As long as the traits
+//! required by the solver are implemented, you should be fine. In this module several of these
+//! traits are defined and implemented. These will be extended as needed. They are also already
+//! implemented for basic `Vec`s, and will in the future also be implemented for types defined by
+//! `ndarray` and `nalgebra`.
 
+/// Dot/scalar product of `T` and `self`
 pub trait ArgminDot<T, U> {
+    /// Dot/scalar product of `T` and `self`
     fn dot(&self, T) -> U;
 }
 
+/// Add a `T` to `self`
 pub trait ArgminAdd<T> {
+    /// Add a `T` to `self`
     fn sub(&self, T) -> Self;
 }
 
+/// Subtract a `T` from `self`
 pub trait ArgminSub<T> {
+    /// Subtract a `T` from `self`
     fn sub(&self, T) -> Self;
 }
 
+/// Add a `T` scaled by an `U` to `self`
 pub trait ArgminScaledAdd<T, U> {
+    /// Add a `T` scaled by an `U` to `self`
     fn scaled_add(&self, U, T) -> Self;
 }
 
+/// Subtract a `T` scaled by an `U` from `self`
 pub trait ArgminScaledSub<T, U> {
+    /// Subtract a `T` scaled by an `U` from `self`
     fn scaled_sub(&self, U, T) -> Self;
 }
 
+/// Scale `self` by a `U`
 pub trait ArgminScale<U> {
+    /// Scale `self` by a `U`
     fn scale(&self, U) -> Self;
 }
 
+/// Compute the l2-norm (`U`) of `self`
 pub trait ArgminNorm<U> {
+    /// Compute the l2-norm (`U`) of `self`
     fn norm(&self) -> U;
 }
 
+/// Implement a subset of the mathematics traits
 macro_rules! make_math {
     ($t:ty, $u:ty, $v:ty) => {
         impl<'a> ArgminDot<$t, $u> for $v {
@@ -77,6 +98,7 @@ macro_rules! make_math {
     };
 }
 
+/// Implement another subset of the mathematics traits
 macro_rules! make_math2 {
     ($u:ty, $v:ty) => {
         impl<'a> ArgminScale<$u> for $v {
@@ -87,6 +109,7 @@ macro_rules! make_math2 {
     };
 }
 
+/// Implement yet another subset of the mathematics traits
 macro_rules! make_math3 {
     ($u:ty, $v:ty) => {
         impl<'a> ArgminNorm<$u> for $v {
