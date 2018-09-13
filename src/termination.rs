@@ -8,6 +8,11 @@
 //! # Termination
 //!
 //! Defines reasons for termination.
+//!
+//! TODO:
+//!   * Maybe it is better to define a trait (with `terminated` and `text` methods), because it
+//!     would allow implementers of solvers to define their own `TerminationReason`s. However, this
+//!     would require a lot of work.
 
 /// Indicates why the optimization algorithm stopped
 #[derive(Debug, Clone, PartialEq)]
