@@ -6,26 +6,34 @@
 // copied, modified, or distributed except according to those terms.
 
 //! # Logging
+//!
+//! Provides logging functionality for solvers.
 
 pub mod slog_logger;
 
 use {ArgminKV, ArgminLog, Error};
 
+/// Container for `ArgminLog`gers
 pub struct ArgminLogger {
+    /// Vector of boxed types which implement `ArgminLog`
     logger: Vec<Box<ArgminLog>>,
 }
 
 impl ArgminLogger {
+    /// Constructor
     pub fn new() -> Self {
         ArgminLogger { logger: vec![] }
     }
 
+    /// Push another `ArgminLog` to the `logger` field
     pub fn push(&mut self, logger: Box<ArgminLog>) -> &mut Self {
         self.logger.push(logger);
         self
     }
 }
 
+/// By implementing `ArgminLog` for `ArgminLogger` we basically allow a set of `ArgminLog`gers to
+/// be used just like a single `ArgminLog`ger.
 impl ArgminLog for ArgminLogger {
     /// Log general info
     fn log_info(&self, msg: &str, kv: &ArgminKV) -> Result<(), Error> {
