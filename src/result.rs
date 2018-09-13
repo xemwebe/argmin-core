@@ -9,6 +9,9 @@
 //!
 //! Return type of the solvers. Includes the final parameter vector, the final cost, the number of
 //! iterations, whether it terminated and the reason of termination.
+//!
+//! TODO:
+//!   * Maybe it is more appropriate to return the `base` struct?
 
 use termination::TerminationReason;
 
