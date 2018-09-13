@@ -5,7 +5,14 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! # Logging
+//! # Write parameter vectors somewhere
+//!
+//! This is very basic and needs much more work. The idea is that parameter vectors are written to
+//! disk (or anywhere, essentially) on a regular basis, or on certain events (new best parameter
+//! vector found for instance).
+//! Several standard implementations should be provided (like writing an image as a PNG) as well as
+//! the possibility to implement such a writer for custom types. This will require a bit of
+//! thinking.
 
 pub mod file;
 
