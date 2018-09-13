@@ -10,6 +10,9 @@
 //! This crate contains the core functionality of argmin. If you just want to run an optimization
 //! method, this is *not* what you are looking for. However, if you want to implement your own
 //! solver based on the argmin architecture, you should find all necessary tools here.
+//!
+//! TODOs:
+//!   * Provide an example of how to implement a solver
 
 pub extern crate ctrlc;
 pub extern crate failure;
