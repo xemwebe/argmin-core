@@ -1,8 +1,12 @@
-<!-- [![Build Status](https://travis-ci.org/stefan-k/argmin-rs.svg?branch=master)](https://travis-ci.org/stefan-k/argmin-rs) -->
+[![Build Status](https://travis-ci.org/stefan-k/argmin-rs.svg?branch=master)](https://travis-ci.org/stefan-k/argmin-rs)
 
-# argmin-core
+# argmin-core: Argmin Optimizaton toolbox core
 
-<!-- [Documentation](https://stefan-k.github.io/argmin-rs/argmin/)  -->
+This crate contains the core functionality of argmin.
+If you just want to run an optimization method, this is *not* what you are looking for.
+However, if you want to implement your own solver based on the argmin architecture, you should find all necessary tools here.
+
+[Documentation](https://argmin-rs.github.io/argmin-rs/argmin-core/) 
 
 ## License
 
