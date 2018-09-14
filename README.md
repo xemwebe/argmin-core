@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/stefan-k/argmin-rs.svg?branch=master)](https://travis-ci.org/stefan-k/argmin-rs)
+[![Build Status](https://travis-ci.org/argmin-rs/argmin-core.svg?branch=master)](https://travis-ci.org/argmin-rs/argmin-core)
 
 # argmin-core: argmin optimizaton toolbox core
 
