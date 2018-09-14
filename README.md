@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/stefan-k/argmin-rs.svg?branch=master)](https://travis-ci.org/stefan-k/argmin-rs)
 
-# argmin-core: Argmin Optimizaton toolbox core
+# argmin-core: argmin optimizaton toolbox core
 
 This crate contains the core functionality of argmin.
 If you just want to run an optimization method, this is *not* what you are looking for.
