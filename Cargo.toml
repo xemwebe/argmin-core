@@ -1,12 +1,12 @@
 [package]
 name = "argmin_core"
-version = "0.0.0"
+version = "0.1.0"
 authors = ["Stefan Kroboth <stefan.kroboth@gmail.com>"]
 license = "MIT OR Apache-2.0"
 description = "WIP optimization toolbox for Rust"
-documentation = "https://stefan-k.github.io/argmin-rs/argmin-core/"
-homepage = "https://github.com/stefan-k/argmin-core"
-repository = "https://github.com/stefan-k/argmin-core"
+documentation = "https://argmin-rs.github.io/argmin-core/argmin_core/"
+homepage = "https://github.com/argmin-rs/argmin-core"
+repository = "https://github.com/argmin-rs/argmin-core"
 readme = "README.md"
 keywords = ["optimization", "math", "science", "HPC"]
 categories = ["science"]
@@ -17,11 +17,11 @@ exclude = [
 ]
 
 [dependencies]
-failure = "*"
-failure_derive = "*"
-ctrlc = "*"
-slog = "*"
-slog-term = "*"
-slog-async = "*"
-slog-json = "*"
-rand = "*"
+failure = "0.1.2"
+failure_derive = "0.1.2"
+ctrlc = "3.1.1"
+slog = "2.4.0"
+slog-term = "2.2.4"
+slog-async = "2.3.0"
+slog-json = "2.2.0"
+rand = "0.5.5"
