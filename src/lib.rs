@@ -220,7 +220,8 @@ pub trait ArgminOperator {
     fn gradient(&self, &Self::Parameters) -> Result<Self::Parameters, Error> {
         Err(ArgminError::NotImplemented {
             text: "Method `gradient` of ArgminOperator trait not implemented!".to_string(),
-        }.into())
+        }
+        .into())
     }
 
     /// Modifies a parameter vector. Comes with a variable that indicates the "degree" of the
@@ -228,13 +229,59 @@ pub trait ArgminOperator {
     fn modify(&mut self, &Self::Parameters, f64) -> Result<Self::Parameters, Error> {
         Err(ArgminError::NotImplemented {
             text: "Method `modify` of ArgminOperator trait not implemented!".to_string(),
-        }.into())
+        }
+        .into())
     }
 
     /// Allows to clone the boxed trait object.
     fn box_clone(
         &self,
     ) -> Box<ArgminOperator<Parameters = Self::Parameters, OperatorOutput = Self::OperatorOutput>>;
+}
+
+#[derive(Clone)]
+pub struct NoOperator<T: Clone, U: Clone> {
+    param: std::marker::PhantomData<*const T>,
+    output: std::marker::PhantomData<*const U>,
+}
+
+impl<T: Clone, U: Clone> NoOperator<T, U> {
+    pub fn new() -> Self {
+        NoOperator {
+            param: std::marker::PhantomData,
+            output: std::marker::PhantomData,
+        }
+    }
+}
+
+impl<T, U> ArgminOperator for NoOperator<T, U>
+where
+    T: Clone + std::default::Default,
+    U: Clone + std::default::Default,
+{
+    type Parameters = T;
+    type OperatorOutput = U;
+
+    fn apply(&self, _p: &Self::Parameters) -> Result<Self::OperatorOutput, Error> {
+        Ok(Self::OperatorOutput::default())
+    }
+
+    fn gradient(&self, _p: &Self::Parameters) -> Result<Self::Parameters, Error> {
+        Ok(Self::Parameters::default())
+    }
+
+    fn modify(&mut self, _p: &Self::Parameters, _t: f64) -> Result<Self::Parameters, Error> {
+        Ok(Self::Parameters::default())
+    }
+
+    fn box_clone(
+        &self,
+    ) -> Box<ArgminOperator<Parameters = Self::Parameters, OperatorOutput = Self::OperatorOutput>>
+    {
+        unimplemented!()
+        // let tmp: NoOperator<T, U> = NoOperator::new();
+        // Box::new(tmp)
+    }
 }
 
 impl<T, U> Clone for Box<ArgminOperator<Parameters = T, OperatorOutput = U>> {
