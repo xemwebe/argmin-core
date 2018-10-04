@@ -21,6 +21,19 @@ pub trait ArgminDot<T, U> {
     fn dot(&self, T) -> U;
 }
 
+/// Dot/scalar product of `T` and `self` weighted by W (p^TWv)
+pub trait ArgminWeightedDot<T, U, V> {
+    /// Dot/scalar product of `T` and `self`
+    fn weighted_dot(&self, V, T) -> U;
+}
+
+/// TEMPORARY: only for testing!
+impl ArgminWeightedDot<Vec<f64>, f64, Vec<Vec<f64>>> for Vec<f64> {
+    fn weighted_dot(&self, w: Vec<Vec<f64>>, v: Vec<f64>) -> f64 {
+        self.dot(w.iter().map(|x| v.dot(x)).collect::<Vec<f64>>())
+    }
+}
+
 /// Add a `T` to `self`
 pub trait ArgminAdd<T> {
     /// Add a `T` to `self`
