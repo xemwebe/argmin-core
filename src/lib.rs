@@ -14,8 +14,6 @@
 //! TODOs:
 //!   * Provide an example of how to implement a solver
 
-#![feature(associated_type_defaults)]
-
 pub extern crate ctrlc;
 pub extern crate failure;
 #[macro_use]
@@ -223,7 +221,7 @@ pub trait ArgminOperator {
     /// Output of the operator. Most solvers expect `f64`.
     type OperatorOutput;
     /// Type of Hessian
-    type Hessian = ();
+    type Hessian;
 
     /// Applies the operator/cost function to parameters
     fn apply(&self, &Self::Parameters) -> Result<Self::OperatorOutput, Error>;
@@ -365,4 +363,20 @@ pub trait ArgminLineSearch: ArgminSolver {
     /// calculate the initial gradient using an operator as opposed to setting it manually (see
     /// `set_initial_gradient`)
     fn calc_initial_gradient(&mut self) -> Result<(), Error>;
+}
+
+/// Defines a common interface to methods which calculate approximate steps for trust recion
+/// methods.. Requires that `ArgminSolver` is implemented as well.
+pub trait ArgminTrustRegion: ArgminSolver {
+    // /// Set the initial parameter (starting point)
+    // fn set_initial_parameter(&mut self, <Self as ArgminNextIter>::Parameters);
+
+    /// Set the initial step length
+    fn set_radius(&mut self, f64);
+
+    /// Set the gradient at the starting point
+    fn set_grad(&mut self, <Self as ArgminNextIter>::Parameters);
+
+    /// Set the gradient at the starting point
+    fn set_hessian(&mut self, <Self as ArgminNextIter>::Hessian);
 }
