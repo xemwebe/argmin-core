@@ -14,6 +14,8 @@
 //! TODOs:
 //!   * Provide an example of how to implement a solver
 
+#![feature(associated_type_defaults)]
+
 pub extern crate ctrlc;
 pub extern crate failure;
 #[macro_use]
@@ -73,6 +75,12 @@ pub trait ArgminSolver: ArgminNextIter {
         &<Self as ArgminNextIter>::Parameters,
     ) -> Result<<Self as ArgminNextIter>::Parameters, Error>;
 
+    /// compute the hessian for a parameter vector
+    fn hessian(
+        &mut self,
+        &<Self as ArgminNextIter>::Parameters,
+    ) -> Result<<Self as ArgminNextIter>::Hessian, Error>;
+
     /// modify the parameter vector
     fn modify(
         &mut self,
@@ -119,6 +127,8 @@ pub trait ArgminNextIter {
     type Parameters: Clone;
     /// Output of the operator
     type OperatorOutput;
+    /// Hessian
+    type Hessian;
 
     /// Computes one iteration of the algorithm.
     fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error>;
@@ -212,6 +222,8 @@ pub trait ArgminOperator {
     type Parameters;
     /// Output of the operator. Most solvers expect `f64`.
     type OperatorOutput;
+    /// Type of Hessian
+    type Hessian = ();
 
     /// Applies the operator/cost function to parameters
     fn apply(&self, &Self::Parameters) -> Result<Self::OperatorOutput, Error>;
@@ -220,6 +232,14 @@ pub trait ArgminOperator {
     fn gradient(&self, &Self::Parameters) -> Result<Self::Parameters, Error> {
         Err(ArgminError::NotImplemented {
             text: "Method `gradient` of ArgminOperator trait not implemented!".to_string(),
+        }
+        .into())
+    }
+
+    /// Computes the hessian at the given parameters
+    fn hessian(&self, &Self::Parameters) -> Result<Self::Hessian, Error> {
+        Err(ArgminError::NotImplemented {
+            text: "Method `hessian` of ArgminOperator trait not implemented!".to_string(),
         }
         .into())
     }
@@ -236,31 +256,41 @@ pub trait ArgminOperator {
     /// Allows to clone the boxed trait object.
     fn box_clone(
         &self,
-    ) -> Box<ArgminOperator<Parameters = Self::Parameters, OperatorOutput = Self::OperatorOutput>>;
+    ) -> Box<
+        ArgminOperator<
+            Parameters = Self::Parameters,
+            OperatorOutput = Self::OperatorOutput,
+            Hessian = Self::Hessian,
+        >,
+    >;
 }
 
 #[derive(Clone)]
-pub struct NoOperator<T: Clone, U: Clone> {
+pub struct NoOperator<T: Clone, U: Clone, H: Clone> {
     param: std::marker::PhantomData<*const T>,
     output: std::marker::PhantomData<*const U>,
+    hessian: std::marker::PhantomData<*const H>,
 }
 
-impl<T: Clone, U: Clone> NoOperator<T, U> {
+impl<T: Clone, U: Clone, H: Clone> NoOperator<T, U, H> {
     pub fn new() -> Self {
         NoOperator {
             param: std::marker::PhantomData,
             output: std::marker::PhantomData,
+            hessian: std::marker::PhantomData,
         }
     }
 }
 
-impl<T, U> ArgminOperator for NoOperator<T, U>
+impl<T, U, H> ArgminOperator for NoOperator<T, U, H>
 where
     T: Clone + std::default::Default,
     U: Clone + std::default::Default,
+    H: Clone + std::default::Default,
 {
     type Parameters = T;
     type OperatorOutput = U;
+    type Hessian = H;
 
     fn apply(&self, _p: &Self::Parameters) -> Result<Self::OperatorOutput, Error> {
         Ok(Self::OperatorOutput::default())
@@ -270,24 +300,33 @@ where
         Ok(Self::Parameters::default())
     }
 
+    fn hessian(&self, _p: &Self::Parameters) -> Result<Self::Hessian, Error> {
+        Ok(Self::Hessian::default())
+    }
+
     fn modify(&mut self, _p: &Self::Parameters, _t: f64) -> Result<Self::Parameters, Error> {
         Ok(Self::Parameters::default())
     }
 
     fn box_clone(
         &self,
-    ) -> Box<ArgminOperator<Parameters = Self::Parameters, OperatorOutput = Self::OperatorOutput>>
-    {
+    ) -> Box<
+        ArgminOperator<
+            Parameters = Self::Parameters,
+            OperatorOutput = Self::OperatorOutput,
+            Hessian = Self::Hessian,
+        >,
+    > {
         unimplemented!()
         // let tmp: NoOperator<T, U> = NoOperator::new();
         // Box::new(tmp)
     }
 }
 
-impl<T, U> Clone for Box<ArgminOperator<Parameters = T, OperatorOutput = U>> {
+impl<T, U, H> Clone for Box<ArgminOperator<Parameters = T, OperatorOutput = U, Hessian = H>> {
     /// Implements `clone` for a boxed `ArgminOperator`. Requires obviously that `box_clone` is
     /// implemented (see `ArgminOperator` trait).
-    fn clone(&self) -> Box<ArgminOperator<Parameters = T, OperatorOutput = U>> {
+    fn clone(&self) -> Box<ArgminOperator<Parameters = T, OperatorOutput = U, Hessian = H>> {
         self.box_clone()
     }
 }

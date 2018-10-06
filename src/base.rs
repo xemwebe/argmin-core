@@ -27,9 +27,9 @@ use ArgminWrite;
 use Error;
 
 /// Storage for data needed by most solvers
-pub struct ArgminBase<T, U> {
+pub struct ArgminBase<T, U, H> {
     /// The operator/cost function
-    operator: Box<ArgminOperator<Parameters = T, OperatorOutput = U>>,
+    operator: Box<ArgminOperator<Parameters = T, OperatorOutput = U, Hessian = H>>,
 
     /// Current parameter vector
     cur_param: T,
@@ -49,6 +49,9 @@ pub struct ArgminBase<T, U> {
     /// Current gradient
     cur_grad: T,
 
+    /// Current hessian
+    cur_hessian: H,
+
     /// Current iteration number
     cur_iter: u64,
 
@@ -60,6 +63,9 @@ pub struct ArgminBase<T, U> {
 
     /// Number of gradient evaluations so far
     grad_func_count: u64,
+
+    /// Number of gradient evaluations so far
+    hessian_func_count: u64,
 
     /// Reason of termination
     termination_reason: TerminationReason,
@@ -74,13 +80,14 @@ pub struct ArgminBase<T, U> {
     writer: ArgminWriter<T>,
 }
 
-impl<T, U> ArgminBase<T, U>
+impl<T, U, H> ArgminBase<T, U, H>
 where
     T: Clone + std::default::Default,
+    H: Clone + std::default::Default,
 {
     /// Constructor
     pub fn new(
-        operator: Box<ArgminOperator<Parameters = T, OperatorOutput = U>>,
+        operator: Box<ArgminOperator<Parameters = T, OperatorOutput = U, Hessian = H>>,
         param: T,
     ) -> Self {
         ArgminBase {
@@ -91,10 +98,12 @@ where
             best_cost: std::f64::INFINITY,
             target_cost: std::f64::NEG_INFINITY,
             cur_grad: T::default(),
+            cur_hessian: H::default(),
             cur_iter: 0,
             max_iters: std::u64::MAX,
             cost_func_count: 0,
             grad_func_count: 0,
+            hessian_func_count: 0,
             termination_reason: TerminationReason::NotTerminated,
             total_time: std::time::Duration::new(0, 0),
             logger: ArgminLogger::new(),
@@ -119,6 +128,7 @@ where
             "cur_cost" => self.cur_cost;
             "cost_func_count" => self.cost_func_count;
             "grad_func_count" => self.grad_func_count;
+            "hessian_func_count" => self.hessian_func_count;
         )
     }
 
@@ -134,12 +144,15 @@ where
         self.best_cost = std::f64::INFINITY;
         self.cost_func_count = 0;
         self.grad_func_count = 0;
+        self.hessian_func_count = 0;
         self.termination_reason = TerminationReason::NotTerminated;
         self.total_time = std::time::Duration::new(0, 0);
     }
 
     /// Return the operator (TODO: Check if this is still necessary!)
-    pub fn operator(&self) -> &Box<ArgminOperator<Parameters = T, OperatorOutput = U>> {
+    pub fn operator(
+        &self,
+    ) -> &Box<ArgminOperator<Parameters = T, OperatorOutput = U, Hessian = H>> {
         &self.operator
     }
 
@@ -153,6 +166,12 @@ where
     pub fn gradient(&mut self, param: &T) -> Result<T, Error> {
         self.increment_grad_func_count();
         self.operator.gradient(param)
+    }
+
+    /// Compute the hessian at `param`
+    pub fn hessian(&mut self, param: &T) -> Result<H, Error> {
+        self.increment_hessian_func_count();
+        self.operator.hessian(param)
     }
 
     /// Modify a `param` with the `modify` method of `operator`.
@@ -215,6 +234,17 @@ where
         self.cur_grad.clone()
     }
 
+    /// Set the current hessian
+    pub fn set_cur_hessian(&mut self, hessian: H) -> &mut Self {
+        self.cur_hessian = hessian;
+        self
+    }
+
+    /// Return the current hessian
+    pub fn cur_hessian(&self) -> H {
+        self.cur_hessian.clone()
+    }
+
     /// Set the target cost function value
     pub fn set_target_cost(&mut self, cost: f64) -> &mut Self {
         self.target_cost = cost;
@@ -257,6 +287,17 @@ where
     /// Return the gradient evaluation count
     pub fn grad_func_count(&self) -> u64 {
         self.grad_func_count
+    }
+
+    /// Increment the hessian evaluation count
+    pub fn increment_hessian_func_count(&mut self) -> &mut Self {
+        self.hessian_func_count += 1;
+        self
+    }
+
+    /// Return the gradient evaluation count
+    pub fn hessian_func_count(&self) -> u64 {
+        self.hessian_func_count
     }
 
     /// Set the maximum number of iterations.
