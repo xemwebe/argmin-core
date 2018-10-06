@@ -12,7 +12,7 @@
 #[macro_export]
 macro_rules! box_clone {
     () => {
-        fn box_clone(&self) -> Box<ArgminOperator<Parameters = Self::Parameters, OperatorOutput = Self::OperatorOutput>> {
+        fn box_clone(&self) -> Box<ArgminOperator<Parameters = Self::Parameters, OperatorOutput = Self::OperatorOutput, Hessian = Self::Hessian>> {
             Box::new((*self).clone())
         }
     };
@@ -35,7 +35,8 @@ macro_rules! check_param {
             None => {
                 return Err(ArgminError::$error {
                     text: $msg.to_string(),
-                }.into());
+                }
+                .into());
             }
             Some(ref x) => x.clone(),
         }
