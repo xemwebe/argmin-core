@@ -37,7 +37,7 @@ impl ArgminWeightedDot<Vec<f64>, f64, Vec<Vec<f64>>> for Vec<f64> {
 /// Add a `T` to `self`
 pub trait ArgminAdd<T> {
     /// Add a `T` to `self`
-    fn sub(&self, T) -> Self;
+    fn add(&self, T) -> Self;
 }
 
 /// Subtract a `T` from `self`
@@ -80,7 +80,7 @@ macro_rules! make_math {
         }
 
         impl<'a> ArgminAdd<$t> for $v {
-            fn sub(&self, other: $t) -> $v {
+            fn add(&self, other: $t) -> $v {
                 self.iter().zip(other.iter()).map(|(a, b)| a + b).collect()
             }
         }
