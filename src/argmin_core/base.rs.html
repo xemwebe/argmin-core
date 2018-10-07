@@ -339,6 +339,47 @@
 <span id="339">339</span>
 <span id="340">340</span>
 <span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
+<span id="362">362</span>
+<span id="363">363</span>
+<span id="364">364</span>
+<span id="365">365</span>
+<span id="366">366</span>
+<span id="367">367</span>
+<span id="368">368</span>
+<span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
+<span id="380">380</span>
+<span id="381">381</span>
+<span id="382">382</span>
 </pre><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -369,9 +410,9 @@
 <span class="kw">use</span> <span class="ident">Error</span>;
 
 <span class="doccomment">/// Storage for data needed by most solvers</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ArgminBase</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ArgminBase</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">U</span>, <span class="ident">H</span><span class="op">&gt;</span> {
     <span class="doccomment">/// The operator/cost function</span>
-    <span class="ident">operator</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ArgminOperator</span><span class="op">&lt;</span><span class="ident">Parameters</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="ident">U</span><span class="op">&gt;&gt;</span>,
+    <span class="ident">operator</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ArgminOperator</span><span class="op">&lt;</span><span class="ident">Parameters</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="ident">U</span>, <span class="ident">Hessian</span> <span class="op">=</span> <span class="ident">H</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
 
     <span class="doccomment">/// Current parameter vector</span>
     <span class="ident">cur_param</span>: <span class="ident">T</span>,
@@ -391,6 +432,9 @@
     <span class="doccomment">/// Current gradient</span>
     <span class="ident">cur_grad</span>: <span class="ident">T</span>,
 
+    <span class="doccomment">/// Current hessian</span>
+    <span class="ident">cur_hessian</span>: <span class="ident">H</span>,
+
     <span class="doccomment">/// Current iteration number</span>
     <span class="ident">cur_iter</span>: <span class="ident">u64</span>,
 
@@ -402,6 +446,9 @@
 
     <span class="doccomment">/// Number of gradient evaluations so far</span>
     <span class="ident">grad_func_count</span>: <span class="ident">u64</span>,
+
+    <span class="doccomment">/// Number of gradient evaluations so far</span>
+    <span class="ident">hessian_func_count</span>: <span class="ident">u64</span>,
 
     <span class="doccomment">/// Reason of termination</span>
     <span class="ident">termination_reason</span>: <span class="ident">TerminationReason</span>,
@@ -416,13 +463,14 @@
     <span class="ident">writer</span>: <span class="ident">ArgminWriter</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> <span class="ident">ArgminBase</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">U</span>, <span class="ident">H</span><span class="op">&gt;</span> <span class="ident">ArgminBase</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">U</span>, <span class="ident">H</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">std</span>::<span class="ident">default</span>::<span class="ident">Default</span>,
+    <span class="ident">H</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">std</span>::<span class="ident">default</span>::<span class="ident">Default</span>,
 {
     <span class="doccomment">/// Constructor</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">operator</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ArgminOperator</span><span class="op">&lt;</span><span class="ident">Parameters</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="ident">U</span><span class="op">&gt;&gt;</span>,
+        <span class="ident">operator</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ArgminOperator</span><span class="op">&lt;</span><span class="ident">Parameters</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="ident">U</span>, <span class="ident">Hessian</span> <span class="op">=</span> <span class="ident">H</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
         <span class="ident">param</span>: <span class="ident">T</span>,
     ) <span class="op">-&gt;</span> <span class="self">Self</span> {
         <span class="ident">ArgminBase</span> {
@@ -433,10 +481,12 @@
             <span class="ident">best_cost</span>: <span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">INFINITY</span>,
             <span class="ident">target_cost</span>: <span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">NEG_INFINITY</span>,
             <span class="ident">cur_grad</span>: <span class="ident">T</span>::<span class="ident">default</span>(),
+            <span class="ident">cur_hessian</span>: <span class="ident">H</span>::<span class="ident">default</span>(),
             <span class="ident">cur_iter</span>: <span class="number">0</span>,
             <span class="ident">max_iters</span>: <span class="ident">std</span>::<span class="ident">u64</span>::<span class="ident">MAX</span>,
             <span class="ident">cost_func_count</span>: <span class="number">0</span>,
             <span class="ident">grad_func_count</span>: <span class="number">0</span>,
+            <span class="ident">hessian_func_count</span>: <span class="number">0</span>,
             <span class="ident">termination_reason</span>: <span class="ident">TerminationReason</span>::<span class="ident">NotTerminated</span>,
             <span class="ident">total_time</span>: <span class="ident">std</span>::<span class="ident">time</span>::<span class="ident">Duration</span>::<span class="ident">new</span>(<span class="number">0</span>, <span class="number">0</span>),
             <span class="ident">logger</span>: <span class="ident">ArgminLogger</span>::<span class="ident">new</span>(),
@@ -461,6 +511,7 @@
             <span class="string">&quot;cur_cost&quot;</span> <span class="op">=&gt;</span> <span class="self">self</span>.<span class="ident">cur_cost</span>;
             <span class="string">&quot;cost_func_count&quot;</span> <span class="op">=&gt;</span> <span class="self">self</span>.<span class="ident">cost_func_count</span>;
             <span class="string">&quot;grad_func_count&quot;</span> <span class="op">=&gt;</span> <span class="self">self</span>.<span class="ident">grad_func_count</span>;
+            <span class="string">&quot;hessian_func_count&quot;</span> <span class="op">=&gt;</span> <span class="self">self</span>.<span class="ident">hessian_func_count</span>;
         )
     }
 
@@ -476,12 +527,15 @@
         <span class="self">self</span>.<span class="ident">best_cost</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">INFINITY</span>;
         <span class="self">self</span>.<span class="ident">cost_func_count</span> <span class="op">=</span> <span class="number">0</span>;
         <span class="self">self</span>.<span class="ident">grad_func_count</span> <span class="op">=</span> <span class="number">0</span>;
+        <span class="self">self</span>.<span class="ident">hessian_func_count</span> <span class="op">=</span> <span class="number">0</span>;
         <span class="self">self</span>.<span class="ident">termination_reason</span> <span class="op">=</span> <span class="ident">TerminationReason</span>::<span class="ident">NotTerminated</span>;
         <span class="self">self</span>.<span class="ident">total_time</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">time</span>::<span class="ident">Duration</span>::<span class="ident">new</span>(<span class="number">0</span>, <span class="number">0</span>);
     }
 
     <span class="doccomment">/// Return the operator (TODO: Check if this is still necessary!)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">operator</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ArgminOperator</span><span class="op">&lt;</span><span class="ident">Parameters</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="ident">U</span><span class="op">&gt;&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">operator</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+    ) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ArgminOperator</span><span class="op">&lt;</span><span class="ident">Parameters</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="ident">U</span>, <span class="ident">Hessian</span> <span class="op">=</span> <span class="ident">H</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">operator</span>
     }
 
@@ -495,6 +549,12 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">param</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">increment_grad_func_count</span>();
         <span class="self">self</span>.<span class="ident">operator</span>.<span class="ident">gradient</span>(<span class="ident">param</span>)
+    }
+
+    <span class="doccomment">/// Compute the hessian at `param`</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hessian</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">param</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">increment_hessian_func_count</span>();
+        <span class="self">self</span>.<span class="ident">operator</span>.<span class="ident">hessian</span>(<span class="ident">param</span>)
     }
 
     <span class="doccomment">/// Modify a `param` with the `modify` method of `operator`.</span>
@@ -557,6 +617,17 @@
         <span class="self">self</span>.<span class="ident">cur_grad</span>.<span class="ident">clone</span>()
     }
 
+    <span class="doccomment">/// Set the current hessian</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_cur_hessian</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">hessian</span>: <span class="ident">H</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">cur_hessian</span> <span class="op">=</span> <span class="ident">hessian</span>;
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Return the current hessian</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cur_hessian</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">H</span> {
+        <span class="self">self</span>.<span class="ident">cur_hessian</span>.<span class="ident">clone</span>()
+    }
+
     <span class="doccomment">/// Set the target cost function value</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_target_cost</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cost</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">target_cost</span> <span class="op">=</span> <span class="ident">cost</span>;
@@ -599,6 +670,17 @@
     <span class="doccomment">/// Return the gradient evaluation count</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">grad_func_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u64</span> {
         <span class="self">self</span>.<span class="ident">grad_func_count</span>
+    }
+
+    <span class="doccomment">/// Increment the hessian evaluation count</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">increment_hessian_func_count</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">hessian_func_count</span> <span class="op">+=</span> <span class="number">1</span>;
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Return the gradient evaluation count</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hessian_func_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u64</span> {
+        <span class="self">self</span>.<span class="ident">hessian_func_count</span>
     }
 
     <span class="doccomment">/// Set the maximum number of iterations.</span>
