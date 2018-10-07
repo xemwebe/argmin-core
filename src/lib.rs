@@ -321,10 +321,12 @@ where
     }
 }
 
-impl<T, U, H> Clone for Box<ArgminOperator<Parameters = T, OperatorOutput = U, Hessian = H>> {
+impl<'a, T, U, H> Clone
+    for Box<ArgminOperator<Parameters = T, OperatorOutput = U, Hessian = H> + 'a>
+{
     /// Implements `clone` for a boxed `ArgminOperator`. Requires obviously that `box_clone` is
     /// implemented (see `ArgminOperator` trait).
-    fn clone(&self) -> Box<ArgminOperator<Parameters = T, OperatorOutput = U, Hessian = H>> {
+    fn clone(&self) -> Box<ArgminOperator<Parameters = T, OperatorOutput = U, Hessian = H> + 'a> {
         self.box_clone()
     }
 }
