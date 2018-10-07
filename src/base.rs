@@ -27,9 +27,9 @@ use ArgminWrite;
 use Error;
 
 /// Storage for data needed by most solvers
-pub struct ArgminBase<T, U, H> {
+pub struct ArgminBase<'a, T, U, H> {
     /// The operator/cost function
-    operator: Box<ArgminOperator<Parameters = T, OperatorOutput = U, Hessian = H>>,
+    operator: Box<ArgminOperator<Parameters = T, OperatorOutput = U, Hessian = H> + 'a>,
 
     /// Current parameter vector
     cur_param: T,
@@ -80,14 +80,14 @@ pub struct ArgminBase<T, U, H> {
     writer: ArgminWriter<T>,
 }
 
-impl<T, U, H> ArgminBase<T, U, H>
+impl<'a, T, U, H> ArgminBase<'a, T, U, H>
 where
     T: Clone + std::default::Default,
     H: Clone + std::default::Default,
 {
     /// Constructor
     pub fn new(
-        operator: Box<ArgminOperator<Parameters = T, OperatorOutput = U, Hessian = H>>,
+        operator: Box<ArgminOperator<Parameters = T, OperatorOutput = U, Hessian = H> + 'a>,
         param: T,
     ) -> Self {
         ArgminBase {
@@ -152,7 +152,7 @@ where
     /// Return the operator (TODO: Check if this is still necessary!)
     pub fn operator(
         &self,
-    ) -> &Box<ArgminOperator<Parameters = T, OperatorOutput = U, Hessian = H>> {
+    ) -> &Box<ArgminOperator<Parameters = T, OperatorOutput = U, Hessian = H> + 'a> {
         &self.operator
     }
 
