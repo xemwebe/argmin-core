@@ -25,6 +25,8 @@ slog-term = "2.2.4"
 slog-async = "2.3.0"
 slog-json = "2.2.0"
 rand = "0.5.5"
+ndarray = "0.12.0"
+ndarray-linalg = "0.10.0"
 
 [badges]
 travis-ci = { repository = "argmin-rs/argmin-core", branch = "master" }

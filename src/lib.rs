@@ -14,12 +14,16 @@
 //! TODOs:
 //!   * Provide an example of how to implement a solver
 
+#![feature(specialization)]
+
 pub extern crate ctrlc;
 pub extern crate failure;
 #[macro_use]
 pub extern crate failure_derive;
 #[macro_use]
 extern crate slog;
+extern crate ndarray;
+extern crate ndarray_linalg;
 extern crate rand;
 extern crate slog_async;
 extern crate slog_json;
