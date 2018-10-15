@@ -31,4 +31,8 @@ pub enum ArgminError {
     /// Indicates that a condition is violated
     #[fail(display = "Condition violated: {}", text)]
     ConditionViolated { text: String },
+
+    /// Indicates an impossible error
+    #[fail(display = "Impossible Error: {}", text)]
+    ImpossibleError { text: String },
 }
