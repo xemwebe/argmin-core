@@ -15,10 +15,8 @@
 #[derive(Debug, Fail)]
 pub enum ArgminError {
     /// Indicates and invalid parameter
-    ///
-    /// TODO: Rename `parameter` to `text` and fix this in all the other code as well.
-    #[fail(display = "Invalid parameter: {}", parameter)]
-    InvalidParameter { parameter: String },
+    #[fail(display = "Invalid parameter: {}", text)]
+    InvalidParameter { text: String },
 
     /// Indicates that a function is not implemented
     #[fail(display = "Not implemented: {}", text)]
