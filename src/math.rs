@@ -17,7 +17,7 @@
 
 use ndarray;
 use ndarray_linalg::Inverse;
-// use Error;
+use Error;
 
 /// Dot/scalar product of `T` and `self`
 pub trait ArgminDot<T, U> {
@@ -95,10 +95,11 @@ pub trait ArgminNorm<U> {
 }
 
 /// Compute the inverse (`T`) of `self`
-// fn ainv(&self) -> Result<T, Error>;
-pub trait ArgminInv {}
+pub trait ArgminInv<T> {
+    fn ainv(&self) -> Result<T, Error>;
+}
 
-impl<'a, T> ArgminInv for T where T: Inverse {}
+// impl<'a, T> ArgminInv for T where T: Inverse {}
 
 // impl<'a, T> ArgminInv<T> for T
 // where
@@ -258,15 +259,15 @@ macro_rules! make_math_ndarray3 {
             }
         }
 
-        // impl<'a> ArgminInv<ndarray::Array2<$t>> for ndarray::Array2<$t>
-        // where
-        //     ndarray::Array2<$t>: Inverse,
-        // {
-        //     fn ainv(&self) -> Result<ndarray::Array2<$t>, Error> {
-        //         // Stupid error types...
-        //         Ok(self.inv()?)
-        //     }
-        // }
+        impl<'a> ArgminInv<ndarray::Array2<$t>> for ndarray::Array2<$t>
+        where
+            ndarray::Array2<$t>: Inverse,
+        {
+            fn ainv(&self) -> Result<ndarray::Array2<$t>, Error> {
+                // Stupid error types...
+                Ok(self.inv()?)
+            }
+        }
     };
 }
 
