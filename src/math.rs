@@ -183,6 +183,18 @@ macro_rules! make_math_ndarray {
             }
         }
 
+        impl<'a> ArgminDot<ndarray::Array1<$t>, ndarray::Array1<$t>> for ndarray::Array2<$t> {
+            fn dot(&self, other: ndarray::Array1<$t>) -> ndarray::Array1<$t> {
+                ndarray::Array2::dot(self, &other)
+            }
+        }
+
+        impl<'a> ArgminDot<ndarray::Array2<$t>, ndarray::Array1<$t>> for ndarray::Array1<$t> {
+            fn dot(&self, other: ndarray::Array2<$t>) -> ndarray::Array1<$t> {
+                ndarray::Array1::dot(self, &other)
+            }
+        }
+
         impl<'a> ArgminDot<ndarray::Array2<$t>, ndarray::Array2<$t>> for ndarray::Array2<$t> {
             fn dot(&self, other: ndarray::Array2<$t>) -> ndarray::Array2<$t> {
                 ndarray::Array2::dot(self, &other)
