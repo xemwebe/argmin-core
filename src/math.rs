@@ -38,6 +38,13 @@ impl ArgminWeightedDot<Vec<f64>, f64, Vec<Vec<f64>>> for Vec<f64> {
     }
 }
 
+impl ArgminWeightedDot<ndarray::Array1<f64>, f64, ndarray::Array2<f64>> for ndarray::Array1<f64> {
+    fn weighted_dot(&self, w: ndarray::Array2<f64>, v: ndarray::Array1<f64>) -> f64 {
+        self.dot(&w.dot(&v.clone()))
+        // self.dot(w.iter().map(|x| v.dot(x)).collect::<Vec<f64>>())
+    }
+}
+
 /// Add a `T` to `self`
 pub trait ArgminAdd<T> {
     /// Add a `T` to `self`
