@@ -380,6 +380,9 @@ pub trait ArgminTrustRegion: ArgminSolver {
     /// Set the initial step length
     fn set_radius(&mut self, f64);
 
+    /// Set the initial step length
+    fn radius(&self) -> f64;
+
     /// Set the gradient at the starting point
     fn set_grad(&mut self, <Self as ArgminNextIter>::Parameters);
 
