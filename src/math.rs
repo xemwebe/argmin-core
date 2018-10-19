@@ -41,7 +41,24 @@ impl ArgminWeightedDot<Vec<f64>, f64, Vec<Vec<f64>>> for Vec<f64> {
 impl ArgminWeightedDot<ndarray::Array1<f64>, f64, ndarray::Array2<f64>> for ndarray::Array1<f64> {
     fn weighted_dot(&self, w: ndarray::Array2<f64>, v: ndarray::Array1<f64>) -> f64 {
         self.dot(&w.dot(&v.clone()))
-        // self.dot(w.iter().map(|x| v.dot(x)).collect::<Vec<f64>>())
+    }
+}
+
+/// Return param vector of all zeros (for now, this is a hack. It should be done better)
+pub trait ArgminZero {
+    /// Return param vector of all zeros
+    fn zero(&self) -> Self;
+}
+
+impl ArgminZero for Vec<f64> {
+    fn zero(&self) -> Vec<f64> {
+        self.iter().map(|_| 0.0).collect::<Self>()
+    }
+}
+
+impl ArgminZero for ndarray::Array1<f64> {
+    fn zero(&self) -> ndarray::Array1<f64> {
+        self.iter().map(|_| 0.0).collect::<Self>()
     }
 }
 
