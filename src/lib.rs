@@ -108,6 +108,9 @@ pub trait ArgminSolver: ArgminNextIter {
     /// set current gradient
     fn set_cur_hessian(&mut self, <Self as ArgminNextIter>::Hessian);
 
+    /// set current parameter vector
+    fn set_best_param(&mut self, <Self as ArgminNextIter>::Parameters);
+
     /// Execute the optimization algorithm.
     fn run(&mut self) -> Result<ArgminResult<<Self as ArgminNextIter>::Parameters>, Error>;
 
