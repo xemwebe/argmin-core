@@ -27,6 +27,9 @@ use ArgminWrite;
 use Error;
 
 /// Storage for data needed by most solvers
+///
+/// TODO: cur_cost, best_cost and target_cost should be `U`, but then initialization is difficult
+/// as it cannot be expected that each `U` has something like `INFINITY` and `NEG_INFINITY`...
 pub struct ArgminBase<'a, T, U, H> {
     /// The operator/cost function
     operator: Box<ArgminOperator<Parameters = T, OperatorOutput = U, Hessian = H> + 'a>,
