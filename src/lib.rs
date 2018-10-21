@@ -90,6 +90,15 @@ pub trait ArgminSolver: ArgminNextIter {
         f64,
     ) -> Result<<Self as ArgminNextIter>::Parameters, Error>;
 
+    /// return current parameter vector
+    fn cur_param(&self) -> <Self as ArgminNextIter>::Parameters;
+
+    /// return current gradient
+    fn cur_grad(&self) -> <Self as ArgminNextIter>::Parameters;
+
+    /// return current gradient
+    fn cur_hessian(&self) -> <Self as ArgminNextIter>::Hessian;
+
     /// Execute the optimization algorithm.
     fn run(&mut self) -> Result<ArgminResult<<Self as ArgminNextIter>::Parameters>, Error>;
 
