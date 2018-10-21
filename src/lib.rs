@@ -121,6 +121,10 @@ pub trait ArgminSolver: ArgminNextIter {
     /// Returns the best solution found during optimization.
     fn result(&self) -> ArgminResult<<Self as ArgminNextIter>::Parameters>;
 
+    /// Set termination reason (doesn't terminate yet! -- this is helpful for terminating within
+    /// the iterations)
+    fn set_termination_reason(&mut self, TerminationReason);
+
     /// Evaluate all stopping criterions and return the `TerminationReason`
     fn terminate(&mut self) -> TerminationReason;
 
