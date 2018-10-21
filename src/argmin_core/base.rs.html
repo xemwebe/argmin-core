@@ -380,6 +380,9 @@
 <span id="380">380</span>
 <span id="381">381</span>
 <span id="382">382</span>
+<span id="383">383</span>
+<span id="384">384</span>
+<span id="385">385</span>
 </pre><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -410,6 +413,9 @@
 <span class="kw">use</span> <span class="ident">Error</span>;
 
 <span class="doccomment">/// Storage for data needed by most solvers</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// TODO: cur_cost, best_cost and target_cost should be `U`, but then initialization is difficult</span>
+<span class="doccomment">/// as it cannot be expected that each `U` has something like `INFINITY` and `NEG_INFINITY`...</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ArgminBase</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">U</span>, <span class="ident">H</span><span class="op">&gt;</span> {
     <span class="doccomment">/// The operator/cost function</span>
     <span class="ident">operator</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ArgminOperator</span><span class="op">&lt;</span><span class="ident">Parameters</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="ident">U</span>, <span class="ident">Hessian</span> <span class="op">=</span> <span class="ident">H</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span>,

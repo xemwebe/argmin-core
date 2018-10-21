@@ -32,6 +32,8 @@
 <span id="32">32</span>
 <span id="33">33</span>
 <span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
 </pre><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -50,10 +52,8 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Fail</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ArgminError</span> {
     <span class="doccomment">/// Indicates and invalid parameter</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// TODO: Rename `parameter` to `text` and fix this in all the other code as well.</span>
-    <span class="attribute">#[<span class="ident">fail</span>(<span class="ident">display</span> <span class="op">=</span> <span class="string">&quot;Invalid parameter: {}&quot;</span>, <span class="ident">parameter</span>)]</span>
-    <span class="ident">InvalidParameter</span> { <span class="ident">parameter</span>: <span class="ident">String</span> },
+    <span class="attribute">#[<span class="ident">fail</span>(<span class="ident">display</span> <span class="op">=</span> <span class="string">&quot;Invalid parameter: {}&quot;</span>, <span class="ident">text</span>)]</span>
+    <span class="ident">InvalidParameter</span> { <span class="ident">text</span>: <span class="ident">String</span> },
 
     <span class="doccomment">/// Indicates that a function is not implemented</span>
     <span class="attribute">#[<span class="ident">fail</span>(<span class="ident">display</span> <span class="op">=</span> <span class="string">&quot;Not implemented: {}&quot;</span>, <span class="ident">text</span>)]</span>
@@ -66,6 +66,10 @@
     <span class="doccomment">/// Indicates that a condition is violated</span>
     <span class="attribute">#[<span class="ident">fail</span>(<span class="ident">display</span> <span class="op">=</span> <span class="string">&quot;Condition violated: {}&quot;</span>, <span class="ident">text</span>)]</span>
     <span class="ident">ConditionViolated</span> { <span class="ident">text</span>: <span class="ident">String</span> },
+
+    <span class="doccomment">/// Indicates an impossible error</span>
+    <span class="attribute">#[<span class="ident">fail</span>(<span class="ident">display</span> <span class="op">=</span> <span class="string">&quot;Impossible Error: {}&quot;</span>, <span class="ident">text</span>)]</span>
+    <span class="ident">ImpossibleError</span> { <span class="ident">text</span>: <span class="ident">String</span> },
 }
 </pre>
 </section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g. <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g. <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g. <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../";window.currentCrate = "argmin_core";</script><script src="../../aliases.js"></script><script src="../../main.js"></script><script defer src="../../search-index.js"></script></body></html>

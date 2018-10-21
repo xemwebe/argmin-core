@@ -382,6 +382,50 @@
 <span id="382">382</span>
 <span id="383">383</span>
 <span id="384">384</span>
+<span id="385">385</span>
+<span id="386">386</span>
+<span id="387">387</span>
+<span id="388">388</span>
+<span id="389">389</span>
+<span id="390">390</span>
+<span id="391">391</span>
+<span id="392">392</span>
+<span id="393">393</span>
+<span id="394">394</span>
+<span id="395">395</span>
+<span id="396">396</span>
+<span id="397">397</span>
+<span id="398">398</span>
+<span id="399">399</span>
+<span id="400">400</span>
+<span id="401">401</span>
+<span id="402">402</span>
+<span id="403">403</span>
+<span id="404">404</span>
+<span id="405">405</span>
+<span id="406">406</span>
+<span id="407">407</span>
+<span id="408">408</span>
+<span id="409">409</span>
+<span id="410">410</span>
+<span id="411">411</span>
+<span id="412">412</span>
+<span id="413">413</span>
+<span id="414">414</span>
+<span id="415">415</span>
+<span id="416">416</span>
+<span id="417">417</span>
+<span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
 </pre><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -399,12 +443,16 @@
 <span class="doccomment">//! TODOs:</span>
 <span class="doccomment">//!   * Provide an example of how to implement a solver</span>
 
+<span class="comment">// #![feature(specialization)]</span>
+
 <span class="kw">pub</span> <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">ctrlc</span>;
 <span class="kw">pub</span> <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">failure</span>;
 <span class="attribute">#[<span class="ident">macro_use</span>]</span>
 <span class="kw">pub</span> <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">failure_derive</span>;
 <span class="attribute">#[<span class="ident">macro_use</span>]</span>
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">slog</span>;
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">ndarray</span>;
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">ndarray_linalg</span>;
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">rand</span>;
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">slog_async</span>;
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">slog_json</span>;
@@ -471,6 +519,27 @@
         <span class="ident">f64</span>,
     ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
 
+    <span class="doccomment">/// return current parameter vector</span>
+    <span class="kw">fn</span> <span class="ident">cur_param</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span>;
+
+    <span class="doccomment">/// return current gradient</span>
+    <span class="kw">fn</span> <span class="ident">cur_grad</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span>;
+
+    <span class="doccomment">/// return current gradient</span>
+    <span class="kw">fn</span> <span class="ident">cur_hessian</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Hessian</span>;
+
+    <span class="doccomment">/// set current parameter vector</span>
+    <span class="kw">fn</span> <span class="ident">set_cur_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span>);
+
+    <span class="doccomment">/// set current gradient</span>
+    <span class="kw">fn</span> <span class="ident">set_cur_grad</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span>);
+
+    <span class="doccomment">/// set current gradient</span>
+    <span class="kw">fn</span> <span class="ident">set_cur_hessian</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Hessian</span>);
+
+    <span class="doccomment">/// set current parameter vector</span>
+    <span class="kw">fn</span> <span class="ident">set_best_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span>);
+
     <span class="doccomment">/// Execute the optimization algorithm.</span>
     <span class="kw">fn</span> <span class="ident">run</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ArgminResult</span><span class="op">&lt;&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
 
@@ -481,11 +550,32 @@
     <span class="doccomment">/// Returns the best solution found during optimization.</span>
     <span class="kw">fn</span> <span class="ident">result</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">ArgminResult</span><span class="op">&lt;&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span><span class="op">&gt;</span>;
 
+    <span class="doccomment">/// Set termination reason (doesn&#39;t terminate yet! -- this is helpful for terminating within</span>
+    <span class="doccomment">/// the iterations)</span>
+    <span class="kw">fn</span> <span class="ident">set_termination_reason</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">TerminationReason</span>);
+
     <span class="doccomment">/// Evaluate all stopping criterions and return the `TerminationReason`</span>
     <span class="kw">fn</span> <span class="ident">terminate</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">TerminationReason</span>;
 
     <span class="doccomment">/// Set max number of iterations.</span>
     <span class="kw">fn</span> <span class="ident">set_max_iters</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">u64</span>);
+
+    <span class="doccomment">/// Get max number of iterations.</span>
+    <span class="kw">fn</span> <span class="ident">max_iters</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u64</span>;
+
+    <span class="doccomment">/// Get current cost function value</span>
+    <span class="kw">fn</span> <span class="ident">cur_cost</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">f64</span>;
+
+    <span class="doccomment">/// Get current cost function value</span>
+    <span class="kw">fn</span> <span class="ident">set_cur_cost</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f64</span>);
+
+    <span class="doccomment">/// Get best cost function value</span>
+    <span class="comment">// fn best_cost(&amp;self) -&gt; &lt;Self as ArgminNextIter&gt;::OperatorOutput;</span>
+    <span class="kw">fn</span> <span class="ident">best_cost</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">f64</span>;
+
+    <span class="doccomment">/// set best cost value</span>
+    <span class="comment">// fn set_best_cost(&amp;mut self, &lt;Self as ArgminNextIter&gt;::OperatorOutput);</span>
+    <span class="kw">fn</span> <span class="ident">set_best_cost</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f64</span>);
 
     <span class="doccomment">/// Set the target cost function value which is used as a stopping criterion</span>
     <span class="kw">fn</span> <span class="ident">set_target_cost</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f64</span>);
@@ -496,10 +586,8 @@
     <span class="doccomment">/// Add a writer to the array of writers</span>
     <span class="kw">fn</span> <span class="ident">add_writer</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ArgminWrite</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="self">Self</span>::<span class="ident">Parameters</span><span class="op">&gt;&gt;</span>);
 
-    <span class="doccomment">/// Reset the algorithm to its initial state</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// TODO: This may be dangerous because it doesn&#39;t really reset everything (only `base`).</span>
-    <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>);
+    <span class="doccomment">/// Reset the base of the algorithm to its initial state</span>
+    <span class="kw">fn</span> <span class="ident">base_reset</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>);
 }
 
 <span class="doccomment">/// Main part of every solver: `next_iter` computes one iteration of the algorithm and `init` is</span>
