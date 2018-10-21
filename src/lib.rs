@@ -14,7 +14,7 @@
 //! TODOs:
 //!   * Provide an example of how to implement a solver
 
-#![feature(specialization)]
+// #![feature(specialization)]
 
 pub extern crate ctrlc;
 pub extern crate failure;
@@ -131,6 +131,23 @@ pub trait ArgminSolver: ArgminNextIter {
     /// Set max number of iterations.
     fn set_max_iters(&mut self, u64);
 
+    /// Get max number of iterations.
+    fn max_iters(&self) -> u64;
+
+    /// Get current cost function value
+    fn cur_cost(&self) -> f64;
+
+    /// Get current cost function value
+    fn set_cur_cost(&mut self, f64);
+
+    /// Get best cost function value
+    // fn best_cost(&self) -> <Self as ArgminNextIter>::OperatorOutput;
+    fn best_cost(&self) -> f64;
+
+    /// set best cost value
+    // fn set_best_cost(&mut self, <Self as ArgminNextIter>::OperatorOutput);
+    fn set_best_cost(&mut self, f64);
+
     /// Set the target cost function value which is used as a stopping criterion
     fn set_target_cost(&mut self, f64);
 
@@ -140,10 +157,8 @@ pub trait ArgminSolver: ArgminNextIter {
     /// Add a writer to the array of writers
     fn add_writer(&mut self, Box<ArgminWrite<Param = Self::Parameters>>);
 
-    /// Reset the algorithm to its initial state
-    ///
-    /// TODO: This may be dangerous because it doesn't really reset everything (only `base`).
-    fn reset(&mut self);
+    /// Reset the base of the algorithm to its initial state
+    fn base_reset(&mut self);
 }
 
 /// Main part of every solver: `next_iter` computes one iteration of the algorithm and `init` is
