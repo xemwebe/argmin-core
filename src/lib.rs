@@ -16,6 +16,7 @@
 
 // #![feature(specialization)]
 
+#[cfg(feature = "ctrlc")]
 pub extern crate ctrlc;
 pub extern crate failure;
 #[macro_use]
