@@ -15,7 +15,9 @@
 //! implemented for basic `Vec`s, and will in the future also be implemented for types defined by
 //! `ndarray` and `nalgebra`.
 
+#[cfg(feature = "ndarrayl")]
 use ndarray;
+#[cfg(feature = "ndarrayl")]
 use ndarray_linalg::Inverse;
 use Error;
 
@@ -38,6 +40,7 @@ impl ArgminWeightedDot<Vec<f64>, f64, Vec<Vec<f64>>> for Vec<f64> {
     }
 }
 
+#[cfg(feature = "ndarrayl")]
 impl ArgminWeightedDot<ndarray::Array1<f64>, f64, ndarray::Array2<f64>> for ndarray::Array1<f64> {
     fn weighted_dot(&self, w: ndarray::Array2<f64>, v: ndarray::Array1<f64>) -> f64 {
         self.dot(&w.dot(&v.clone()))
@@ -56,6 +59,7 @@ impl ArgminZero for Vec<f64> {
     }
 }
 
+#[cfg(feature = "ndarrayl")]
 impl ArgminZero for ndarray::Array1<f64> {
     fn zero(&self) -> ndarray::Array1<f64> {
         self.iter().map(|_| 0.0).collect::<Self>()
@@ -199,6 +203,7 @@ macro_rules! make_math3 {
 }
 
 /// Implement a subset of the mathematics traits
+#[cfg(feature = "ndarrayl")]
 macro_rules! make_math_ndarray {
     ($t:ty) => {
         impl<'a> ArgminDot<ndarray::Array1<$t>, $t> for ndarray::Array1<$t> {
@@ -287,6 +292,7 @@ macro_rules! make_math_ndarray {
     };
 }
 
+#[cfg(feature = "ndarrayl")]
 macro_rules! make_math_ndarray3 {
     ($t:ty) => {
         impl<'a> ArgminNorm<$t> for ndarray::Array1<$t> {
@@ -349,15 +355,27 @@ make_math2!(usize, Vec<usize>);
 make_math3!(f32, Vec<f32>);
 make_math3!(f64, Vec<f64>);
 
+#[cfg(feature = "ndarrayl")]
 make_math_ndarray!(f32);
+#[cfg(feature = "ndarrayl")]
 make_math_ndarray!(f64);
+#[cfg(feature = "ndarrayl")]
 make_math_ndarray!(i8);
+#[cfg(feature = "ndarrayl")]
 make_math_ndarray!(i16);
+#[cfg(feature = "ndarrayl")]
 make_math_ndarray!(i32);
+#[cfg(feature = "ndarrayl")]
 make_math_ndarray!(i64);
+#[cfg(feature = "ndarrayl")]
 make_math_ndarray!(u8);
+#[cfg(feature = "ndarrayl")]
 make_math_ndarray!(u16);
+#[cfg(feature = "ndarrayl")]
 make_math_ndarray!(u32);
+#[cfg(feature = "ndarrayl")]
 make_math_ndarray!(u64);
+#[cfg(feature = "ndarrayl")]
 make_math_ndarray3!(f32);
+#[cfg(feature = "ndarrayl")]
 make_math_ndarray3!(f64);

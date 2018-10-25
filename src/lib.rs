@@ -23,7 +23,9 @@ pub extern crate failure;
 pub extern crate failure_derive;
 #[macro_use]
 extern crate slog;
+#[cfg(feature = "ndarrayl")]
 extern crate ndarray;
+#[cfg(feature = "ndarrayl")]
 extern crate ndarray_linalg;
 extern crate rand;
 extern crate slog_async;
