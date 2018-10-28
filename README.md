@@ -1,8 +1,8 @@
 [![Build Status](https://travis-ci.org/argmin-rs/argmin-core.svg?branch=master)](https://travis-ci.org/argmin-rs/argmin-core)
 
-# argmin-core: argmin optimizaton toolbox core
+# argmin-core: argmin optimization toolbox core
 
-This crate contains the core functionality of argmin.
+This crate contains the core functionality of [argmin](https://github.com/argmin-rs/argmin).
 If you just want to run an optimization method, this is *not* what you are looking for.
 However, if you want to implement your own solver based on the argmin architecture, you should find all necessary tools here.
 
