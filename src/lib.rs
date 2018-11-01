@@ -414,8 +414,8 @@ pub trait ArgminLineSearch: ArgminSolver {
     fn calc_initial_gradient(&mut self) -> Result<(), Error>;
 }
 
-/// Defines a common interface to methods which calculate approximate steps for trust recion
-/// methods.. Requires that `ArgminSolver` is implemented as well.
+/// Defines a common interface to methods which calculate approximate steps for trust region
+/// methods. Requires that `ArgminSolver` is implemented as well.
 pub trait ArgminTrustRegion: ArgminSolver {
     // /// Set the initial parameter (starting point)
     // fn set_initial_parameter(&mut self, <Self as ArgminNextIter>::Parameters);
@@ -428,4 +428,13 @@ pub trait ArgminTrustRegion: ArgminSolver {
 
     /// Set the gradient at the starting point
     fn set_hessian(&mut self, <Self as ArgminNextIter>::Hessian);
+}
+
+/// Every method for the update of beta needs to implement this trait.
+pub trait ArgminNLCGBetaUpdate<T> {
+    /// Update beta
+    /// Parameter 1: \nabla f_k
+    /// Parameter 2: \nabla f_{k+1}
+    /// Parameter 3: p_k
+    fn update(&self, &T, &T, &T) -> f64;
 }
