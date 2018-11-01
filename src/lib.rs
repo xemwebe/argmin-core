@@ -137,6 +137,9 @@ pub trait ArgminSolver: ArgminNextIter {
     /// Get max number of iterations.
     fn max_iters(&self) -> u64;
 
+    /// Get current iteration number.
+    fn cur_iter(&self) -> u64;
+
     /// Get current cost function value
     fn cur_cost(&self) -> f64;
 
