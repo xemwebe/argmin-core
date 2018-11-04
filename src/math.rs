@@ -21,6 +21,25 @@ use ndarray;
 use ndarray_linalg::Inverse;
 use Error;
 
+pub trait ArgminMul<T, U> {
+    fn amul(&self, T) -> U;
+}
+
+impl ArgminMul<f64, Vec<f64>> for Vec<f64> {
+    fn amul(&self, f: f64) -> Vec<f64> {
+        self.iter().map(|x| f * x).collect::<Vec<f64>>()
+    }
+}
+
+impl<F, T, U> ArgminMul<T, U> for F
+where
+    F: ArgminDot<T, U>,
+{
+    fn amul(&self, f: T) -> U {
+        self.dot(f)
+    }
+}
+
 /// Dot/scalar product of `T` and `self`
 pub trait ArgminDot<T, U> {
     /// Dot/scalar product of `T` and `self`
@@ -43,7 +62,7 @@ impl ArgminWeightedDot<Vec<f64>, f64, Vec<Vec<f64>>> for Vec<f64> {
 #[cfg(feature = "ndarrayl")]
 impl ArgminWeightedDot<ndarray::Array1<f64>, f64, ndarray::Array2<f64>> for ndarray::Array1<f64> {
     fn weighted_dot(&self, w: ndarray::Array2<f64>, v: ndarray::Array1<f64>) -> f64 {
-        self.dot(&w.dot(&v.clone()))
+        self.dot(&w.dot(&v))
     }
 }
 
