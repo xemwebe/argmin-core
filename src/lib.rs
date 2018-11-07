@@ -140,6 +140,9 @@ pub trait ArgminSolver: ArgminNextIter {
     /// Get current iteration number.
     fn cur_iter(&self) -> u64;
 
+    /// Increment the iteration number by one
+    fn increment_iter(&mut self);
+
     /// Get current cost function value
     fn cur_cost(&self) -> f64;
 
