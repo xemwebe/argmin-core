@@ -43,7 +43,7 @@ impl<T> ArgminResult<T> {
             cost,
             iters,
             terminated: termination_reason.terminated(),
-            termination_reason: termination_reason,
+            termination_reason,
         }
     }
 }

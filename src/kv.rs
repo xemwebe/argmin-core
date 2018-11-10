@@ -16,7 +16,7 @@
 use std;
 
 /// A simple key-value storage
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub struct ArgminKV {
     /// The actual key value storage
     pub kv: Vec<(&'static str, String)>,

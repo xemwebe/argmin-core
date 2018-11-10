@@ -19,6 +19,7 @@ pub mod file;
 use ArgminWrite;
 use Error;
 
+#[derive(Default)]
 pub struct ArgminWriter<T> {
     writers: Vec<Box<ArgminWrite<Param = T>>>,
 }

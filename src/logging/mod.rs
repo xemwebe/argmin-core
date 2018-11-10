@@ -14,6 +14,7 @@ pub mod slog_logger;
 use {ArgminKV, ArgminLog, Error};
 
 /// Container for `ArgminLog`gers
+#[derive(Default)]
 pub struct ArgminLogger {
     /// Vector of boxed types which implement `ArgminLog`
     logger: Vec<Box<ArgminLog>>,

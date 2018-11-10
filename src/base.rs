@@ -94,7 +94,7 @@ where
         param: T,
     ) -> Self {
         ArgminBase {
-            operator: operator,
+            operator,
             cur_param: param.clone(),
             best_param: param,
             cur_cost: std::f64::INFINITY,
@@ -150,13 +150,6 @@ where
         self.hessian_func_count = 0;
         self.termination_reason = TerminationReason::NotTerminated;
         self.total_time = std::time::Duration::new(0, 0);
-    }
-
-    /// Return the operator (TODO: Check if this is still necessary!)
-    pub fn operator(
-        &self,
-    ) -> &Box<ArgminOperator<Parameters = T, OperatorOutput = U, Hessian = H> + 'a> {
-        &self.operator
     }
 
     /// Apply the operator to `param`

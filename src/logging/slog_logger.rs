@@ -87,7 +87,7 @@ pub struct ArgminSlogKV {
 impl KV for ArgminSlogKV {
     fn serialize(&self, _record: &Record, serializer: &mut Serializer) -> slog::Result {
         for idx in self.kv.clone().iter().rev() {
-            serializer.emit_str(idx.0, &format!("{}", idx.1))?;
+            serializer.emit_str(idx.0, &idx.1.to_string())?;
         }
         Ok(())
     }

@@ -258,8 +258,8 @@ impl<T: Clone> ArgminIterationData<T> {
     /// Constructor
     pub fn new(param: T, cost: f64) -> Self {
         ArgminIterationData {
-            param: param,
-            cost: cost,
+            param,
+            cost,
             kv: None,
         }
     }
@@ -343,7 +343,7 @@ pub trait ArgminOperator {
     >;
 }
 
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub struct NoOperator<T: Clone, U: Clone, H: Clone> {
     param: std::marker::PhantomData<*const T>,
     output: std::marker::PhantomData<*const U>,
