@@ -63,7 +63,7 @@
 <span class="kw">use</span> <span class="ident">std</span>;
 
 <span class="doccomment">/// A simple key-value storage</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ArgminKV</span> {
     <span class="doccomment">/// The actual key value storage</span>
     <span class="kw">pub</span> <span class="ident">kv</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">String</span>)<span class="op">&gt;</span>,

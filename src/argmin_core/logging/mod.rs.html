@@ -52,6 +52,7 @@
 <span id="52">52</span>
 <span id="53">53</span>
 <span id="54">54</span>
+<span id="55">55</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -69,6 +70,7 @@
 <span class="kw">use</span> {<span class="ident">ArgminKV</span>, <span class="ident">ArgminLog</span>, <span class="ident">Error</span>};
 
 <span class="doccomment">/// Container for `ArgminLog`gers</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ArgminLogger</span> {
     <span class="doccomment">/// Vector of boxed types which implement `ArgminLog`</span>
     <span class="ident">logger</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ArgminLog</span><span class="op">&gt;&gt;</span>,

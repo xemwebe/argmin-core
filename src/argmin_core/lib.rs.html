@@ -562,7 +562,7 @@
 
     <span class="doccomment">/// modify the parameter vector</span>
     <span class="kw">fn</span> <span class="ident">modify</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="kw-2">&amp;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span>,
         <span class="ident">f64</span>,
     ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
@@ -732,8 +732,8 @@
     <span class="doccomment">/// Constructor</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">param</span>: <span class="ident">T</span>, <span class="ident">cost</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
         <span class="ident">ArgminIterationData</span> {
-            <span class="ident">param</span>: <span class="ident">param</span>,
-            <span class="ident">cost</span>: <span class="ident">cost</span>,
+            <span class="ident">param</span>,
+            <span class="ident">cost</span>,
             <span class="ident">kv</span>: <span class="prelude-val">None</span>,
         }
     }
@@ -798,7 +798,7 @@
 
     <span class="doccomment">/// Modifies a parameter vector. Comes with a variable that indicates the &quot;degree&quot; of the</span>
     <span class="doccomment">/// modification.</span>
-    <span class="kw">fn</span> <span class="ident">modify</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Parameters</span>, <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Parameters</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">modify</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Parameters</span>, <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Parameters</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">NotImplemented</span> {
             <span class="ident">text</span>: <span class="string">&quot;Method `modify` of ArgminOperator trait not implemented!&quot;</span>.<span class="ident">to_string</span>(),
         }
@@ -817,7 +817,7 @@
     <span class="op">&gt;</span>;
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NoOperator</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Clone</span>, <span class="ident">U</span>: <span class="ident">Clone</span>, <span class="ident">H</span>: <span class="ident">Clone</span><span class="op">&gt;</span> {
     <span class="ident">param</span>: <span class="ident">std</span>::<span class="ident">marker</span>::<span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">*</span><span class="kw">const</span> <span class="ident">T</span><span class="op">&gt;</span>,
     <span class="ident">output</span>: <span class="ident">std</span>::<span class="ident">marker</span>::<span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">*</span><span class="kw">const</span> <span class="ident">U</span><span class="op">&gt;</span>,
@@ -856,7 +856,7 @@
         <span class="prelude-val">Ok</span>(<span class="self">Self</span>::<span class="ident">Hessian</span>::<span class="ident">default</span>())
     }
 
-    <span class="kw">fn</span> <span class="ident">modify</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_p</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Parameters</span>, <span class="ident">_t</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Parameters</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">modify</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_p</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Parameters</span>, <span class="ident">_t</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Parameters</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">Self</span>::<span class="ident">Parameters</span>::<span class="ident">default</span>())
     }
 
