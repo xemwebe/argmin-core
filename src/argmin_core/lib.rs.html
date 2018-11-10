@@ -441,6 +441,36 @@
 <span id="441">441</span>
 <span id="442">442</span>
 <span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -584,6 +614,9 @@
     <span class="doccomment">/// Get current iteration number.</span>
     <span class="kw">fn</span> <span class="ident">cur_iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u64</span>;
 
+    <span class="doccomment">/// Increment the iteration number by one</span>
+    <span class="kw">fn</span> <span class="ident">increment_iter</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>);
+
     <span class="doccomment">/// Get current cost function value</span>
     <span class="kw">fn</span> <span class="ident">cur_cost</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">f64</span>;
 
@@ -609,6 +642,33 @@
 
     <span class="doccomment">/// Reset the base of the algorithm to its initial state</span>
     <span class="kw">fn</span> <span class="ident">base_reset</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>);
+
+    <span class="doccomment">/// Increment the cost function evaluation count</span>
+    <span class="kw">fn</span> <span class="ident">increment_cost_func_count</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>);
+
+    <span class="doccomment">/// Increaese the cost function evaluation count by a given value</span>
+    <span class="kw">fn</span> <span class="ident">increase_cost_func_count</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">u64</span>);
+
+    <span class="doccomment">/// Return the cost function evaluation count</span>
+    <span class="kw">fn</span> <span class="ident">cost_func_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u64</span>;
+
+    <span class="doccomment">/// Increment the gradient evaluation count</span>
+    <span class="kw">fn</span> <span class="ident">increment_grad_func_count</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>);
+
+    <span class="doccomment">/// Increase the gradient evaluation count by a given value</span>
+    <span class="kw">fn</span> <span class="ident">increase_grad_func_count</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">u64</span>);
+
+    <span class="doccomment">/// Return the gradient evaluation count</span>
+    <span class="kw">fn</span> <span class="ident">grad_func_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u64</span>;
+
+    <span class="doccomment">/// Increment the hessian evaluation count</span>
+    <span class="kw">fn</span> <span class="ident">increment_hessian_func_count</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>);
+
+    <span class="doccomment">/// Increase the hessian evaluation count by a given value</span>
+    <span class="kw">fn</span> <span class="ident">increase_hessian_func_count</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">u64</span>);
+
+    <span class="doccomment">/// Return the gradient evaluation count</span>
+    <span class="kw">fn</span> <span class="ident">hessian_func_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u64</span>;
 }
 
 <span class="doccomment">/// Main part of every solver: `next_iter` computes one iteration of the algorithm and `init` is</span>
