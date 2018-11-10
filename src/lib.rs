@@ -168,6 +168,33 @@ pub trait ArgminSolver: ArgminNextIter {
 
     /// Reset the base of the algorithm to its initial state
     fn base_reset(&mut self);
+
+    /// Increment the cost function evaluation count
+    fn increment_cost_func_count(&mut self);
+
+    /// Increaese the cost function evaluation count by a given value
+    fn increase_cost_func_count(&mut self, u64);
+
+    /// Return the cost function evaluation count
+    fn cost_func_count(&self) -> u64;
+
+    /// Increment the gradient evaluation count
+    fn increment_grad_func_count(&mut self);
+
+    /// Increase the gradient evaluation count by a given value
+    fn increase_grad_func_count(&mut self, u64);
+
+    /// Return the gradient evaluation count
+    fn grad_func_count(&self) -> u64;
+
+    /// Increment the hessian evaluation count
+    fn increment_hessian_func_count(&mut self);
+
+    /// Increase the hessian evaluation count by a given value
+    fn increase_hessian_func_count(&mut self, u64);
+
+    /// Return the gradient evaluation count
+    fn hessian_func_count(&self) -> u64;
 }
 
 /// Main part of every solver: `next_iter` computes one iteration of the algorithm and `init` is
