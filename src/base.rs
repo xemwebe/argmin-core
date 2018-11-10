@@ -32,7 +32,7 @@ use Error;
 /// as it cannot be expected that each `U` has something like `INFINITY` and `NEG_INFINITY`...
 pub struct ArgminBase<'a, T, U, H> {
     /// The operator/cost function
-    operator: Box<ArgminOperator<Parameters = T, OperatorOutput = U, Hessian = H> + 'a>,
+    operator: &'a ArgminOperator<Parameters = T, OperatorOutput = U, Hessian = H>,
 
     /// Current parameter vector
     cur_param: T,
@@ -90,7 +90,7 @@ where
 {
     /// Constructor
     pub fn new(
-        operator: Box<ArgminOperator<Parameters = T, OperatorOutput = U, Hessian = H> + 'a>,
+        operator: &'a ArgminOperator<Parameters = T, OperatorOutput = U, Hessian = H>,
         param: T,
     ) -> Self {
         ArgminBase {
@@ -171,7 +171,7 @@ where
     }
 
     /// Modify a `param` with the `modify` method of `operator`.
-    pub fn modify(&mut self, param: &T, factor: f64) -> Result<T, Error> {
+    pub fn modify(&self, param: &T, factor: f64) -> Result<T, Error> {
         self.operator.modify(&param, factor)
     }
 
