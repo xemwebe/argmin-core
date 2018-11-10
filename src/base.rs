@@ -276,6 +276,12 @@ where
         self
     }
 
+    /// Increaese the cost function evaluation count by a given value
+    pub fn increase_cost_func_count(&mut self, count: u64) -> &mut Self {
+        self.cost_func_count += count;
+        self
+    }
+
     /// Return the cost function evaluation count
     pub fn cost_func_count(&self) -> u64 {
         self.cost_func_count
@@ -287,6 +293,12 @@ where
         self
     }
 
+    /// Increase the gradient evaluation count by a given value
+    pub fn increase_grad_func_count(&mut self, count: u64) -> &mut Self {
+        self.grad_func_count += count;
+        self
+    }
+
     /// Return the gradient evaluation count
     pub fn grad_func_count(&self) -> u64 {
         self.grad_func_count
@@ -295,6 +307,12 @@ where
     /// Increment the hessian evaluation count
     pub fn increment_hessian_func_count(&mut self) -> &mut Self {
         self.hessian_func_count += 1;
+        self
+    }
+
+    /// Increase the hessian evaluation count by a given value
+    pub fn increase_hessian_func_count(&mut self, count: u64) -> &mut Self {
+        self.hessian_func_count += count;
         self
     }
 
