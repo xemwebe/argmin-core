@@ -290,11 +290,10 @@ impl<T: Clone> ArgminIterationData<T> {
 
 /// This trait needs to be implemented for every operator/cost function.
 ///
-/// It is required to implement the `apply` and `box_clone` methods, all others are optional and
-/// provide a default implementation which is essentially returning an error which indicates that
-/// the method has not been implemented. Those methods (`gradient` and `modify`) only need to be
-/// implemented if the uses solver requires it. The `box_clone` method can be 'half automatically'
-/// implemented using the `box_clone!` macro.
+/// It is required to implement the `apply` method, all others are optional and provide a default
+/// implementation which is essentially returning an error which indicates that the method has not
+/// been implemented. Those methods (`gradient` and `modify`) only need to be implemented if the
+/// uses solver requires it.
 pub trait ArgminOperator {
     /// Type of the parameter vector
     type Parameters;
@@ -330,17 +329,6 @@ pub trait ArgminOperator {
         }
         .into())
     }
-
-    /// Allows to clone the boxed trait object.
-    fn box_clone(
-        &self,
-    ) -> Box<
-        ArgminOperator<
-            Parameters = Self::Parameters,
-            OperatorOutput = Self::OperatorOutput,
-            Hessian = Self::Hessian,
-        >,
-    >;
 }
 
 #[derive(Clone, Default)]
@@ -384,30 +372,6 @@ where
 
     fn modify(&self, _p: &Self::Parameters, _t: f64) -> Result<Self::Parameters, Error> {
         Ok(Self::Parameters::default())
-    }
-
-    fn box_clone(
-        &self,
-    ) -> Box<
-        ArgminOperator<
-            Parameters = Self::Parameters,
-            OperatorOutput = Self::OperatorOutput,
-            Hessian = Self::Hessian,
-        >,
-    > {
-        unimplemented!()
-        // let tmp: NoOperator<T, U> = NoOperator::new();
-        // Box::new(tmp)
-    }
-}
-
-impl<'a, T, U, H> Clone
-    for Box<ArgminOperator<Parameters = T, OperatorOutput = U, Hessian = H> + 'a>
-{
-    /// Implements `clone` for a boxed `ArgminOperator`. Requires obviously that `box_clone` is
-    /// implemented (see `ArgminOperator` trait).
-    fn clone(&self) -> Box<ArgminOperator<Parameters = T, OperatorOutput = U, Hessian = H> + 'a> {
-        self.box_clone()
     }
 }
 
