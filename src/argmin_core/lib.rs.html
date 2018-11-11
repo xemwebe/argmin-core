@@ -435,42 +435,6 @@
 <span id="435">435</span>
 <span id="436">436</span>
 <span id="437">437</span>
-<span id="438">438</span>
-<span id="439">439</span>
-<span id="440">440</span>
-<span id="441">441</span>
-<span id="442">442</span>
-<span id="443">443</span>
-<span id="444">444</span>
-<span id="445">445</span>
-<span id="446">446</span>
-<span id="447">447</span>
-<span id="448">448</span>
-<span id="449">449</span>
-<span id="450">450</span>
-<span id="451">451</span>
-<span id="452">452</span>
-<span id="453">453</span>
-<span id="454">454</span>
-<span id="455">455</span>
-<span id="456">456</span>
-<span id="457">457</span>
-<span id="458">458</span>
-<span id="459">459</span>
-<span id="460">460</span>
-<span id="461">461</span>
-<span id="462">462</span>
-<span id="463">463</span>
-<span id="464">464</span>
-<span id="465">465</span>
-<span id="466">466</span>
-<span id="467">467</span>
-<span id="468">468</span>
-<span id="469">469</span>
-<span id="470">470</span>
-<span id="471">471</span>
-<span id="472">472</span>
-<span id="473">473</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -764,11 +728,10 @@
 
 <span class="doccomment">/// This trait needs to be implemented for every operator/cost function.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// It is required to implement the `apply` and `box_clone` methods, all others are optional and</span>
-<span class="doccomment">/// provide a default implementation which is essentially returning an error which indicates that</span>
-<span class="doccomment">/// the method has not been implemented. Those methods (`gradient` and `modify`) only need to be</span>
-<span class="doccomment">/// implemented if the uses solver requires it. The `box_clone` method can be &#39;half automatically&#39;</span>
-<span class="doccomment">/// implemented using the `box_clone!` macro.</span>
+<span class="doccomment">/// It is required to implement the `apply` method, all others are optional and provide a default</span>
+<span class="doccomment">/// implementation which is essentially returning an error which indicates that the method has not</span>
+<span class="doccomment">/// been implemented. Those methods (`gradient` and `modify`) only need to be implemented if the</span>
+<span class="doccomment">/// uses solver requires it.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ArgminOperator</span> {
     <span class="doccomment">/// Type of the parameter vector</span>
     <span class="kw">type</span> <span class="ident">Parameters</span>;
@@ -804,17 +767,6 @@
         }
         .<span class="ident">into</span>())
     }
-
-    <span class="doccomment">/// Allows to clone the boxed trait object.</span>
-    <span class="kw">fn</span> <span class="ident">box_clone</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-    ) <span class="op">-&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span>
-        <span class="ident">ArgminOperator</span><span class="op">&lt;</span>
-            <span class="ident">Parameters</span> <span class="op">=</span> <span class="self">Self</span>::<span class="ident">Parameters</span>,
-            <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="self">Self</span>::<span class="ident">OperatorOutput</span>,
-            <span class="ident">Hessian</span> <span class="op">=</span> <span class="self">Self</span>::<span class="ident">Hessian</span>,
-        <span class="op">&gt;</span>,
-    <span class="op">&gt;</span>;
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Default</span>)]</span>
@@ -858,30 +810,6 @@
 
     <span class="kw">fn</span> <span class="ident">modify</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_p</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Parameters</span>, <span class="ident">_t</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Parameters</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">Self</span>::<span class="ident">Parameters</span>::<span class="ident">default</span>())
-    }
-
-    <span class="kw">fn</span> <span class="ident">box_clone</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-    ) <span class="op">-&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span>
-        <span class="ident">ArgminOperator</span><span class="op">&lt;</span>
-            <span class="ident">Parameters</span> <span class="op">=</span> <span class="self">Self</span>::<span class="ident">Parameters</span>,
-            <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="self">Self</span>::<span class="ident">OperatorOutput</span>,
-            <span class="ident">Hessian</span> <span class="op">=</span> <span class="self">Self</span>::<span class="ident">Hessian</span>,
-        <span class="op">&gt;</span>,
-    <span class="op">&gt;</span> {
-        <span class="macro">unimplemented</span><span class="macro">!</span>()
-        <span class="comment">// let tmp: NoOperator&lt;T, U&gt; = NoOperator::new();</span>
-        <span class="comment">// Box::new(tmp)</span>
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">U</span>, <span class="ident">H</span><span class="op">&gt;</span> <span class="ident">Clone</span>
-    <span class="kw">for</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ArgminOperator</span><span class="op">&lt;</span><span class="ident">Parameters</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="ident">U</span>, <span class="ident">Hessian</span> <span class="op">=</span> <span class="ident">H</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-{
-    <span class="doccomment">/// Implements `clone` for a boxed `ArgminOperator`. Requires obviously that `box_clone` is</span>
-    <span class="doccomment">/// implemented (see `ArgminOperator` trait).</span>
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ArgminOperator</span><span class="op">&lt;</span><span class="ident">Parameters</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">OperatorOutput</span> <span class="op">=</span> <span class="ident">U</span>, <span class="ident">Hessian</span> <span class="op">=</span> <span class="ident">H</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">box_clone</span>()
     }
 }
 
