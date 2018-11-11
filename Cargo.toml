@@ -1,9 +1,9 @@
 [package]
 name = "argmin_core"
-version = "0.1.4"
+version = "0.1.5"
 authors = ["Stefan Kroboth <stefan.kroboth@gmail.com>"]
 license = "MIT OR Apache-2.0"
-description = "WIP optimization toolbox for Rust"
+description = "A pure Rust optimization toolbox"
 documentation = "https://argmin-rs.github.io/argmin-core/argmin_core/"
 homepage = "https://github.com/argmin-rs/argmin-core"
 repository = "https://github.com/argmin-rs/argmin-core"
