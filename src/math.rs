@@ -40,6 +40,17 @@ where
     }
 }
 
+pub trait ModifiedCholesky {
+    fn modified_cholesky(&self) -> Self;
+}
+
+#[cfg(feature = "ndarrayl")]
+impl ModifiedCholesky for ndarray::Array2<f64> {
+    fn modified_cholesky(&self) -> ndarray::Array2<f64> {
+        unimplemented!()
+    }
+}
+
 /// Dot/scalar product of `T` and `self`
 pub trait ArgminDot<T, U> {
     /// Dot/scalar product of `T` and `self`
