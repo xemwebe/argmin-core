@@ -16,6 +16,8 @@
 //! `ndarray` and `nalgebra`.
 
 #[cfg(feature = "ndarrayl")]
+use crate::errors::ArgminError;
+#[cfg(feature = "ndarrayl")]
 use ndarray;
 #[cfg(feature = "ndarrayl")]
 use ndarray_linalg::Inverse;
@@ -40,13 +42,38 @@ where
     }
 }
 
-pub trait ModifiedCholesky {
-    fn modified_cholesky(&self) -> Self;
+pub trait ModifiedCholesky
+where
+    Self: Sized,
+{
+    fn modified_cholesky(&self, delta: f64, beta: f64) -> Result<Self, Error>;
 }
 
 #[cfg(feature = "ndarrayl")]
 impl ModifiedCholesky for ndarray::Array2<f64> {
-    fn modified_cholesky(&self) -> ndarray::Array2<f64> {
+    fn modified_cholesky(&self, delta: f64, beta: f64) -> Result<ndarray::Array2<f64>, Error> {
+        if delta <= 0.0 {
+            return Err(ArgminError::InvalidParameter {
+                text: "modified_cholesky: delta must be > 0.0.".to_string(),
+            }
+            .into());
+        }
+        if beta <= 0.0 {
+            return Err(ArgminError::InvalidParameter {
+                text: "modified_cholesky: beta must be > 0.0.".to_string(),
+            }
+            .into());
+        }
+        let mut c: ndarray::Array2<f64> = ndarray::Array2::zeros(self.raw_dim());
+        // let c = ndarray::Array2::zeros(self.shape());
+        let mut c_diag = c.diag_mut();
+        let a_diag = self.diag();
+        c_diag.assign(&a_diag);
+        // c_diag
+        //     .iter_mut()
+        //     .zip(a_diag.iter())
+        //     .map(|(c, a)| *c = *a)
+        //     .count();
         unimplemented!()
     }
 }
