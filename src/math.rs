@@ -42,6 +42,34 @@ where
     }
 }
 
+#[cfg(feature = "ndarrayl")]
+fn swap_columns<T>(
+    mat: &mut ndarray::Array2<T>,
+    idx1: usize,
+    idx2: usize,
+) -> &mut ndarray::Array2<T>
+where
+    ndarray::OwnedRepr<T>: ndarray::Data,
+{
+    let s = mat.raw_dim();
+    for i in 0..s[0] {
+        mat.swap((i, idx1), (i, idx2));
+    }
+    mat
+}
+
+#[cfg(feature = "ndarrayl")]
+fn swap_rows<T>(mat: &mut ndarray::Array2<T>, idx1: usize, idx2: usize) -> &mut ndarray::Array2<T>
+where
+    ndarray::OwnedRepr<T>: ndarray::Data,
+{
+    let s = mat.raw_dim();
+    for i in 0..s[1] {
+        mat.swap((idx1, i), (idx2, i));
+    }
+    mat
+}
+
 pub trait ModifiedCholesky
 where
     Self: Sized,
@@ -51,6 +79,7 @@ where
 
 #[cfg(feature = "ndarrayl")]
 impl ModifiedCholesky for ndarray::Array2<f64> {
+    /// Algorithm 6.5 in "Numerical Optimization" by Nocedal and Wright
     fn modified_cholesky(&self, delta: f64, beta: f64) -> Result<ndarray::Array2<f64>, Error> {
         if delta <= 0.0 {
             return Err(ArgminError::InvalidParameter {
@@ -65,15 +94,9 @@ impl ModifiedCholesky for ndarray::Array2<f64> {
             .into());
         }
         let mut c: ndarray::Array2<f64> = ndarray::Array2::zeros(self.raw_dim());
-        // let c = ndarray::Array2::zeros(self.shape());
         let mut c_diag = c.diag_mut();
         let a_diag = self.diag();
         c_diag.assign(&a_diag);
-        // c_diag
-        //     .iter_mut()
-        //     .zip(a_diag.iter())
-        //     .map(|(c, a)| *c = *a)
-        //     .count();
         unimplemented!()
     }
 }
@@ -436,3 +459,48 @@ make_math_ndarray!(u64);
 make_math_ndarray3!(f32);
 #[cfg(feature = "ndarrayl")]
 make_math_ndarray3!(f64);
+
+#[cfg(test)]
+mod tests {
+    #[cfg(feature = "ndarrayl")]
+    #[test]
+    fn test_swap_columns() {
+        let mut a: ndarray::Array2<i64> = ndarray::arr2(&[[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
+        let b = super::swap_columns(&mut a, 1, 2);
+        let c: ndarray::Array2<i64> = ndarray::arr2(&[[1, 3, 2], [4, 6, 5], [7, 9, 8]]);
+        b.iter()
+            .zip(c.iter())
+            .map(|(x, y)| assert_eq!(*x, *y))
+            .count();
+        // this should work, but it doesn't.
+        // assert_eq!(b, c);
+    }
+
+    #[cfg(feature = "ndarrayl")]
+    #[test]
+    fn test_swap_rows() {
+        let mut a: ndarray::Array2<i64> = ndarray::arr2(&[[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
+        let b = super::swap_rows(&mut a, 1, 2);
+        let c: ndarray::Array2<i64> = ndarray::arr2(&[[1, 2, 3], [7, 8, 9], [4, 5, 6]]);
+        b.iter()
+            .zip(c.iter())
+            .map(|(x, y)| assert_eq!(*x, *y))
+            .count();
+        // this should work, but it doesn't.
+        // assert_eq!(b, c);
+    }
+
+    #[cfg(feature = "ndarrayl")]
+    #[test]
+    fn test_swap_rows_and_columns() {
+        let mut a: ndarray::Array2<i64> = ndarray::arr2(&[[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
+        let b = super::swap_columns(super::swap_rows(&mut a, 1, 2), 1, 2);
+        let c: ndarray::Array2<i64> = ndarray::arr2(&[[1, 3, 2], [7, 9, 8], [4, 6, 5]]);
+        b.iter()
+            .zip(c.iter())
+            .map(|(x, y)| assert_eq!(*x, *y))
+            .count();
+        // this should work, but it doesn't.
+        // assert_eq!(b, c);
+    }
+}
