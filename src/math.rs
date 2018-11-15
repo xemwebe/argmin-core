@@ -81,6 +81,7 @@ where
 impl ModifiedCholesky for ndarray::Array2<f64> {
     /// Algorithm 6.5 in "Numerical Optimization" by Nocedal and Wright
     fn modified_cholesky(&self, delta: f64, beta: f64) -> Result<ndarray::Array2<f64>, Error> {
+        use ndarray::s;
         if delta <= 0.0 {
             return Err(ArgminError::InvalidParameter {
                 text: "modified_cholesky: delta must be > 0.0.".to_string(),
@@ -94,10 +95,20 @@ impl ModifiedCholesky for ndarray::Array2<f64> {
             .into());
         }
         let mut c: ndarray::Array2<f64> = ndarray::Array2::zeros(self.raw_dim());
-        let mut c_diag = c.diag_mut();
         let a_diag = self.diag();
-        c_diag.assign(&a_diag);
-        unimplemented!()
+        c.diag_mut().assign(&a_diag);
+        debug_assert!(self.is_square());
+        let n = self.raw_dim()[0];
+        let mut l: ndarray::Array2<f64> = ndarray::Array::zeros((n, n));
+        let d: ndarray::Array1<f64> = ndarray::Array::zeros(n);
+        for j in 0..(n - 1) {
+            if j > 0 {
+                l.slice_mut(s![j, 0..(j - 1)])
+                    .assign(&(&c.slice(s![j, 0..(j - 1)]) / d[j]));
+            }
+            unimplemented!()
+        }
+        Ok(l)
     }
 }
 
