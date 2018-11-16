@@ -43,11 +43,7 @@ where
 }
 
 #[cfg(feature = "ndarrayl")]
-fn swap_columns<T>(
-    mat: &mut ndarray::Array2<T>,
-    idx1: usize,
-    idx2: usize,
-) -> &mut ndarray::Array2<T>
+fn swap_columns<T>(mat: &mut ndarray::Array2<T>, idx1: usize, idx2: usize)
 where
     ndarray::OwnedRepr<T>: ndarray::Data,
 {
@@ -55,11 +51,10 @@ where
     for i in 0..s[0] {
         mat.swap((i, idx1), (i, idx2));
     }
-    mat
 }
 
 #[cfg(feature = "ndarrayl")]
-fn swap_rows<T>(mat: &mut ndarray::Array2<T>, idx1: usize, idx2: usize) -> &mut ndarray::Array2<T>
+fn swap_rows<T>(mat: &mut ndarray::Array2<T>, idx1: usize, idx2: usize)
 where
     ndarray::OwnedRepr<T>: ndarray::Data,
 {
@@ -67,7 +62,27 @@ where
     for i in 0..s[1] {
         mat.swap((idx1, i), (idx2, i));
     }
-    mat
+}
+
+#[cfg(feature = "ndarrayl")]
+fn index_of_largest<'a, T>(c: &ndarray::ArrayView1<T>) -> usize
+where
+    <ndarray::ViewRepr<&'a T> as ndarray::Data>::Elem:
+        std::cmp::PartialOrd + num::traits::Signed + Clone,
+{
+    let mut max = num::abs(c.diag()[0].clone());
+    let mut max_idx = 0;
+    c.iter()
+        .enumerate()
+        .map(|(i, ci)| {
+            let ci = num::abs(ci.clone());
+            if ci > max {
+                max = ci;
+                max_idx = i
+            }
+        })
+        .count();
+    max_idx
 }
 
 pub trait ModifiedCholesky
@@ -80,6 +95,8 @@ where
 #[cfg(feature = "ndarrayl")]
 impl ModifiedCholesky for ndarray::Array2<f64> {
     /// Algorithm 6.5 in "Numerical Optimization" by Nocedal and Wright
+    ///
+    /// This can certainly be implemented more memory efficiently
     fn modified_cholesky(&self, delta: f64, beta: f64) -> Result<ndarray::Array2<f64>, Error> {
         use ndarray::s;
         if delta <= 0.0 {
@@ -102,6 +119,9 @@ impl ModifiedCholesky for ndarray::Array2<f64> {
         let mut l: ndarray::Array2<f64> = ndarray::Array::zeros((n, n));
         let d: ndarray::Array1<f64> = ndarray::Array::zeros(n);
         for j in 0..(n - 1) {
+            let max_idx = index_of_largest(&c.diag().slice(s![j..]));
+            swap_rows(&mut c, j, max_idx);
+            swap_columns(&mut c, j, max_idx);
             if j > 0 {
                 l.slice_mut(s![j, 0..(j - 1)])
                     .assign(&(&c.slice(s![j, 0..(j - 1)]) / d[j]));
@@ -477,9 +497,9 @@ mod tests {
     #[test]
     fn test_swap_columns() {
         let mut a: ndarray::Array2<i64> = ndarray::arr2(&[[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
-        let b = super::swap_columns(&mut a, 1, 2);
+        super::swap_columns(&mut a, 1, 2);
         let c: ndarray::Array2<i64> = ndarray::arr2(&[[1, 3, 2], [4, 6, 5], [7, 9, 8]]);
-        b.iter()
+        a.iter()
             .zip(c.iter())
             .map(|(x, y)| assert_eq!(*x, *y))
             .count();
@@ -491,9 +511,9 @@ mod tests {
     #[test]
     fn test_swap_rows() {
         let mut a: ndarray::Array2<i64> = ndarray::arr2(&[[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
-        let b = super::swap_rows(&mut a, 1, 2);
+        super::swap_rows(&mut a, 1, 2);
         let c: ndarray::Array2<i64> = ndarray::arr2(&[[1, 2, 3], [7, 8, 9], [4, 5, 6]]);
-        b.iter()
+        a.iter()
             .zip(c.iter())
             .map(|(x, y)| assert_eq!(*x, *y))
             .count();
@@ -505,12 +525,26 @@ mod tests {
     #[test]
     fn test_swap_rows_and_columns() {
         let mut a: ndarray::Array2<i64> = ndarray::arr2(&[[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
-        let b = super::swap_columns(super::swap_rows(&mut a, 1, 2), 1, 2);
+        super::swap_rows(&mut a, 1, 2);
+        super::swap_columns(&mut a, 1, 2);
         let c: ndarray::Array2<i64> = ndarray::arr2(&[[1, 3, 2], [7, 9, 8], [4, 6, 5]]);
-        b.iter()
+        a.iter()
             .zip(c.iter())
             .map(|(x, y)| assert_eq!(*x, *y))
             .count();
+        // this should work, but it doesn't.
+        // assert_eq!(b, c);
+    }
+
+    #[cfg(feature = "ndarrayl")]
+    #[test]
+    fn test_biggest_index() {
+        use ndarray::s;
+        let j = 1;
+        let a: ndarray::Array2<i64> =
+            ndarray::arr2(&[[1, 2, 3, 0], [4, 2, 6, 0], [7, 8, 3, 0], [3, 4, 2, 8]]);
+        let idx = super::index_of_largest(&a.diag().slice(s![j..]));
+        assert_eq!(idx + j, 3);
         // this should work, but it doesn't.
         // assert_eq!(b, c);
     }
