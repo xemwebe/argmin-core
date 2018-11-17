@@ -89,7 +89,7 @@ pub trait ModifiedCholesky
 where
     Self: Sized,
 {
-    fn modified_cholesky(&self, delta: f64, beta: f64) -> Result<Self, Error>;
+    fn modified_cholesky(&self, delta: f64, beta: f64) -> Result<(Self, Self), Error>;
 }
 
 #[cfg(feature = "ndarrayl")]
@@ -97,7 +97,11 @@ impl ModifiedCholesky for ndarray::Array2<f64> {
     /// Algorithm 6.5 in "Numerical Optimization" by Nocedal and Wright
     ///
     /// This can certainly be implemented more memory efficiently
-    fn modified_cholesky(&self, delta: f64, beta: f64) -> Result<ndarray::Array2<f64>, Error> {
+    fn modified_cholesky(
+        &self,
+        delta: f64,
+        beta: f64,
+    ) -> Result<(ndarray::Array2<f64>, ndarray::Array2<f64>), Error> {
         use ndarray::s;
         if delta <= 0.0 {
             return Err(ArgminError::InvalidParameter {
@@ -117,18 +121,50 @@ impl ModifiedCholesky for ndarray::Array2<f64> {
         debug_assert!(self.is_square());
         let n = self.raw_dim()[0];
         let mut l: ndarray::Array2<f64> = ndarray::Array::zeros((n, n));
-        let d: ndarray::Array1<f64> = ndarray::Array::zeros(n);
-        for j in 0..(n - 1) {
+        let mut d: ndarray::Array1<f64> = ndarray::Array::zeros(n);
+        for j in 0..n {
             let max_idx = index_of_largest(&c.diag().slice(s![j..]));
-            swap_rows(&mut c, j, max_idx);
-            swap_columns(&mut c, j, max_idx);
-            if j > 0 {
-                l.slice_mut(s![j, 0..(j - 1)])
-                    .assign(&(&c.slice(s![j, 0..(j - 1)]) / d[j]));
+            swap_rows(&mut c, j, j + max_idx);
+            swap_columns(&mut c, j, j + max_idx);
+            for s in 0..j {
+                l[(j, s)] = c[(j, s)] / d[s];
             }
-            unimplemented!()
+
+            for i in (j + 1)..n {
+                c[(i, j)] = self[(i, j)]
+                    - if j > 0 {
+                        (&l.slice(s![j, 0..(j - 1)]) * &c.slice(s![i, 0..(j - 1)])).scalar_sum()
+                    } else {
+                        0.0
+                    };
+            }
+            let theta =
+                if j <= (n - 1) {
+                    c.slice(s![(j + 1).., j]).fold(0.0, |acc, x| {
+                        if (*x).abs() > acc {
+                            (*x).abs()
+                        } else {
+                            acc
+                        }
+                    })
+                } else {
+                    0.0
+                };
+
+            d[j] = c[(j, j)].abs().max((theta / beta).powi(2)).max(delta);
+
+            // println!("dj: {:?}; theta: {:?}", d, theta);
+            if j < (n - 1) {
+                for i in (j + 1)..n {
+                    let c2 = c[(i, j)].powi(2);
+                    c[(i, i)] -= c2 / d[j];
+                }
+            }
         }
-        Ok(l)
+        // println!("{:?}", c);
+        let mut dout = ndarray::Array2::eye(n);
+        dout.diag_mut().assign(&d);
+        Ok((l, dout))
     }
 }
 
@@ -547,5 +583,20 @@ mod tests {
         assert_eq!(idx + j, 3);
         // this should work, but it doesn't.
         // assert_eq!(b, c);
+    }
+
+    #[cfg(feature = "ndarrayl")]
+    #[test]
+    fn test_modified_cholesky() {
+        use super::ModifiedCholesky;
+        let a: ndarray::Array2<f64> =
+            ndarray::arr2(&[[4.0, 2.0, 1.0], [2.0, 6.0, 3.0], [1.0, 3.0, -0.004]]);
+        let delta = std::f64::EPSILON * 1.0f64.max(6.0 + 3.0);
+        let beta = (6.0f64.max(3.0 / (3.0f64.powi(2) - 1.0).sqrt().max(std::f64::EPSILON))).sqrt();
+        let (l, d) = a.modified_cholesky(delta, beta).unwrap();
+        let f = l.dot(&d).dot(&(l.t()));
+        println!("{:?}", l);
+        println!("{:?}", d);
+        println!("{:?}", f);
     }
 }
