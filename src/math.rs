@@ -70,7 +70,7 @@ where
     <ndarray::ViewRepr<&'a T> as ndarray::Data>::Elem:
         std::cmp::PartialOrd + num::traits::Signed + Clone,
 {
-    let mut max = num::abs(c.diag()[0].clone());
+    let mut max = num::abs(c[0].clone());
     let mut max_idx = 0;
     c.iter()
         .enumerate()
@@ -131,16 +131,14 @@ impl ModifiedCholesky for ndarray::Array2<f64> {
                 l[(j, s)] = c[(j, s)] / d[s];
             }
 
-            for i in (j + 1)..n {
-                c[(i, j)] = self[(i, j)]
-                    - if j > 0 {
-                        (&l.slice(s![j, 0..(j - 1)]) * &c.slice(s![i, 0..(j - 1)])).scalar_sum()
-                    } else {
-                        0.0
-                    };
+            // for i in (j + 1)..n {
+            for i in j..n {
+                c[(i, j)] =
+                    self[(i, j)] - (&l.slice(s![j, 0..j]) * &c.slice(s![i, 0..j])).scalar_sum();
             }
+
             let theta =
-                if j <= (n - 1) {
+                if j < (n - 1) {
                     c.slice(s![(j + 1).., j]).fold(0.0, |acc, x| {
                         if (*x).abs() > acc {
                             (*x).abs()
@@ -154,7 +152,11 @@ impl ModifiedCholesky for ndarray::Array2<f64> {
 
             d[j] = c[(j, j)].abs().max((theta / beta).powi(2)).max(delta);
 
-            // println!("dj: {:?}; theta: {:?}", d, theta);
+            // weirdly enough, this seems to be necessary, even though it is not part of the
+            // algorithm in the reference. The reason seems to be that d[j] is not available at the
+            // beginning of the loop...
+            l[(j, j)] = c[(j, j)] / d[j];
+
             if j < (n - 1) {
                 for i in (j + 1)..n {
                     let c2 = c[(i, j)].powi(2);
@@ -162,7 +164,8 @@ impl ModifiedCholesky for ndarray::Array2<f64> {
                 }
             }
         }
-        // println!("{:?}", c);
+        // println!("c: {:?}", c);
+        // println!("d: {:?}", d);
         let mut dout = ndarray::Array2::eye(n);
         dout.diag_mut().assign(&d);
         Ok((l, dout))
@@ -594,8 +597,14 @@ mod tests {
             ndarray::arr2(&[[4.0, 2.0, 1.0], [2.0, 6.0, 3.0], [1.0, 3.0, -0.004]]);
         let (l, d) = a.modified_cholesky().unwrap();
         let f = l.dot(&d).dot(&(l.t()));
-        println!("{:?}", l);
-        println!("{:?}", d);
-        println!("{:?}", f);
+        let res: ndarray::Array2<f64> =
+            ndarray::arr2(&[[4.0, 2.0, 1.0], [2.0, 6.0, 3.0], [1.0, 3.0, 3.004]]);
+        assert!(f.all_close(&res, 2.0 * std::f64::EPSILON));
+        // let dsqrt = d.map(|x| x.sqrt());
+        // let m = l.dot(&dsqrt);
+        // println!("l: {:?}", l);
+        // println!("d: {:?}", d);
+        // println!("f: {:?}", f);
+        // println!("m: {:?}", m);
     }
 }
