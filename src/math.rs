@@ -15,8 +15,8 @@
 //! implemented for basic `Vec`s, and will in the future also be implemented for types defined by
 //! `ndarray` and `nalgebra`.
 
-#[cfg(feature = "ndarrayl")]
-use crate::errors::ArgminError;
+// #[cfg(feature = "ndarrayl")]
+// use crate::errors::ArgminError;
 #[cfg(feature = "ndarrayl")]
 use ndarray;
 #[cfg(feature = "ndarrayl")]
@@ -89,7 +89,7 @@ pub trait ModifiedCholesky
 where
     Self: Sized,
 {
-    fn modified_cholesky(&self, delta: f64, beta: f64) -> Result<(Self, Self), Error>;
+    fn modified_cholesky(&self) -> Result<(Self, Self), Error>;
 }
 
 #[cfg(feature = "ndarrayl")]
@@ -97,31 +97,32 @@ impl ModifiedCholesky for ndarray::Array2<f64> {
     /// Algorithm 6.5 in "Numerical Optimization" by Nocedal and Wright
     ///
     /// This can certainly be implemented more memory efficiently
-    fn modified_cholesky(
-        &self,
-        delta: f64,
-        beta: f64,
-    ) -> Result<(ndarray::Array2<f64>, ndarray::Array2<f64>), Error> {
+    fn modified_cholesky(&self) -> Result<(ndarray::Array2<f64>, ndarray::Array2<f64>), Error> {
         use ndarray::s;
-        if delta <= 0.0 {
-            return Err(ArgminError::InvalidParameter {
-                text: "modified_cholesky: delta must be > 0.0.".to_string(),
-            }
-            .into());
-        }
-        if beta <= 0.0 {
-            return Err(ArgminError::InvalidParameter {
-                text: "modified_cholesky: beta must be > 0.0.".to_string(),
-            }
-            .into());
-        }
-        let mut c: ndarray::Array2<f64> = ndarray::Array2::zeros(self.raw_dim());
-        let a_diag = self.diag();
-        c.diag_mut().assign(&a_diag);
         debug_assert!(self.is_square());
         let n = self.raw_dim()[0];
+        let a_diag = self.diag();
+
+        let diag_max = a_diag.fold(0.0, |acc, x| if x.abs() > acc { x.abs() } else { acc });
+        let off_diag_max =
+            self.indexed_iter()
+                .filter(|((i, j), _)| i != j)
+                .fold(
+                    0.0,
+                    |acc, ((_, _), x)| if x.abs() > acc { x.abs() } else { acc },
+                );
+
+        let delta = std::f64::EPSILON * 1.0f64.max(diag_max + off_diag_max);
+        let beta = (diag_max
+            .max(off_diag_max / ((n as f64).powi(2) - 1.0).sqrt())
+            .max(std::f64::EPSILON))
+        .sqrt();
+
+        let mut c: ndarray::Array2<f64> = ndarray::Array2::zeros(self.raw_dim());
+        c.diag_mut().assign(&a_diag);
         let mut l: ndarray::Array2<f64> = ndarray::Array::zeros((n, n));
         let mut d: ndarray::Array1<f64> = ndarray::Array::zeros(n);
+
         for j in 0..n {
             let max_idx = index_of_largest(&c.diag().slice(s![j..]));
             swap_rows(&mut c, j, j + max_idx);
@@ -591,9 +592,7 @@ mod tests {
         use super::ModifiedCholesky;
         let a: ndarray::Array2<f64> =
             ndarray::arr2(&[[4.0, 2.0, 1.0], [2.0, 6.0, 3.0], [1.0, 3.0, -0.004]]);
-        let delta = std::f64::EPSILON * 1.0f64.max(6.0 + 3.0);
-        let beta = (6.0f64.max(3.0 / (3.0f64.powi(2) - 1.0).sqrt().max(std::f64::EPSILON))).sqrt();
-        let (l, d) = a.modified_cholesky(delta, beta).unwrap();
+        let (l, d) = a.modified_cholesky().unwrap();
         let f = l.dot(&d).dot(&(l.t()));
         println!("{:?}", l);
         println!("{:?}", d);
