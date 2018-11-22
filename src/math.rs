@@ -172,6 +172,35 @@ impl ModifiedCholesky for ndarray::Array2<f64> {
     }
 }
 
+pub trait GershgorinCircles {
+    fn gershgorin_circles(&self) -> Result<Vec<(f64, f64)>, Error>;
+}
+
+#[cfg(feature = "ndarrayl")]
+impl GershgorinCircles for ndarray::Array2<f64> {
+    fn gershgorin_circles(&self) -> Result<Vec<(f64, f64)>, Error> {
+        debug_assert!(self.is_square());
+        use ndarray::s;
+        let n = self.raw_dim()[0];
+        let mut out: Vec<(f64, f64)> = Vec::with_capacity(n);
+        for i in 0..n {
+            // TODO: do this with slices instead of loops
+            let aii = self[(i, i)];
+            let mut ri = 0.0;
+            let mut ci = 0.0;
+            for j in 0..n {
+                if i == j {
+                    continue;
+                }
+                ri += self[(i, j)].abs();
+                ci += self[(j, i)].abs();
+            }
+            out.push((aii, ri.min(ci)));
+        }
+        Ok(out)
+    }
+}
+
 /// Dot/scalar product of `T` and `self`
 pub trait ArgminDot<T, U> {
     /// Dot/scalar product of `T` and `self`
@@ -606,5 +635,29 @@ mod tests {
         // println!("d: {:?}", d);
         // println!("f: {:?}", f);
         // println!("m: {:?}", m);
+    }
+
+    #[cfg(feature = "ndarrayl")]
+    #[test]
+    fn test_gershgorin_circles() {
+        use super::GershgorinCircles;
+        let a: ndarray::Array2<f64> = ndarray::arr2(&[
+            [10.0, -1.0, 0.0, 1.0],
+            [0.2, 8.0, 0.2, 0.2],
+            [1.0, 1.0, 2.0, 1.0],
+            [-1.0, -1.0, -1.0, -11.0],
+        ]);
+        // without considering the columns as well
+        // let b: Vec<(f64, f64)> = vec![(10.0, 2.0), (8.0, 0.6), (2.0, 3.0), (-11.0, 3.0)];
+        // with considering the columns
+        let b: Vec<(f64, f64)> = vec![(10.0, 2.0), (8.0, 0.6), (2.0, 1.2), (-11.0, 2.2)];
+        let res = a.gershgorin_circles().unwrap();
+        b.iter()
+            .zip(res.iter())
+            .map(|((x1, y1), (x2, y2))| {
+                assert!((x1 - x2).abs() < 2.0 * std::f64::EPSILON);
+                assert!((y1 - y2).abs() < 2.0 * std::f64::EPSILON);
+            })
+            .count();
     }
 }
