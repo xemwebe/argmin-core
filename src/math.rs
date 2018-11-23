@@ -180,7 +180,7 @@ pub trait GershgorinCircles {
 impl GershgorinCircles for ndarray::Array2<f64> {
     fn gershgorin_circles(&self) -> Result<Vec<(f64, f64)>, Error> {
         debug_assert!(self.is_square());
-        use ndarray::s;
+        // use ndarray::s;
         let n = self.raw_dim()[0];
         let mut out: Vec<(f64, f64)> = Vec::with_capacity(n);
         for i in 0..n {
