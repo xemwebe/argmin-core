@@ -15,6 +15,7 @@
 //!   * Provide an example of how to implement a solver
 
 // #![feature(specialization)]
+#![feature(doc_spotlight)]
 
 #[cfg(feature = "ctrlc")]
 pub extern crate ctrlc;
@@ -67,6 +68,7 @@ pub use termination::TerminationReason;
 
 /// Defines the interface to a solver. Usually, there is no need to implement this manually, use
 /// the `argmin_derive` crate instead.
+#[doc(spotlight)]
 pub trait ArgminSolver: ArgminNextIter {
     /// apply cost function or operator to a parameter vector
     fn apply(
@@ -303,7 +305,12 @@ pub trait ArgminOperator {
     type Hessian;
 
     /// Applies the operator/cost function to parameters
-    fn apply(&self, &Self::Parameters) -> Result<Self::OperatorOutput, Error>;
+    fn apply(&self, &Self::Parameters) -> Result<Self::OperatorOutput, Error> {
+        Err(ArgminError::NotImplemented {
+            text: "Method `apply` of ArgminOperator trait not implemented!".to_string(),
+        }
+        .into())
+    }
 
     /// Computes the gradient at the given parameters
     fn gradient(&self, &Self::Parameters) -> Result<Self::Parameters, Error> {
