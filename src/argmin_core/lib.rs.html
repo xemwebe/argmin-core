@@ -435,6 +435,13 @@
 <span id="435">435</span>
 <span id="436">436</span>
 <span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -453,6 +460,7 @@
 <span class="doccomment">//!   * Provide an example of how to implement a solver</span>
 
 <span class="comment">// #![feature(specialization)]</span>
+<span class="attribute">#![<span class="ident">feature</span>(<span class="ident">doc_spotlight</span>)]</span>
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ctrlc&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">ctrlc</span>;
@@ -505,6 +513,7 @@
 
 <span class="doccomment">/// Defines the interface to a solver. Usually, there is no need to implement this manually, use</span>
 <span class="doccomment">/// the `argmin_derive` crate instead.</span>
+<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">spotlight</span>)]</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ArgminSolver</span>: <span class="ident">ArgminNextIter</span> {
     <span class="doccomment">/// apply cost function or operator to a parameter vector</span>
     <span class="kw">fn</span> <span class="ident">apply</span>(
@@ -741,7 +750,12 @@
     <span class="kw">type</span> <span class="ident">Hessian</span>;
 
     <span class="doccomment">/// Applies the operator/cost function to parameters</span>
-    <span class="kw">fn</span> <span class="ident">apply</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Parameters</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">OperatorOutput</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">apply</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Parameters</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">OperatorOutput</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">NotImplemented</span> {
+            <span class="ident">text</span>: <span class="string">&quot;Method `apply` of ArgminOperator trait not implemented!&quot;</span>.<span class="ident">to_string</span>(),
+        }
+        .<span class="ident">into</span>())
+    }
 
     <span class="doccomment">/// Computes the gradient at the given parameters</span>
     <span class="kw">fn</span> <span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Parameters</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Parameters</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
