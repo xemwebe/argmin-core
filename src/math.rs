@@ -89,7 +89,7 @@ pub trait ModifiedCholesky
 where
     Self: Sized,
 {
-    fn modified_cholesky(&self) -> Result<(Self, Self), Error>;
+    fn modified_cholesky(&self) -> Result<(Self, Self, Self), Error>;
 }
 
 #[cfg(feature = "ndarrayl")]
@@ -97,7 +97,16 @@ impl ModifiedCholesky for ndarray::Array2<f64> {
     /// Algorithm 6.5 in "Numerical Optimization" by Nocedal and Wright
     ///
     /// This can certainly be implemented more memory efficiently
-    fn modified_cholesky(&self) -> Result<(ndarray::Array2<f64>, ndarray::Array2<f64>), Error> {
+    fn modified_cholesky(
+        &self,
+    ) -> Result<
+        (
+            ndarray::Array2<f64>,
+            ndarray::Array2<f64>,
+            ndarray::Array2<f64>,
+        ),
+        Error,
+    > {
         use ndarray::s;
         debug_assert!(self.is_square());
         let n = self.raw_dim()[0];
@@ -168,7 +177,7 @@ impl ModifiedCholesky for ndarray::Array2<f64> {
         // println!("d: {:?}", d);
         let mut dout = ndarray::Array2::eye(n);
         dout.diag_mut().assign(&d);
-        Ok((l, dout))
+        Ok((l, dout, c))
     }
 }
 
@@ -198,6 +207,38 @@ impl GershgorinCircles for ndarray::Array2<f64> {
             out.push((aii, ri.min(ci)));
         }
         Ok(out)
+    }
+}
+
+pub trait GershgorinModification {
+    fn gershgorin_modification(&self) -> Result<f64, Error>;
+}
+
+#[cfg(feature = "ndarrayl")]
+impl GershgorinModification for ndarray::Array2<f64> {
+    fn gershgorin_modification(&self) -> Result<f64, Error> {
+        let discs = self.gershgorin_circles()?;
+        let b1 = discs.iter().fold(std::f64::INFINITY, |acc, x| {
+            if x.0 - x.1 < acc {
+                x.0 - x.1
+            } else {
+                acc
+            }
+        });
+        let (_, d, c) = self.modified_cholesky()?;
+        let b2 = (&d.diag() - &c.diag())
+            .iter()
+            .fold(
+                std::f64::NEG_INFINITY,
+                |acc, &x| {
+                    if x > acc {
+                        x
+                    } else {
+                        acc
+                    }
+                },
+            );
+        Ok(b1.min(b2))
     }
 }
 
@@ -624,7 +665,7 @@ mod tests {
         use super::ModifiedCholesky;
         let a: ndarray::Array2<f64> =
             ndarray::arr2(&[[4.0, 2.0, 1.0], [2.0, 6.0, 3.0], [1.0, 3.0, -0.004]]);
-        let (l, d) = a.modified_cholesky().unwrap();
+        let (l, d, _) = a.modified_cholesky().unwrap();
         let f = l.dot(&d).dot(&(l.t()));
         let res: ndarray::Array2<f64> =
             ndarray::arr2(&[[4.0, 2.0, 1.0], [2.0, 6.0, 3.0], [1.0, 3.0, 3.004]]);
