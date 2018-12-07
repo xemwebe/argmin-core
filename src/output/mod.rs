@@ -16,8 +16,8 @@
 
 pub mod file;
 
-use ArgminWrite;
-use Error;
+use crate::ArgminWrite;
+use crate::Error;
 
 #[derive(Default)]
 pub struct ArgminWriter<T> {

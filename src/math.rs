@@ -17,14 +17,14 @@
 
 // #[cfg(feature = "ndarrayl")]
 // use crate::errors::ArgminError;
+use crate::Error;
 #[cfg(feature = "ndarrayl")]
 use ndarray;
 #[cfg(feature = "ndarrayl")]
 use ndarray_linalg::Inverse;
-use Error;
 
 pub trait ArgminMul<T, U> {
-    fn amul(&self, T) -> U;
+    fn amul(&self, other: T) -> U;
 }
 
 impl ArgminMul<f64, Vec<f64>> for Vec<f64> {
@@ -245,13 +245,13 @@ impl GershgorinModification for ndarray::Array2<f64> {
 /// Dot/scalar product of `T` and `self`
 pub trait ArgminDot<T, U> {
     /// Dot/scalar product of `T` and `self`
-    fn dot(&self, T) -> U;
+    fn dot(&self, other: T) -> U;
 }
 
 /// Dot/scalar product of `T` and `self` weighted by W (p^TWv)
 pub trait ArgminWeightedDot<T, U, V> {
     /// Dot/scalar product of `T` and `self`
-    fn weighted_dot(&self, V, T) -> U;
+    fn weighted_dot(&self, w: V, vec: T) -> U;
 }
 
 /// TEMPORARY: only for testing!
@@ -290,7 +290,7 @@ impl ArgminZero for ndarray::Array1<f64> {
 /// Add a `T` to `self`
 pub trait ArgminAdd<T> {
     /// Add a `T` to `self`
-    fn add(&self, T) -> Self;
+    fn add(&self, other: T) -> Self;
 }
 
 // would be great if this worked
@@ -304,7 +304,7 @@ pub trait ArgminAdd<T> {
 /// Subtract a `T` from `self`
 pub trait ArgminSub<T> {
     /// Subtract a `T` from `self`
-    fn sub(&self, T) -> Self;
+    fn sub(&self, other: T) -> Self;
 }
 
 // would be great if this worked
@@ -322,19 +322,19 @@ pub trait ArgminSub<T> {
 /// Add a `T` scaled by an `U` to `self`
 pub trait ArgminScaledAdd<T, U> {
     /// Add a `T` scaled by an `U` to `self`
-    fn scaled_add(&self, U, T) -> Self;
+    fn scaled_add(&self, factor: U, vec: T) -> Self;
 }
 
 /// Subtract a `T` scaled by an `U` from `self`
 pub trait ArgminScaledSub<T, U> {
     /// Subtract a `T` scaled by an `U` from `self`
-    fn scaled_sub(&self, U, T) -> Self;
+    fn scaled_sub(&self, factor: U, vec: T) -> Self;
 }
 
 /// Scale `self` by a `U`
 pub trait ArgminScale<U> {
     /// Scale `self` by a `U`
-    fn scale(&self, U) -> Self;
+    fn scale(&self, factor: U) -> Self;
 }
 
 /// Compute the l2-norm (`U`) of `self`

@@ -7,9 +7,9 @@
 
 //! # Output parameter vectors to file
 
+use crate::ArgminWrite;
+use crate::Error;
 use std;
-use ArgminWrite;
-use Error;
 
 pub struct WriteToFile<T> {
     _param: std::marker::PhantomData<T>,

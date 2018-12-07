@@ -15,16 +15,16 @@
 //! TODO:
 //!   * It would be great if `T` did not have to implement `Default`
 
-use logging::ArgminLogger;
-use output::ArgminWriter;
+use crate::logging::ArgminLogger;
+use crate::output::ArgminWriter;
+use crate::termination::TerminationReason;
+use crate::ArgminKV;
+use crate::ArgminLog;
+use crate::ArgminOperator;
+use crate::ArgminResult;
+use crate::ArgminWrite;
+use crate::Error;
 use std;
-use termination::TerminationReason;
-use ArgminKV;
-use ArgminLog;
-use ArgminOperator;
-use ArgminResult;
-use ArgminWrite;
-use Error;
 
 /// Storage for data needed by most solvers
 ///

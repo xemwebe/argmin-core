@@ -13,7 +13,7 @@
 //! TODO:
 //!   * Maybe it is more appropriate to return the `base` struct?
 
-use termination::TerminationReason;
+use crate::termination::TerminationReason;
 
 /// Return struct for all solvers.
 #[derive(Debug, Clone)]

@@ -2,6 +2,7 @@
 name = "argmin_core"
 version = "0.1.6"
 authors = ["Stefan Kroboth <stefan.kroboth@gmail.com>"]
+edition = "2018"
 license = "MIT OR Apache-2.0"
 description = "A pure Rust optimization toolbox (core functionality)"
 documentation = "https://argmin-rs.github.io/argmin-core/argmin_core/"
@@ -23,9 +24,9 @@ ctrlc = { version = "3.1.1", optional = true }
 slog = "2.4.1"
 slog-term = "2.2.4"
 slog-async = "2.3.0"
-slog-json = "2.2.0"
+slog-json = "2.3.0"
 rand = "0.5.5"
-ndarray = { version = "0.12.0", optional = true }
+ndarray = { version = "0.12.1", optional = true }
 ndarray-linalg = { version = "0.10.0", optional = true }
 num = { version = "0.2", optional = true }
 

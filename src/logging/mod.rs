@@ -11,7 +11,7 @@
 
 pub mod slog_logger;
 
-use {ArgminKV, ArgminLog, Error};
+use crate::{ArgminKV, ArgminLog, Error};
 
 /// Container for `ArgminLog`gers
 #[derive(Default)]

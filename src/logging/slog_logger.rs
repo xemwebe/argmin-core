@@ -7,6 +7,7 @@
 
 //! # Loggers based on the `slog` crate
 
+use crate::{ArgminKV, ArgminLog, Error};
 use slog;
 use slog::{Drain, Record, Serializer, KV};
 use slog_async;
@@ -15,7 +16,6 @@ use slog_json;
 use slog_term;
 use std::fs::OpenOptions;
 use std::sync::Mutex;
-use {ArgminKV, ArgminLog, Error};
 
 /// A logger based on `slog`
 pub struct ArgminSlogLogger {
