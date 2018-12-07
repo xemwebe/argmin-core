@@ -16,9 +16,6 @@
 
 // #![feature(specialization)]
 #![feature(doc_spotlight)]
-// necessary to get clippy to shut up about the s! macro
-// remove this as soon as modified cholesky stuff is removed.
-#![allow(clippy::deref_addrof)]
 // I really do not like the a..=b syntax
 #![allow(clippy::range_plus_one)]
 
