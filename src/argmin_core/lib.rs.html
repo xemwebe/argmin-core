@@ -442,6 +442,8 @@
 <span id="442">442</span>
 <span id="443">443</span>
 <span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -461,6 +463,8 @@
 
 <span class="comment">// #![feature(specialization)]</span>
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">doc_spotlight</span>)]</span>
+<span class="comment">// I really do not like the a..=b syntax</span>
+<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">range_plus_one</span>)]</span>
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ctrlc&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">ctrlc</span>;
@@ -499,17 +503,17 @@
 <span class="kw">mod</span> <span class="ident">termination</span>;
 
 <span class="comment">// TODO: Maybe leave logging/output stuff in its namespace</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">base</span>::<span class="ident">ArgminBase</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">errors</span>::<span class="kw-2">*</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">base</span>::<span class="ident">ArgminBase</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">errors</span>::<span class="kw-2">*</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">kv</span>::<span class="ident">ArgminKV</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">logging</span>::<span class="ident">slog_logger</span>::<span class="ident">ArgminSlogLogger</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">logging</span>::<span class="ident">ArgminLogger</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">math</span>::<span class="kw-2">*</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">output</span>::<span class="ident">file</span>::<span class="ident">WriteToFile</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">output</span>::<span class="ident">ArgminWriter</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">result</span>::<span class="ident">ArgminResult</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">termination</span>::<span class="ident">TerminationReason</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">failure</span>::<span class="ident">Error</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">kv</span>::<span class="ident">ArgminKV</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">logging</span>::<span class="ident">slog_logger</span>::<span class="ident">ArgminSlogLogger</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">logging</span>::<span class="ident">ArgminLogger</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">math</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">output</span>::<span class="ident">file</span>::<span class="ident">WriteToFile</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">output</span>::<span class="ident">ArgminWriter</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">result</span>::<span class="ident">ArgminResult</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">termination</span>::<span class="ident">TerminationReason</span>;
 
 <span class="doccomment">/// Defines the interface to a solver. Usually, there is no need to implement this manually, use</span>
 <span class="doccomment">/// the `argmin_derive` crate instead.</span>
@@ -518,26 +522,26 @@
     <span class="doccomment">/// apply cost function or operator to a parameter vector</span>
     <span class="kw">fn</span> <span class="ident">apply</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="kw-2">&amp;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span>,
+        <span class="ident">param</span>: <span class="kw-2">&amp;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span>,
     ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">OperatorOutput</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// compute the gradient for a parameter vector</span>
     <span class="kw">fn</span> <span class="ident">gradient</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="kw-2">&amp;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span>,
+        <span class="ident">param</span>: <span class="kw-2">&amp;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span>,
     ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// compute the hessian for a parameter vector</span>
     <span class="kw">fn</span> <span class="ident">hessian</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="kw-2">&amp;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span>,
+        <span class="ident">param</span>: <span class="kw-2">&amp;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span>,
     ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Hessian</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// modify the parameter vector</span>
     <span class="kw">fn</span> <span class="ident">modify</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="kw-2">&amp;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span>,
-        <span class="ident">f64</span>,
+        <span class="ident">param</span>: <span class="kw-2">&amp;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span>,
+        <span class="ident">extent</span>: <span class="ident">f64</span>,
     ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// return current parameter vector</span>
@@ -550,16 +554,16 @@
     <span class="kw">fn</span> <span class="ident">cur_hessian</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Hessian</span>;
 
     <span class="doccomment">/// set current parameter vector</span>
-    <span class="kw">fn</span> <span class="ident">set_cur_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span>);
+    <span class="kw">fn</span> <span class="ident">set_cur_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">param</span>: <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span>);
 
     <span class="doccomment">/// set current gradient</span>
-    <span class="kw">fn</span> <span class="ident">set_cur_grad</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span>);
+    <span class="kw">fn</span> <span class="ident">set_cur_grad</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">grad</span>: <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span>);
 
     <span class="doccomment">/// set current gradient</span>
-    <span class="kw">fn</span> <span class="ident">set_cur_hessian</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Hessian</span>);
+    <span class="kw">fn</span> <span class="ident">set_cur_hessian</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">hessian</span>: <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Hessian</span>);
 
     <span class="doccomment">/// set current parameter vector</span>
-    <span class="kw">fn</span> <span class="ident">set_best_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span>);
+    <span class="kw">fn</span> <span class="ident">set_best_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">param</span>: <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span>);
 
     <span class="doccomment">/// Execute the optimization algorithm.</span>
     <span class="kw">fn</span> <span class="ident">run</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ArgminResult</span><span class="op">&lt;&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
@@ -573,13 +577,13 @@
 
     <span class="doccomment">/// Set termination reason (doesn&#39;t terminate yet! -- this is helpful for terminating within</span>
     <span class="doccomment">/// the iterations)</span>
-    <span class="kw">fn</span> <span class="ident">set_termination_reason</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">TerminationReason</span>);
+    <span class="kw">fn</span> <span class="ident">set_termination_reason</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">reason</span>: <span class="ident">TerminationReason</span>);
 
     <span class="doccomment">/// Evaluate all stopping criterions and return the `TerminationReason`</span>
     <span class="kw">fn</span> <span class="ident">terminate</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">TerminationReason</span>;
 
     <span class="doccomment">/// Set max number of iterations.</span>
-    <span class="kw">fn</span> <span class="ident">set_max_iters</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">u64</span>);
+    <span class="kw">fn</span> <span class="ident">set_max_iters</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">iters</span>: <span class="ident">u64</span>);
 
     <span class="doccomment">/// Get max number of iterations.</span>
     <span class="kw">fn</span> <span class="ident">max_iters</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u64</span>;
@@ -594,7 +598,7 @@
     <span class="kw">fn</span> <span class="ident">cur_cost</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">f64</span>;
 
     <span class="doccomment">/// Get current cost function value</span>
-    <span class="kw">fn</span> <span class="ident">set_cur_cost</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f64</span>);
+    <span class="kw">fn</span> <span class="ident">set_cur_cost</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cost</span>: <span class="ident">f64</span>);
 
     <span class="doccomment">/// Get best cost function value</span>
     <span class="comment">// fn best_cost(&amp;self) -&gt; &lt;Self as ArgminNextIter&gt;::OperatorOutput;</span>
@@ -602,16 +606,16 @@
 
     <span class="doccomment">/// set best cost value</span>
     <span class="comment">// fn set_best_cost(&amp;mut self, &lt;Self as ArgminNextIter&gt;::OperatorOutput);</span>
-    <span class="kw">fn</span> <span class="ident">set_best_cost</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f64</span>);
+    <span class="kw">fn</span> <span class="ident">set_best_cost</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cost</span>: <span class="ident">f64</span>);
 
     <span class="doccomment">/// Set the target cost function value which is used as a stopping criterion</span>
-    <span class="kw">fn</span> <span class="ident">set_target_cost</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f64</span>);
+    <span class="kw">fn</span> <span class="ident">set_target_cost</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cost</span>: <span class="ident">f64</span>);
 
     <span class="doccomment">/// Add a logger to the array of loggers</span>
-    <span class="kw">fn</span> <span class="ident">add_logger</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ArgminLog</span><span class="op">&gt;</span>);
+    <span class="kw">fn</span> <span class="ident">add_logger</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">logger</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ArgminLog</span><span class="op">&gt;</span>);
 
     <span class="doccomment">/// Add a writer to the array of writers</span>
-    <span class="kw">fn</span> <span class="ident">add_writer</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ArgminWrite</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="self">Self</span>::<span class="ident">Parameters</span><span class="op">&gt;&gt;</span>);
+    <span class="kw">fn</span> <span class="ident">add_writer</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">writer</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ArgminWrite</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="self">Self</span>::<span class="ident">Parameters</span><span class="op">&gt;&gt;</span>);
 
     <span class="doccomment">/// Reset the base of the algorithm to its initial state</span>
     <span class="kw">fn</span> <span class="ident">base_reset</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>);
@@ -620,7 +624,7 @@
     <span class="kw">fn</span> <span class="ident">increment_cost_func_count</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>);
 
     <span class="doccomment">/// Increaese the cost function evaluation count by a given value</span>
-    <span class="kw">fn</span> <span class="ident">increase_cost_func_count</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">u64</span>);
+    <span class="kw">fn</span> <span class="ident">increase_cost_func_count</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">count</span>: <span class="ident">u64</span>);
 
     <span class="doccomment">/// Return the cost function evaluation count</span>
     <span class="kw">fn</span> <span class="ident">cost_func_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u64</span>;
@@ -629,7 +633,7 @@
     <span class="kw">fn</span> <span class="ident">increment_grad_func_count</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>);
 
     <span class="doccomment">/// Increase the gradient evaluation count by a given value</span>
-    <span class="kw">fn</span> <span class="ident">increase_grad_func_count</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">u64</span>);
+    <span class="kw">fn</span> <span class="ident">increase_grad_func_count</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">count</span>: <span class="ident">u64</span>);
 
     <span class="doccomment">/// Return the gradient evaluation count</span>
     <span class="kw">fn</span> <span class="ident">grad_func_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u64</span>;
@@ -638,7 +642,7 @@
     <span class="kw">fn</span> <span class="ident">increment_hessian_func_count</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>);
 
     <span class="doccomment">/// Increase the hessian evaluation count by a given value</span>
-    <span class="kw">fn</span> <span class="ident">increase_hessian_func_count</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">u64</span>);
+    <span class="kw">fn</span> <span class="ident">increase_hessian_func_count</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">count</span>: <span class="ident">u64</span>);
 
     <span class="doccomment">/// Return the gradient evaluation count</span>
     <span class="kw">fn</span> <span class="ident">hessian_func_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u64</span>;
@@ -670,12 +674,12 @@
 <span class="doccomment">/// Defince the interface every logger needs to expose</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ArgminLog</span> {
     <span class="doccomment">/// Logs general information (a message `msg` and/or key-value pairs `kv`).</span>
-    <span class="kw">fn</span> <span class="ident">log_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="ident">ArgminKV</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">log_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">kv</span>: <span class="kw-2">&amp;</span><span class="ident">ArgminKV</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Logs information from iterations. Only accepts key-value pairs. `log_iter` is made to log</span>
     <span class="doccomment">/// to a database or a CSV file. Therefore the structure of the key-value pairs should not</span>
     <span class="doccomment">/// change inbetween iterations.</span>
-    <span class="kw">fn</span> <span class="ident">log_iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">&amp;</span><span class="ident">ArgminKV</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">log_iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">kv</span>: <span class="kw-2">&amp;</span><span class="ident">ArgminKV</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span>;
 }
 
 <span class="doccomment">/// Every writer (which is something that writes parameter vectors somewhere after each iteration)</span>
@@ -684,7 +688,7 @@
     <span class="kw">type</span> <span class="ident">Param</span>;
 
     <span class="doccomment">/// Writes the parameter vector somewhere</span>
-    <span class="kw">fn</span> <span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Param</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">param</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Param</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span>;
 }
 
 <span class="doccomment">/// The datastructure which is returned by the `next_iter` method of the `ArgminNextIter` trait.</span>
@@ -750,7 +754,7 @@
     <span class="kw">type</span> <span class="ident">Hessian</span>;
 
     <span class="doccomment">/// Applies the operator/cost function to parameters</span>
-    <span class="kw">fn</span> <span class="ident">apply</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Parameters</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">OperatorOutput</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">apply</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_param</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Parameters</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">OperatorOutput</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">NotImplemented</span> {
             <span class="ident">text</span>: <span class="string">&quot;Method `apply` of ArgminOperator trait not implemented!&quot;</span>.<span class="ident">to_string</span>(),
         }
@@ -758,7 +762,7 @@
     }
 
     <span class="doccomment">/// Computes the gradient at the given parameters</span>
-    <span class="kw">fn</span> <span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Parameters</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Parameters</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_param</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Parameters</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Parameters</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">NotImplemented</span> {
             <span class="ident">text</span>: <span class="string">&quot;Method `gradient` of ArgminOperator trait not implemented!&quot;</span>.<span class="ident">to_string</span>(),
         }
@@ -766,7 +770,7 @@
     }
 
     <span class="doccomment">/// Computes the hessian at the given parameters</span>
-    <span class="kw">fn</span> <span class="ident">hessian</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Parameters</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Hessian</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">hessian</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_param</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Parameters</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Hessian</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">NotImplemented</span> {
             <span class="ident">text</span>: <span class="string">&quot;Method `hessian` of ArgminOperator trait not implemented!&quot;</span>.<span class="ident">to_string</span>(),
         }
@@ -775,7 +779,7 @@
 
     <span class="doccomment">/// Modifies a parameter vector. Comes with a variable that indicates the &quot;degree&quot; of the</span>
     <span class="doccomment">/// modification.</span>
-    <span class="kw">fn</span> <span class="ident">modify</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Parameters</span>, <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Parameters</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">modify</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_param</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Parameters</span>, <span class="ident">_extent</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Parameters</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">NotImplemented</span> {
             <span class="ident">text</span>: <span class="string">&quot;Method `modify` of ArgminOperator trait not implemented!&quot;</span>.<span class="ident">to_string</span>(),
         }
@@ -838,21 +842,21 @@
 <span class="doccomment">/// avoids unneccessary computation of those values.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ArgminLineSearch</span>: <span class="ident">ArgminSolver</span> {
     <span class="doccomment">/// Set the initial parameter (starting point)</span>
-    <span class="kw">fn</span> <span class="ident">set_initial_parameter</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span>);
+    <span class="kw">fn</span> <span class="ident">set_initial_parameter</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">param</span>: <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span>);
 
     <span class="doccomment">/// Set the search direction</span>
-    <span class="kw">fn</span> <span class="ident">set_search_direction</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span>);
+    <span class="kw">fn</span> <span class="ident">set_search_direction</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">direction</span>: <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span>);
 
     <span class="doccomment">/// Set the initial step length</span>
-    <span class="kw">fn</span> <span class="ident">set_initial_alpha</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">set_initial_alpha</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">step_length</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Set the cost function value at the starting point as opposed to computing it (see</span>
     <span class="doccomment">/// `calc_initial_cost`)</span>
-    <span class="kw">fn</span> <span class="ident">set_initial_cost</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f64</span>);
+    <span class="kw">fn</span> <span class="ident">set_initial_cost</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cost</span>: <span class="ident">f64</span>);
 
     <span class="doccomment">/// Set the gradient at the starting point as opposed to computing it (see</span>
     <span class="doccomment">/// `calc_initial_gradient`)</span>
-    <span class="kw">fn</span> <span class="ident">set_initial_gradient</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span>);
+    <span class="kw">fn</span> <span class="ident">set_initial_gradient</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">grad</span>: <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span>);
 
     <span class="doccomment">/// calculate the initial cost function value using an operator as opposed to setting it</span>
     <span class="doccomment">/// manually (see `set_initial_cost`)</span>
@@ -870,13 +874,13 @@
     <span class="comment">// fn set_initial_parameter(&amp;mut self, &lt;Self as ArgminNextIter&gt;::Parameters);</span>
 
     <span class="doccomment">/// Set the initial step length</span>
-    <span class="kw">fn</span> <span class="ident">set_radius</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f64</span>);
+    <span class="kw">fn</span> <span class="ident">set_radius</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">radius</span>: <span class="ident">f64</span>);
 
     <span class="doccomment">/// Set the gradient at the starting point</span>
-    <span class="kw">fn</span> <span class="ident">set_grad</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span>);
+    <span class="kw">fn</span> <span class="ident">set_grad</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">grad</span>: <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span>);
 
     <span class="doccomment">/// Set the gradient at the starting point</span>
-    <span class="kw">fn</span> <span class="ident">set_hessian</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Hessian</span>);
+    <span class="kw">fn</span> <span class="ident">set_hessian</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">hessian</span>: <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Hessian</span>);
 }
 
 <span class="doccomment">/// Every method for the update of beta needs to implement this trait.</span>
@@ -885,7 +889,7 @@
     <span class="doccomment">/// Parameter 1: \nabla f_k</span>
     <span class="doccomment">/// Parameter 2: \nabla f_{k+1}</span>
     <span class="doccomment">/// Parameter 3: p_k</span>
-    <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="kw-2">&amp;</span><span class="ident">T</span>) <span class="op">-&gt;</span> <span class="ident">f64</span>;
+    <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">nabla_f_k</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">nabla_f_k_p_1</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">p_k</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) <span class="op">-&gt;</span> <span class="ident">f64</span>;
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g. <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g. <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g. <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../";window.currentCrate = "argmin_core";</script><script src="../../aliases.js"></script><script src="../../main.js"></script><script defer src="../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g. <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g. <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g. <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../";window.currentCrate = "argmin_core";</script><script src="../../aliases.js"></script><script src="../../main.js"></script><script src="../../source-files.js"></script><script src="../../source-script.js"></script><script defer src="../../search-index.js"></script></body></html>
