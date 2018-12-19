@@ -23,6 +23,14 @@ use ndarray;
 #[cfg(feature = "ndarrayl")]
 use ndarray_linalg::Inverse;
 
+/// Modified Cholesky decompositions
+pub mod modcholesky {
+    //! Modified Cholesky decompositions
+    //!
+    //! Reexport of `modcholesky` crate.
+    pub use modcholesky::*;
+}
+
 pub trait ArgminMul<T, U> {
     fn amul(&self, other: T) -> U;
 }
