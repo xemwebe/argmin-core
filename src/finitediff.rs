@@ -42,3 +42,33 @@ where
             .collect())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_forward_diff_vec_f64() {
+        #[derive(Clone)]
+        struct Problem {}
+
+        impl ArgminOperator for Problem {
+            type Parameters = Vec<f64>;
+            type OperatorOutput = f64;
+            type Hessian = ();
+
+            fn apply(&self, p: &Self::Parameters) -> Result<Self::OperatorOutput, Error> {
+                Ok(p[0] + p[1].powi(2))
+            }
+
+            fn gradient(&self, p: &Self::Parameters) -> Result<Self::Parameters, Error> {
+                p.forward_diff(self)
+            }
+        }
+        let prob = Problem {};
+        let p = vec![0.0f64, 1.0f64];
+        // println!("{:?}", prob.gradient(&p).unwrap());
+        assert!((1.0 - prob.gradient(&p).unwrap()[0]).abs() < std::f64::EPSILON);
+        assert!((2.0 - prob.gradient(&p).unwrap()[1]).abs() < std::f64::EPSILON);
+    }
+}
