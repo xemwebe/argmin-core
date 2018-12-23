@@ -15,8 +15,6 @@
 //! implemented for basic `Vec`s, and will in the future also be implemented for types defined by
 //! `ndarray` and `nalgebra`.
 
-// #[cfg(feature = "ndarrayl")]
-// use crate::errors::ArgminError;
 use crate::Error;
 #[cfg(feature = "ndarrayl")]
 use ndarray;
