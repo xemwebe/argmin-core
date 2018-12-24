@@ -9,39 +9,87 @@
 //!
 //! TODO: Text.
 
-use crate::ArgminOperator;
-use crate::Error;
+// use crate::ArgminOperator;
 #[cfg(feature = "ndarrayl")]
 use ndarray;
+
+pub fn forward_diff_vec_f64(p: &Vec<f64>, op: &Fn(&Vec<f64>) -> f64) -> Vec<f64> {
+    let fx = (op)(&p);
+    let n = p.len();
+    (0..n)
+        .map(|i| {
+            let mut x1 = p.clone();
+            x1[i] += std::f64::EPSILON;
+            let fx1 = (op)(&x1);
+            (fx1 - fx) / std::f64::EPSILON
+        })
+        .collect()
+}
+
+#[cfg(feature = "ndarrayl")]
+pub fn forward_diff_ndarray_f64(
+    p: &ndarray::Array1<f64>,
+    op: &Fn(&ndarray::Array1<f64>) -> f64,
+) -> ndarray::Array1<f64> {
+    let fx = (op)(&p);
+    let n = p.len();
+    (0..n)
+        .map(|i| {
+            let mut x1 = p.clone();
+            x1[i] += std::f64::EPSILON;
+            let fx1 = (op)(&x1);
+            (fx1 - fx) / std::f64::EPSILON
+        })
+        .collect()
+}
+
+pub fn central_diff_vec_f64(p: &Vec<f64>, op: &Fn(&Vec<f64>) -> f64) -> Vec<f64> {
+    let n = p.len();
+    (0..n)
+        .map(|i| {
+            let mut x1 = p.clone();
+            let mut x2 = p.clone();
+            x1[i] += std::f64::EPSILON;
+            x2[i] -= std::f64::EPSILON;
+            let fx1 = (op)(&x1);
+            let fx2 = (op)(&x2);
+            (fx1 - fx2) / (2.0 * std::f64::EPSILON)
+        })
+        .collect()
+}
+
+#[cfg(feature = "ndarrayl")]
+pub fn central_diff_ndarray_f64(
+    p: &ndarray::Array1<f64>,
+    op: &Fn(&ndarray::Array1<f64>) -> f64,
+) -> ndarray::Array1<f64> {
+    let n = p.len();
+    (0..n)
+        .map(|i| {
+            let mut x1 = p.clone();
+            let mut x2 = p.clone();
+            x1[i] += std::f64::EPSILON;
+            x2[i] -= std::f64::EPSILON;
+            let fx1 = (op)(&x1);
+            let fx2 = (op)(&x2);
+            (fx1 - fx2) / (2.0 * std::f64::EPSILON)
+        })
+        .collect()
+}
 
 pub trait ArgminForwardDiff
 where
     Self: Sized,
 {
-    fn forward_diff<H>(
-        &self,
-        op: &ArgminOperator<Parameters = Self, OperatorOutput = f64, Hessian = H>,
-    ) -> Result<Self, Error>;
+    fn forward_diff(&self, op: &Fn(&Self) -> f64) -> Self;
 }
 
 impl ArgminForwardDiff for Vec<f64>
 where
     Self: Sized,
 {
-    fn forward_diff<H>(
-        &self,
-        op: &ArgminOperator<Parameters = Self, OperatorOutput = f64, Hessian = H>,
-    ) -> Result<Self, Error> {
-        let fx = op.apply(&self)?;
-        let n = self.len();
-        Ok((0..n)
-            .map(|i| {
-                let mut x1 = self.clone();
-                x1[i] += std::f64::EPSILON;
-                let fx1 = op.apply(&x1).unwrap();
-                (fx1 - fx) / std::f64::EPSILON
-            })
-            .collect())
+    fn forward_diff(&self, op: &Fn(&Self) -> f64) -> Self {
+        forward_diff_vec_f64(self, op)
     }
 }
 
@@ -50,20 +98,8 @@ impl ArgminForwardDiff for ndarray::Array1<f64>
 where
     Self: Sized,
 {
-    fn forward_diff<H>(
-        &self,
-        op: &ArgminOperator<Parameters = Self, OperatorOutput = f64, Hessian = H>,
-    ) -> Result<Self, Error> {
-        let fx = op.apply(&self)?;
-        let n = self.len();
-        Ok((0..n)
-            .map(|i| {
-                let mut x1 = self.clone();
-                x1[i] += std::f64::EPSILON;
-                let fx1 = op.apply(&x1).unwrap();
-                (fx1 - fx) / std::f64::EPSILON
-            })
-            .collect())
+    fn forward_diff(&self, op: &Fn(&Self) -> f64) -> Self {
+        forward_diff_ndarray_f64(self, op)
     }
 }
 
@@ -71,32 +107,15 @@ pub trait ArgminCentralDiff
 where
     Self: Sized,
 {
-    fn central_diff<H>(
-        &self,
-        op: &ArgminOperator<Parameters = Self, OperatorOutput = f64, Hessian = H>,
-    ) -> Result<Self, Error>;
+    fn central_diff(&self, op: &Fn(&Self) -> f64) -> Self;
 }
 
 impl ArgminCentralDiff for Vec<f64>
 where
     Self: Sized,
 {
-    fn central_diff<H>(
-        &self,
-        op: &ArgminOperator<Parameters = Self, OperatorOutput = f64, Hessian = H>,
-    ) -> Result<Self, Error> {
-        let n = self.len();
-        Ok((0..n)
-            .map(|i| {
-                let mut x1 = self.clone();
-                let mut x2 = self.clone();
-                x1[i] += std::f64::EPSILON;
-                x2[i] -= std::f64::EPSILON;
-                let fx1 = op.apply(&x1).unwrap();
-                let fx2 = op.apply(&x2).unwrap();
-                (fx1 - fx2) / (2.0 * std::f64::EPSILON)
-            })
-            .collect())
+    fn central_diff(&self, op: &Fn(&Vec<f64>) -> f64) -> Self {
+        central_diff_vec_f64(self, op)
     }
 }
 
@@ -105,28 +124,16 @@ impl ArgminCentralDiff for ndarray::Array1<f64>
 where
     Self: Sized,
 {
-    fn central_diff<H>(
-        &self,
-        op: &ArgminOperator<Parameters = Self, OperatorOutput = f64, Hessian = H>,
-    ) -> Result<Self, Error> {
-        let n = self.len();
-        Ok((0..n)
-            .map(|i| {
-                let mut x1 = self.clone();
-                let mut x2 = self.clone();
-                x1[i] += std::f64::EPSILON;
-                x2[i] -= std::f64::EPSILON;
-                let fx1 = op.apply(&x1).unwrap();
-                let fx2 = op.apply(&x2).unwrap();
-                (fx1 - fx2) / (2.0 * std::f64::EPSILON)
-            })
-            .collect())
+    fn central_diff(&self, op: &Fn(&ndarray::Array1<f64>) -> f64) -> Self {
+        central_diff_ndarray_f64(self, op)
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::ArgminOperator;
+    use crate::Error;
 
     #[test]
     fn test_forward_diff_vec_f64() {
@@ -143,7 +150,7 @@ mod tests {
             }
 
             fn gradient(&self, p: &Self::Parameters) -> Result<Self::Parameters, Error> {
-                p.forward_diff(self)
+                Ok(p.forward_diff(&|p| self.apply(p).unwrap()))
             }
         }
         let prob = Problem {};
@@ -155,7 +162,7 @@ mod tests {
 
     #[cfg(feature = "ndarrayl")]
     #[test]
-    fn test_forward_diff_ndarray1_f64() {
+    fn test_forward_diff_ndarray_f64() {
         use ndarray;
 
         #[derive(Clone)]
@@ -171,7 +178,7 @@ mod tests {
             }
 
             fn gradient(&self, p: &Self::Parameters) -> Result<Self::Parameters, Error> {
-                p.forward_diff(self)
+                Ok(p.forward_diff(&|p| self.apply(p).unwrap()))
             }
         }
         let prob = Problem {};
@@ -196,7 +203,7 @@ mod tests {
             }
 
             fn gradient(&self, p: &Self::Parameters) -> Result<Self::Parameters, Error> {
-                p.central_diff(self)
+                Ok(p.central_diff(&|p| self.apply(p).unwrap()))
             }
         }
         let prob = Problem {};
@@ -221,7 +228,7 @@ mod tests {
             }
 
             fn gradient(&self, p: &Self::Parameters) -> Result<Self::Parameters, Error> {
-                p.central_diff(self)
+                Ok(p.central_diff(&|p| self.apply(p).unwrap()))
             }
         }
         let prob = Problem {};
