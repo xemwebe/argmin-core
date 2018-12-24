@@ -12,6 +12,36 @@
 #[cfg(feature = "ndarrayl")]
 use ndarray;
 
+pub fn forward_diff_vec_f64(p: &Vec<f64>, op: &Fn(&Vec<f64>) -> f64) -> Vec<f64> {
+    let fx = (op)(&p);
+    let n = p.len();
+    (0..n)
+        .map(|i| {
+            let mut x1 = p.clone();
+            x1[i] += std::f64::EPSILON;
+            let fx1 = (op)(&x1);
+            (fx1 - fx) / std::f64::EPSILON
+        })
+        .collect()
+}
+
+#[cfg(feature = "ndarrayl")]
+pub fn forward_diff_ndarray_f64(
+    p: &ndarray::Array1<f64>,
+    op: &Fn(&ndarray::Array1<f64>) -> f64,
+) -> ndarray::Array1<f64> {
+    let fx = (op)(&p);
+    let n = p.len();
+    (0..n)
+        .map(|i| {
+            let mut x1 = p.clone();
+            x1[i] += std::f64::EPSILON;
+            let fx1 = (op)(&x1);
+            (fx1 - fx) / std::f64::EPSILON
+        })
+        .collect()
+}
+
 pub fn forward_jacobian_vec_f64(p: &Vec<f64>, op: &Fn(&Vec<f64>) -> Vec<f64>) -> Vec<Vec<f64>> {
     let fx = (op)(&p);
     let n = p.len();
@@ -48,36 +78,6 @@ pub fn forward_jacobian_ndarray_f64(
     out
 }
 
-pub fn forward_diff_vec_f64(p: &Vec<f64>, op: &Fn(&Vec<f64>) -> f64) -> Vec<f64> {
-    let fx = (op)(&p);
-    let n = p.len();
-    (0..n)
-        .map(|i| {
-            let mut x1 = p.clone();
-            x1[i] += std::f64::EPSILON;
-            let fx1 = (op)(&x1);
-            (fx1 - fx) / std::f64::EPSILON
-        })
-        .collect()
-}
-
-#[cfg(feature = "ndarrayl")]
-pub fn forward_diff_ndarray_f64(
-    p: &ndarray::Array1<f64>,
-    op: &Fn(&ndarray::Array1<f64>) -> f64,
-) -> ndarray::Array1<f64> {
-    let fx = (op)(&p);
-    let n = p.len();
-    (0..n)
-        .map(|i| {
-            let mut x1 = p.clone();
-            x1[i] += std::f64::EPSILON;
-            let fx1 = (op)(&x1);
-            (fx1 - fx) / std::f64::EPSILON
-        })
-        .collect()
-}
-
 pub fn central_diff_vec_f64(p: &Vec<f64>, op: &Fn(&Vec<f64>) -> f64) -> Vec<f64> {
     let n = p.len();
     (0..n)
@@ -112,6 +112,47 @@ pub fn central_diff_ndarray_f64(
         .collect()
 }
 
+pub fn central_jacobian_vec_f64(p: &Vec<f64>, op: &Fn(&Vec<f64>) -> Vec<f64>) -> Vec<Vec<f64>> {
+    let n = p.len();
+    (0..n)
+        .map(|i| {
+            let mut x1 = p.clone();
+            let mut x2 = p.clone();
+            x1[i] += std::f64::EPSILON;
+            x2[i] -= std::f64::EPSILON;
+            let fx1 = (op)(&x1);
+            let fx2 = (op)(&x2);
+            fx1.iter()
+                .zip(fx2.iter())
+                .map(|(a, b)| (a - b) / (2.0 * std::f64::EPSILON))
+                .collect::<Vec<f64>>()
+        })
+        .collect()
+}
+
+#[cfg(feature = "ndarrayl")]
+pub fn central_jacobian_ndarray_f64(
+    p: &ndarray::Array1<f64>,
+    op: &Fn(&ndarray::Array1<f64>) -> ndarray::Array1<f64>,
+) -> ndarray::Array2<f64> {
+    let fx = (op)(&p);
+    let rn = fx.len();
+    let n = p.len();
+    let mut out = ndarray::Array2::zeros((rn, n));
+    for i in 0..n {
+        let mut x1 = p.clone();
+        let mut x2 = p.clone();
+        x1[i] += std::f64::EPSILON;
+        x2[i] -= std::f64::EPSILON;
+        let fx1 = (op)(&x1);
+        let fx2 = (op)(&x2);
+        for j in 0..rn {
+            out[(j, i)] = (fx1[j] - fx2[j]) / (2.0 * std::f64::EPSILON);
+        }
+    }
+    out
+}
+
 pub trait ArgminFiniteDiff
 where
     Self: Sized,
@@ -135,12 +176,12 @@ where
         forward_diff_vec_f64(self, op)
     }
 
-    fn forward_jacobian(&self, op: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian {
-        forward_jacobian_vec_f64(self, op)
-    }
-
     fn central_diff(&self, op: &Fn(&Vec<f64>) -> f64) -> Self {
         central_diff_vec_f64(self, op)
+    }
+
+    fn forward_jacobian(&self, op: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian {
+        forward_jacobian_vec_f64(self, op)
     }
 }
 
@@ -156,12 +197,12 @@ where
         forward_diff_ndarray_f64(self, op)
     }
 
-    fn forward_jacobian(&self, op: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian {
-        forward_jacobian_ndarray_f64(self, op)
-    }
-
     fn central_diff(&self, op: &Fn(&ndarray::Array1<f64>) -> f64) -> Self {
         central_diff_ndarray_f64(self, op)
+    }
+
+    fn forward_jacobian(&self, op: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian {
+        forward_jacobian_ndarray_f64(self, op)
     }
 }
 
@@ -385,6 +426,69 @@ mod tests {
         };
         let p = ndarray::Array1::from_vec(vec![1.0f64, 1.0, 1.0, 1.0, 1.0, 1.0]);
         let jacobian = p.forward_jacobian(&op);
+        let res = vec![
+            vec![-4.0, -6.0, 0.0, 0.0, 0.0, 0.0],
+            vec![6.0, 5.0, -6.0, 0.0, 0.0, 0.0],
+            vec![0.0, 6.0, 5.0, -6.0, 0.0, 0.0],
+            vec![0.0, 0.0, 6.0, 5.0, -6.0, 0.0],
+            vec![0.0, 0.0, 0.0, 6.0, 5.0, -6.0],
+            vec![0.0, 0.0, 0.0, 0.0, 6.0, 9.0],
+        ];
+        // println!("{:?}", jacobian);
+        (0..6)
+            .zip(0..6)
+            .map(|(i, j)| assert!((res[i][j] - jacobian[(i, j)]).abs() < std::f64::EPSILON))
+            .count();
+    }
+
+    #[test]
+    fn test_central_jacobian_vec_f64() {
+        let op = |x: &Vec<f64>| {
+            vec![
+                2.0 * (x[1].powi(3) - x[0].powi(2)),
+                3.0 * (x[1].powi(3) - x[0].powi(2)) + 2.0 * (x[2].powi(3) - x[1].powi(2)),
+                3.0 * (x[2].powi(3) - x[1].powi(2)) + 2.0 * (x[3].powi(3) - x[2].powi(2)),
+                3.0 * (x[3].powi(3) - x[2].powi(2)) + 2.0 * (x[4].powi(3) - x[3].powi(2)),
+                3.0 * (x[4].powi(3) - x[3].powi(2)) + 2.0 * (x[5].powi(3) - x[4].powi(2)),
+                3.0 * (x[5].powi(3) - x[4].powi(2)),
+            ]
+        };
+        let p = vec![1.0f64, 1.0, 1.0, 1.0, 1.0, 1.0];
+        let jacobian = central_jacobian_vec_f64(&p, &op);
+        let res = vec![
+            vec![-4.0, -6.0, 0.0, 0.0, 0.0, 0.0],
+            vec![6.0, 5.0, -6.0, 0.0, 0.0, 0.0],
+            vec![0.0, 6.0, 5.0, -6.0, 0.0, 0.0],
+            vec![0.0, 0.0, 6.0, 5.0, -6.0, 0.0],
+            vec![0.0, 0.0, 0.0, 6.0, 5.0, -6.0],
+            vec![0.0, 0.0, 0.0, 0.0, 6.0, 9.0],
+        ];
+        // println!("{:?}", jacobian);
+        res.iter()
+            .zip(jacobian.iter())
+            .map(|(r, j)| {
+                r.iter()
+                    .zip(j.iter())
+                    .map(|(a, b)| assert!((a - b).abs() < std::f64::EPSILON))
+            })
+            .count();
+    }
+
+    #[cfg(feature = "ndarrayl")]
+    #[test]
+    fn test_central_jacobian_ndarray_f64() {
+        let op = |x: &ndarray::Array1<f64>| {
+            ndarray::Array1::from_vec(vec![
+                2.0 * (x[1].powi(3) - x[0].powi(2)),
+                3.0 * (x[1].powi(3) - x[0].powi(2)) + 2.0 * (x[2].powi(3) - x[1].powi(2)),
+                3.0 * (x[2].powi(3) - x[1].powi(2)) + 2.0 * (x[3].powi(3) - x[2].powi(2)),
+                3.0 * (x[3].powi(3) - x[2].powi(2)) + 2.0 * (x[4].powi(3) - x[3].powi(2)),
+                3.0 * (x[4].powi(3) - x[3].powi(2)) + 2.0 * (x[5].powi(3) - x[4].powi(2)),
+                3.0 * (x[5].powi(3) - x[4].powi(2)),
+            ])
+        };
+        let p = ndarray::Array1::from_vec(vec![1.0f64, 1.0, 1.0, 1.0, 1.0, 1.0]);
+        let jacobian = central_jacobian_ndarray_f64(&p, &op);
         let res = vec![
             vec![-4.0, -6.0, 0.0, 0.0, 0.0, 0.0],
             vec![6.0, 5.0, -6.0, 0.0, 0.0, 0.0],
