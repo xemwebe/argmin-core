@@ -161,8 +161,9 @@ where
     type OperatorOutput;
 
     fn forward_diff(&self, op: &Fn(&Self) -> f64) -> Self;
-    fn forward_jacobian(&self, op: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian;
     fn central_diff(&self, op: &Fn(&Self) -> f64) -> Self;
+    fn forward_jacobian(&self, op: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian;
+    fn central_jacobian(&self, op: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian;
 }
 
 impl ArgminFiniteDiff for Vec<f64>
@@ -182,6 +183,10 @@ where
 
     fn forward_jacobian(&self, op: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian {
         forward_jacobian_vec_f64(self, op)
+    }
+
+    fn central_jacobian(&self, op: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian {
+        central_jacobian_vec_f64(self, op)
     }
 }
 
@@ -203,6 +208,10 @@ where
 
     fn forward_jacobian(&self, op: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian {
         forward_jacobian_ndarray_f64(self, op)
+    }
+
+    fn central_jacobian(&self, op: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian {
+        central_jacobian_ndarray_f64(self, op)
     }
 }
 
@@ -489,6 +498,69 @@ mod tests {
         };
         let p = ndarray::Array1::from_vec(vec![1.0f64, 1.0, 1.0, 1.0, 1.0, 1.0]);
         let jacobian = central_jacobian_ndarray_f64(&p, &op);
+        let res = vec![
+            vec![-4.0, -6.0, 0.0, 0.0, 0.0, 0.0],
+            vec![6.0, 5.0, -6.0, 0.0, 0.0, 0.0],
+            vec![0.0, 6.0, 5.0, -6.0, 0.0, 0.0],
+            vec![0.0, 0.0, 6.0, 5.0, -6.0, 0.0],
+            vec![0.0, 0.0, 0.0, 6.0, 5.0, -6.0],
+            vec![0.0, 0.0, 0.0, 0.0, 6.0, 9.0],
+        ];
+        // println!("{:?}", jacobian);
+        (0..6)
+            .zip(0..6)
+            .map(|(i, j)| assert!((res[i][j] - jacobian[(i, j)]).abs() < std::f64::EPSILON))
+            .count();
+    }
+
+    #[test]
+    fn test_central_jacobian_vec_f64_trait() {
+        let op = |x: &Vec<f64>| {
+            vec![
+                2.0 * (x[1].powi(3) - x[0].powi(2)),
+                3.0 * (x[1].powi(3) - x[0].powi(2)) + 2.0 * (x[2].powi(3) - x[1].powi(2)),
+                3.0 * (x[2].powi(3) - x[1].powi(2)) + 2.0 * (x[3].powi(3) - x[2].powi(2)),
+                3.0 * (x[3].powi(3) - x[2].powi(2)) + 2.0 * (x[4].powi(3) - x[3].powi(2)),
+                3.0 * (x[4].powi(3) - x[3].powi(2)) + 2.0 * (x[5].powi(3) - x[4].powi(2)),
+                3.0 * (x[5].powi(3) - x[4].powi(2)),
+            ]
+        };
+        let p = vec![1.0f64, 1.0, 1.0, 1.0, 1.0, 1.0];
+        let jacobian = p.central_jacobian(&op);
+        let res = vec![
+            vec![-4.0, -6.0, 0.0, 0.0, 0.0, 0.0],
+            vec![6.0, 5.0, -6.0, 0.0, 0.0, 0.0],
+            vec![0.0, 6.0, 5.0, -6.0, 0.0, 0.0],
+            vec![0.0, 0.0, 6.0, 5.0, -6.0, 0.0],
+            vec![0.0, 0.0, 0.0, 6.0, 5.0, -6.0],
+            vec![0.0, 0.0, 0.0, 0.0, 6.0, 9.0],
+        ];
+        // println!("{:?}", jacobian);
+        res.iter()
+            .zip(jacobian.iter())
+            .map(|(r, j)| {
+                r.iter()
+                    .zip(j.iter())
+                    .map(|(a, b)| assert!((a - b).abs() < std::f64::EPSILON))
+            })
+            .count();
+    }
+
+    #[cfg(feature = "ndarrayl")]
+    #[test]
+    fn test_central_jacobian_ndarray_f64_trait() {
+        let op = |x: &ndarray::Array1<f64>| {
+            ndarray::Array1::from_vec(vec![
+                2.0 * (x[1].powi(3) - x[0].powi(2)),
+                3.0 * (x[1].powi(3) - x[0].powi(2)) + 2.0 * (x[2].powi(3) - x[1].powi(2)),
+                3.0 * (x[2].powi(3) - x[1].powi(2)) + 2.0 * (x[3].powi(3) - x[2].powi(2)),
+                3.0 * (x[3].powi(3) - x[2].powi(2)) + 2.0 * (x[4].powi(3) - x[3].powi(2)),
+                3.0 * (x[4].powi(3) - x[3].powi(2)) + 2.0 * (x[5].powi(3) - x[4].powi(2)),
+                3.0 * (x[5].powi(3) - x[4].powi(2)),
+            ])
+        };
+        let p = ndarray::Array1::from_vec(vec![1.0f64, 1.0, 1.0, 1.0, 1.0, 1.0]);
+        let jacobian = p.central_jacobian(&op);
         let res = vec![
             vec![-4.0, -6.0, 0.0, 0.0, 0.0, 0.0],
             vec![6.0, 5.0, -6.0, 0.0, 0.0, 0.0],
