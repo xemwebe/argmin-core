@@ -9,9 +9,29 @@
 //!
 //! TODO: Text.
 
-// use crate::ArgminOperator;
 #[cfg(feature = "ndarrayl")]
 use ndarray;
+
+pub fn forward_diff_jacobian_vec_f64(
+    p: &Vec<f64>,
+    op: &Fn(&Vec<f64>) -> Vec<f64>,
+) -> Vec<Vec<f64>> {
+    let fx = (op)(&p);
+    let rn = fx.len();
+    let n = p.len();
+    assert!(rn == n);
+    (0..n)
+        .map(|i| {
+            let mut x1 = p.clone();
+            x1[i] += std::f64::EPSILON;
+            let fx1 = (op)(&x1);
+            fx1.iter()
+                .zip(fx.iter())
+                .map(|(a, b)| (a - b) / std::f64::EPSILON)
+                .collect::<Vec<f64>>()
+        })
+        .collect()
+}
 
 pub fn forward_diff_vec_f64(p: &Vec<f64>, op: &Fn(&Vec<f64>) -> f64) -> Vec<f64> {
     let fx = (op)(&p);
@@ -236,5 +256,38 @@ mod tests {
         // println!("{:?}", prob.gradient(&p).unwrap());
         assert!((1.0 - prob.gradient(&p).unwrap()[0]).abs() < std::f64::EPSILON);
         assert!((2.0 - prob.gradient(&p).unwrap()[1]).abs() < std::f64::EPSILON);
+    }
+
+    #[test]
+    fn test_forward_diff_jacobian_vec_f64() {
+        let op = |x: &Vec<f64>| {
+            vec![
+                2.0 * (x[1].powi(3) - x[0].powi(2)),
+                3.0 * (x[1].powi(3) - x[0].powi(2)) + 2.0 * (x[2].powi(3) - x[1].powi(2)),
+                3.0 * (x[2].powi(3) - x[1].powi(2)) + 2.0 * (x[3].powi(3) - x[2].powi(2)),
+                3.0 * (x[3].powi(3) - x[2].powi(2)) + 2.0 * (x[4].powi(3) - x[3].powi(2)),
+                3.0 * (x[4].powi(3) - x[3].powi(2)) + 2.0 * (x[5].powi(3) - x[4].powi(2)),
+                3.0 * (x[5].powi(3) - x[4].powi(2)),
+            ]
+        };
+        let p = vec![1.0f64, 1.0, 1.0, 1.0, 1.0, 1.0];
+        let jacobian = forward_diff_jacobian_vec_f64(&p, &op);
+        let res = vec![
+            vec![-4.0, -6.0, 0.0, 0.0, 0.0, 0.0],
+            vec![6.0, 5.0, -6.0, 0.0, 0.0, 0.0],
+            vec![0.0, 6.0, 5.0, -6.0, 0.0, 0.0],
+            vec![0.0, 0.0, 6.0, 5.0, -6.0, 0.0],
+            vec![0.0, 0.0, 0.0, 6.0, 5.0, -6.0],
+            vec![0.0, 0.0, 0.0, 0.0, 6.0, 9.0],
+        ];
+        // println!("{:?}", jacobian);
+        res.iter()
+            .zip(jacobian.iter())
+            .map(|(r, j)| {
+                r.iter()
+                    .zip(j.iter())
+                    .map(|(a, b)| assert!((a - b).abs() < std::f64::EPSILON))
+            })
+            .count();
     }
 }
