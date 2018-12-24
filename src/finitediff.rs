@@ -112,7 +112,7 @@ pub fn central_diff_ndarray_f64(
         .collect()
 }
 
-pub trait ArgminForwardDiff
+pub trait ArgminFiniteDiff
 where
     Self: Sized,
 {
@@ -121,9 +121,10 @@ where
 
     fn forward_diff(&self, op: &Fn(&Self) -> f64) -> Self;
     fn forward_jacobian(&self, op: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian;
+    fn central_diff(&self, op: &Fn(&Self) -> f64) -> Self;
 }
 
-impl ArgminForwardDiff for Vec<f64>
+impl ArgminFiniteDiff for Vec<f64>
 where
     Self: Sized,
 {
@@ -137,10 +138,14 @@ where
     fn forward_jacobian(&self, op: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian {
         forward_jacobian_vec_f64(self, op)
     }
+
+    fn central_diff(&self, op: &Fn(&Vec<f64>) -> f64) -> Self {
+        central_diff_vec_f64(self, op)
+    }
 }
 
 #[cfg(feature = "ndarrayl")]
-impl ArgminForwardDiff for ndarray::Array1<f64>
+impl ArgminFiniteDiff for ndarray::Array1<f64>
 where
     Self: Sized,
 {
@@ -154,29 +159,7 @@ where
     fn forward_jacobian(&self, op: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian {
         forward_jacobian_ndarray_f64(self, op)
     }
-}
 
-pub trait ArgminCentralDiff
-where
-    Self: Sized,
-{
-    fn central_diff(&self, op: &Fn(&Self) -> f64) -> Self;
-}
-
-impl ArgminCentralDiff for Vec<f64>
-where
-    Self: Sized,
-{
-    fn central_diff(&self, op: &Fn(&Vec<f64>) -> f64) -> Self {
-        central_diff_vec_f64(self, op)
-    }
-}
-
-#[cfg(feature = "ndarrayl")]
-impl ArgminCentralDiff for ndarray::Array1<f64>
-where
-    Self: Sized,
-{
     fn central_diff(&self, op: &Fn(&ndarray::Array1<f64>) -> f64) -> Self {
         central_diff_ndarray_f64(self, op)
     }
