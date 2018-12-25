@@ -233,6 +233,11 @@ where
     fn central_diff(&self, op: &Fn(&Self) -> f64) -> Self;
     fn forward_jacobian(&self, op: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian;
     fn central_jacobian(&self, op: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian;
+    fn forward_jacobian_pert(
+        &self,
+        op: &Fn(&Self) -> Self::OperatorOutput,
+        pert: PerturbationVectors,
+    ) -> Self::Jacobian;
 }
 
 impl ArgminFiniteDiff for Vec<f64>
@@ -256,6 +261,14 @@ where
 
     fn central_jacobian(&self, op: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian {
         central_jacobian_vec_f64(self, op)
+    }
+
+    fn forward_jacobian_pert(
+        &self,
+        op: &Fn(&Self) -> Self::OperatorOutput,
+        pert: PerturbationVectors,
+    ) -> Self::Jacobian {
+        forward_jacobian_pert_vec_f64(self, op, pert)
     }
 }
 
@@ -281,6 +294,14 @@ where
 
     fn central_jacobian(&self, op: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian {
         central_jacobian_ndarray_f64(self, op)
+    }
+
+    fn forward_jacobian_pert(
+        &self,
+        op: &Fn(&Self) -> Self::OperatorOutput,
+        pert: PerturbationVectors,
+    ) -> Self::Jacobian {
+        forward_jacobian_pert_ndarray_f64(self, op, pert)
     }
 }
 
@@ -696,6 +717,89 @@ mod tests {
                 .add(5, vec![4, 5]),
         ];
         let jacobian = forward_jacobian_pert_ndarray_f64(&p, &op, pert);
+        let res = vec![
+            vec![-4.0, -6.0, 0.0, 0.0, 0.0, 0.0],
+            vec![6.0, 5.0, -6.0, 0.0, 0.0, 0.0],
+            vec![0.0, 6.0, 5.0, -6.0, 0.0, 0.0],
+            vec![0.0, 0.0, 6.0, 5.0, -6.0, 0.0],
+            vec![0.0, 0.0, 0.0, 6.0, 5.0, -6.0],
+            vec![0.0, 0.0, 0.0, 0.0, 6.0, 9.0],
+        ];
+        // println!("jacobian:\n{:?}", jacobian);
+        // println!("res:\n{:?}", res);
+        (0..6)
+            .zip(0..6)
+            .map(|(i, j)| assert!((res[i][j] - jacobian[(i, j)]).abs() < std::f64::EPSILON))
+            .count();
+    }
+
+    #[test]
+    fn test_forward_jacobian_pert_vec_f64_trait() {
+        let op = |x: &Vec<f64>| {
+            vec![
+                2.0 * (x[1].powi(3) - x[0].powi(2)),
+                3.0 * (x[1].powi(3) - x[0].powi(2)) + 2.0 * (x[2].powi(3) - x[1].powi(2)),
+                3.0 * (x[2].powi(3) - x[1].powi(2)) + 2.0 * (x[3].powi(3) - x[2].powi(2)),
+                3.0 * (x[3].powi(3) - x[2].powi(2)) + 2.0 * (x[4].powi(3) - x[3].powi(2)),
+                3.0 * (x[4].powi(3) - x[3].powi(2)) + 2.0 * (x[5].powi(3) - x[4].powi(2)),
+                3.0 * (x[5].powi(3) - x[4].powi(2)),
+            ]
+        };
+        let p = vec![1.0f64, 1.0, 1.0, 1.0, 1.0, 1.0];
+        let pert = vec![
+            PerturbationVector::new()
+                .add(0, vec![0, 1])
+                .add(3, vec![2, 3, 4]),
+            PerturbationVector::new()
+                .add(1, vec![0, 1, 2])
+                .add(4, vec![3, 4, 5]),
+            PerturbationVector::new()
+                .add(2, vec![1, 2, 3])
+                .add(5, vec![4, 5]),
+        ];
+        let jacobian = p.forward_jacobian_pert(&op, pert);
+        let res = vec![
+            vec![-4.0, -6.0, 0.0, 0.0, 0.0, 0.0],
+            vec![6.0, 5.0, -6.0, 0.0, 0.0, 0.0],
+            vec![0.0, 6.0, 5.0, -6.0, 0.0, 0.0],
+            vec![0.0, 0.0, 6.0, 5.0, -6.0, 0.0],
+            vec![0.0, 0.0, 0.0, 6.0, 5.0, -6.0],
+            vec![0.0, 0.0, 0.0, 0.0, 6.0, 9.0],
+        ];
+        // println!("jacobian:\n{:?}", jacobian);
+        // println!("res:\n{:?}", res);
+        (0..6)
+            .zip(0..6)
+            .map(|(i, j)| assert!((res[i][j] - jacobian[i][j]).abs() < std::f64::EPSILON))
+            .count();
+    }
+
+    #[cfg(feature = "ndarrayl")]
+    #[test]
+    fn test_forward_jacobian_pert_ndarray_f64_trait() {
+        let op = |x: &ndarray::Array1<f64>| {
+            ndarray::Array1::from_vec(vec![
+                2.0 * (x[1].powi(3) - x[0].powi(2)),
+                3.0 * (x[1].powi(3) - x[0].powi(2)) + 2.0 * (x[2].powi(3) - x[1].powi(2)),
+                3.0 * (x[2].powi(3) - x[1].powi(2)) + 2.0 * (x[3].powi(3) - x[2].powi(2)),
+                3.0 * (x[3].powi(3) - x[2].powi(2)) + 2.0 * (x[4].powi(3) - x[3].powi(2)),
+                3.0 * (x[4].powi(3) - x[3].powi(2)) + 2.0 * (x[5].powi(3) - x[4].powi(2)),
+                3.0 * (x[5].powi(3) - x[4].powi(2)),
+            ])
+        };
+        let p = ndarray::Array1::from_vec(vec![1.0f64, 1.0, 1.0, 1.0, 1.0, 1.0]);
+        let pert = vec![
+            PerturbationVector::new()
+                .add(0, vec![0, 1])
+                .add(3, vec![2, 3, 4]),
+            PerturbationVector::new()
+                .add(1, vec![0, 1, 2])
+                .add(4, vec![3, 4, 5]),
+            PerturbationVector::new()
+                .add(2, vec![1, 2, 3])
+                .add(5, vec![4, 5]),
+        ];
+        let jacobian = p.forward_jacobian_pert(&op, pert);
         let res = vec![
             vec![-4.0, -6.0, 0.0, 0.0, 0.0, 0.0],
             vec![6.0, 5.0, -6.0, 0.0, 0.0, 0.0],
