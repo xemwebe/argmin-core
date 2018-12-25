@@ -250,6 +250,35 @@ pub fn central_jacobian_pert_vec_f64(
     out
 }
 
+#[cfg(feature = "ndarrayl")]
+pub fn central_jacobian_pert_ndarray_f64(
+    p: &ndarray::Array1<f64>,
+    op: &Fn(&ndarray::Array1<f64>) -> ndarray::Array1<f64>,
+    pert: PerturbationVectors,
+) -> ndarray::Array2<f64> {
+    let n = pert.len();
+    let mut out = ndarray::Array2::zeros((1, 1));
+    for i in 0..n {
+        let mut x1 = p.clone();
+        let mut x2 = p.clone();
+        for j in pert[i].x_idx.iter() {
+            x1[*j] += std::f64::EPSILON;
+            x2[*j] -= std::f64::EPSILON;
+        }
+        let fx1 = (op)(&x1);
+        let fx2 = (op)(&x2);
+        if i == 0 {
+            out = ndarray::Array2::zeros((fx1.len(), p.len()));
+        }
+        for (k, x_idx) in pert[i].x_idx.iter().enumerate() {
+            for j in pert[i].r_idx[k].iter() {
+                out[(*x_idx, *j)] = (fx1[*j] - fx2[*j]) / (2.0 * std::f64::EPSILON);
+            }
+        }
+    }
+    out
+}
+
 pub trait ArgminFiniteDiff
 where
     Self: Sized,
@@ -882,6 +911,48 @@ mod tests {
         (0..6)
             .zip(0..6)
             .map(|(i, j)| assert!((res[i][j] - jacobian[i][j]).abs() < std::f64::EPSILON))
+            .count();
+    }
+
+    #[cfg(feature = "ndarrayl")]
+    #[test]
+    fn test_central_jacobian_pert_ndarray_f64() {
+        let op = |x: &ndarray::Array1<f64>| {
+            ndarray::Array1::from_vec(vec![
+                2.0 * (x[1].powi(3) - x[0].powi(2)),
+                3.0 * (x[1].powi(3) - x[0].powi(2)) + 2.0 * (x[2].powi(3) - x[1].powi(2)),
+                3.0 * (x[2].powi(3) - x[1].powi(2)) + 2.0 * (x[3].powi(3) - x[2].powi(2)),
+                3.0 * (x[3].powi(3) - x[2].powi(2)) + 2.0 * (x[4].powi(3) - x[3].powi(2)),
+                3.0 * (x[4].powi(3) - x[3].powi(2)) + 2.0 * (x[5].powi(3) - x[4].powi(2)),
+                3.0 * (x[5].powi(3) - x[4].powi(2)),
+            ])
+        };
+        let p = ndarray::Array1::from_vec(vec![1.0f64, 1.0, 1.0, 1.0, 1.0, 1.0]);
+        let pert = vec![
+            PerturbationVector::new()
+                .add(0, vec![0, 1])
+                .add(3, vec![2, 3, 4]),
+            PerturbationVector::new()
+                .add(1, vec![0, 1, 2])
+                .add(4, vec![3, 4, 5]),
+            PerturbationVector::new()
+                .add(2, vec![1, 2, 3])
+                .add(5, vec![4, 5]),
+        ];
+        let jacobian = central_jacobian_pert_ndarray_f64(&p, &op, pert);
+        let res = vec![
+            vec![-4.0, -6.0, 0.0, 0.0, 0.0, 0.0],
+            vec![6.0, 5.0, -6.0, 0.0, 0.0, 0.0],
+            vec![0.0, 6.0, 5.0, -6.0, 0.0, 0.0],
+            vec![0.0, 0.0, 6.0, 5.0, -6.0, 0.0],
+            vec![0.0, 0.0, 0.0, 6.0, 5.0, -6.0],
+            vec![0.0, 0.0, 0.0, 0.0, 6.0, 9.0],
+        ];
+        // println!("jacobian:\n{:?}", jacobian);
+        // println!("res:\n{:?}", res);
+        (0..6)
+            .zip(0..6)
+            .map(|(i, j)| assert!((res[i][j] - jacobian[(i, j)]).abs() < std::f64::EPSILON))
             .count();
     }
 }
