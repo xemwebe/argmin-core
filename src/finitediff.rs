@@ -12,7 +12,7 @@
 #[cfg(feature = "ndarrayl")]
 use ndarray;
 
-const EPS_F64: f64 = std::f64::EPSILON;
+const EPS_F64: f64 = 2.0 * std::f64::EPSILON;
 
 pub struct PerturbationVector {
     pub x_idx: Vec<usize>,
@@ -393,6 +393,8 @@ pub fn forward_hessian_vec_f64(p: &Vec<f64>, grad: &Fn(&Vec<f64>) -> Vec<f64>) -
             let mut x1 = p.clone();
             x1[i] += EPS_F64.sqrt();
             let fx1 = (grad)(&x1);
+            // println!("x1:\n{:?}", x1);
+            // println!("fx1:\n{:?}", fx1);
             fx1.iter()
                 .zip(fx.iter())
                 .map(|(a, b)| (a - b) / (EPS_F64.sqrt()))
@@ -427,6 +429,8 @@ mod tests {
     use crate::ArgminOperator;
     use crate::Error;
 
+    const COMP_ACC: f64 = 1e-6;
+
     #[test]
     fn test_forward_diff_vec_f64() {
         #[derive(Clone)]
@@ -447,11 +451,11 @@ mod tests {
         }
         let prob = Problem {};
         let p = vec![1.0f64, 1.0f64];
-        assert!((1.0 - prob.gradient(&p).unwrap()[0]).abs() < 10.0 * EPS_F64.sqrt());
-        assert!((2.0 - prob.gradient(&p).unwrap()[1]).abs() < 10.0 * EPS_F64.sqrt());
+        assert!((1.0 - prob.gradient(&p).unwrap()[0]).abs() < COMP_ACC);
+        assert!((2.0 - prob.gradient(&p).unwrap()[1]).abs() < COMP_ACC);
         let p = vec![1.0f64, 2.0f64];
-        assert!((1.0 - prob.gradient(&p).unwrap()[0]).abs() < 10.0 * EPS_F64.sqrt());
-        assert!((4.0 - prob.gradient(&p).unwrap()[1]).abs() < 10.0 * EPS_F64.sqrt());
+        assert!((1.0 - prob.gradient(&p).unwrap()[0]).abs() < COMP_ACC);
+        assert!((4.0 - prob.gradient(&p).unwrap()[1]).abs() < COMP_ACC);
     }
 
     #[cfg(feature = "ndarrayl")]
@@ -478,8 +482,8 @@ mod tests {
         let prob = Problem {};
         let p = ndarray::Array1::from_vec(vec![1.0f64, 1.0f64]);
         // println!("{:?}", prob.gradient(&p).unwrap());
-        assert!((1.0 - prob.gradient(&p).unwrap()[0]).abs() < 10.0 * EPS_F64.sqrt());
-        assert!((2.0 - prob.gradient(&p).unwrap()[1]).abs() < 10.0 * EPS_F64.sqrt());
+        assert!((1.0 - prob.gradient(&p).unwrap()[0]).abs() < COMP_ACC);
+        assert!((2.0 - prob.gradient(&p).unwrap()[1]).abs() < COMP_ACC);
     }
 
     #[test]
@@ -503,8 +507,8 @@ mod tests {
         let prob = Problem {};
         let p = vec![1.0f64, 1.0f64];
         // println!("{:?}", prob.gradient(&p).unwrap());
-        assert!((1.0 - prob.gradient(&p).unwrap()[0]).abs() < 10.0 * EPS_F64.sqrt());
-        assert!((2.0 - prob.gradient(&p).unwrap()[1]).abs() < 10.0 * EPS_F64.sqrt());
+        assert!((1.0 - prob.gradient(&p).unwrap()[0]).abs() < COMP_ACC);
+        assert!((2.0 - prob.gradient(&p).unwrap()[1]).abs() < COMP_ACC);
     }
 
     #[test]
@@ -528,8 +532,8 @@ mod tests {
         let prob = Problem {};
         let p = vec![1.0f64, 1.0f64];
         // println!("{:?}", prob.gradient(&p).unwrap());
-        assert!((1.0 - prob.gradient(&p).unwrap()[0]).abs() < 10.0 * EPS_F64.sqrt());
-        assert!((2.0 - prob.gradient(&p).unwrap()[1]).abs() < 10.0 * EPS_F64.sqrt());
+        assert!((1.0 - prob.gradient(&p).unwrap()[0]).abs() < COMP_ACC);
+        assert!((2.0 - prob.gradient(&p).unwrap()[1]).abs() < COMP_ACC);
     }
 
     #[test]
@@ -557,7 +561,7 @@ mod tests {
         // println!("{:?}", jacobian);
         (0..6)
             .zip(0..6)
-            .map(|(i, j)| assert!((res[i][j] - jacobian[i][j]).abs() < 10.0 * EPS_F64.sqrt()))
+            .map(|(i, j)| assert!((res[i][j] - jacobian[i][j]).abs() < COMP_ACC))
             .count();
     }
 
@@ -586,7 +590,7 @@ mod tests {
         // println!("{:?}", jacobian);
         (0..6)
             .zip(0..6)
-            .map(|(i, j)| assert!((res[i][j] - jacobian[i][j]).abs() < 10.0 * EPS_F64.sqrt()))
+            .map(|(i, j)| assert!((res[i][j] - jacobian[i][j]).abs() < COMP_ACC))
             .count();
     }
 
@@ -616,7 +620,7 @@ mod tests {
         // println!("{:?}", jacobian);
         (0..6)
             .zip(0..6)
-            .map(|(i, j)| assert!((res[i][j] - jacobian[(i, j)]).abs() < 10.0 * EPS_F64.sqrt()))
+            .map(|(i, j)| assert!((res[i][j] - jacobian[(i, j)]).abs() < COMP_ACC))
             .count();
     }
 
@@ -646,7 +650,7 @@ mod tests {
         // println!("{:?}", jacobian);
         (0..6)
             .zip(0..6)
-            .map(|(i, j)| assert!((res[i][j] - jacobian[(i, j)]).abs() < 10.0 * EPS_F64.sqrt()))
+            .map(|(i, j)| assert!((res[i][j] - jacobian[(i, j)]).abs() < COMP_ACC))
             .count();
     }
 
@@ -675,7 +679,7 @@ mod tests {
         // println!("{:?}", jacobian);
         (0..6)
             .zip(0..6)
-            .map(|(i, j)| assert!((res[i][j] - jacobian[i][j]).abs() < 10.0 * EPS_F64.sqrt()))
+            .map(|(i, j)| assert!((res[i][j] - jacobian[i][j]).abs() < COMP_ACC))
             .count();
     }
 
@@ -705,7 +709,7 @@ mod tests {
         // println!("{:?}", jacobian);
         (0..6)
             .zip(0..6)
-            .map(|(i, j)| assert!((res[i][j] - jacobian[(i, j)]).abs() < 10.0 * EPS_F64.sqrt()))
+            .map(|(i, j)| assert!((res[i][j] - jacobian[(i, j)]).abs() < COMP_ACC))
             .count();
     }
 
@@ -734,7 +738,7 @@ mod tests {
         // println!("{:?}", jacobian);
         (0..6)
             .zip(0..6)
-            .map(|(i, j)| assert!((res[i][j] - jacobian[i][j]).abs() < 10.0 * EPS_F64.sqrt()))
+            .map(|(i, j)| assert!((res[i][j] - jacobian[i][j]).abs() < COMP_ACC))
             .count();
     }
 
@@ -764,7 +768,7 @@ mod tests {
         // println!("{:?}", jacobian);
         (0..6)
             .zip(0..6)
-            .map(|(i, j)| assert!((res[i][j] - jacobian[(i, j)]).abs() < 10.0 * EPS_F64.sqrt()))
+            .map(|(i, j)| assert!((res[i][j] - jacobian[(i, j)]).abs() < COMP_ACC))
             .count();
     }
 
@@ -805,7 +809,7 @@ mod tests {
         // println!("res:\n{:?}", res);
         (0..6)
             .zip(0..6)
-            .map(|(i, j)| assert!((res[i][j] - jacobian[i][j]).abs() < 10.0 * EPS_F64.sqrt()))
+            .map(|(i, j)| assert!((res[i][j] - jacobian[i][j]).abs() < COMP_ACC))
             .count();
     }
 
@@ -847,7 +851,7 @@ mod tests {
         // println!("res:\n{:?}", res);
         (0..6)
             .zip(0..6)
-            .map(|(i, j)| assert!((res[i][j] - jacobian[(i, j)]).abs() < 10.0 * EPS_F64.sqrt()))
+            .map(|(i, j)| assert!((res[i][j] - jacobian[(i, j)]).abs() < COMP_ACC))
             .count();
     }
 
@@ -888,7 +892,7 @@ mod tests {
         // println!("res:\n{:?}", res);
         (0..6)
             .zip(0..6)
-            .map(|(i, j)| assert!((res[i][j] - jacobian[i][j]).abs() < 10.0 * EPS_F64.sqrt()))
+            .map(|(i, j)| assert!((res[i][j] - jacobian[i][j]).abs() < COMP_ACC))
             .count();
     }
 
@@ -930,7 +934,7 @@ mod tests {
         // println!("res:\n{:?}", res);
         (0..6)
             .zip(0..6)
-            .map(|(i, j)| assert!((res[i][j] - jacobian[(i, j)]).abs() < 10.0 * EPS_F64.sqrt()))
+            .map(|(i, j)| assert!((res[i][j] - jacobian[(i, j)]).abs() < COMP_ACC))
             .count();
     }
 
@@ -971,7 +975,7 @@ mod tests {
         // println!("res:\n{:?}", res);
         (0..6)
             .zip(0..6)
-            .map(|(i, j)| assert!((res[i][j] - jacobian[i][j]).abs() < 10.0 * EPS_F64.sqrt()))
+            .map(|(i, j)| assert!((res[i][j] - jacobian[i][j]).abs() < COMP_ACC))
             .count();
     }
 
@@ -1013,7 +1017,7 @@ mod tests {
         // println!("res:\n{:?}", res);
         (0..6)
             .zip(0..6)
-            .map(|(i, j)| assert!((res[i][j] - jacobian[(i, j)]).abs() < 10.0 * EPS_F64.sqrt()))
+            .map(|(i, j)| assert!((res[i][j] - jacobian[(i, j)]).abs() < COMP_ACC))
             .count();
     }
 
@@ -1054,7 +1058,7 @@ mod tests {
         // println!("res:\n{:?}", res);
         (0..6)
             .zip(0..6)
-            .map(|(i, j)| assert!((res[i][j] - jacobian[i][j]).abs() < 10.0 * EPS_F64.sqrt()))
+            .map(|(i, j)| assert!((res[i][j] - jacobian[i][j]).abs() < COMP_ACC))
             .count();
     }
 
@@ -1096,29 +1100,22 @@ mod tests {
         // println!("res:\n{:?}", res);
         (0..6)
             .zip(0..6)
-            .map(|(i, j)| assert!((res[i][j] - jacobian[(i, j)]).abs() < 10.0 * EPS_F64.sqrt()))
+            .map(|(i, j)| assert!((res[i][j] - jacobian[(i, j)]).abs() < COMP_ACC))
             .count();
     }
 
-    // #[test]
-    // fn test_forward_hessian_vec_f64() {
-    //     let op = |x: &Vec<f64>| x[0] + x[1].powi(2);
-    //     let p = vec![1.0f64, 1.0];
-    //     let diff = p.forward_diff(&op);
-    //     let hessian = forward_hessian_vec_f64(&p, &|d| d.forward_diff(&op));
-    //     // let res = vec![
-    //     //     vec![-4.0, -6.0, 0.0, 0.0, 0.0, 0.0],
-    //     //     vec![6.0, 5.0, -6.0, 0.0, 0.0, 0.0],
-    //     //     vec![0.0, 6.0, 5.0, -6.0, 0.0, 0.0],
-    //     //     vec![0.0, 0.0, 6.0, 5.0, -6.0, 0.0],
-    //     //     vec![0.0, 0.0, 0.0, 6.0, 5.0, -6.0],
-    //     //     vec![0.0, 0.0, 0.0, 0.0, 6.0, 9.0],
-    //     // ];
-    //     println!("hessian:\n{:?}", hessian);
-    //     println!("diff:\n{:?}", diff);
-    //     // (0..6)
-    //     //     .zip(0..6)
-    //     //     .map(|(i, j)| assert!((res[i][j] - jacobian[i][j]).abs() < 10.0* EPS_F64.sqrt()))
-    //     //     .count();
-    // }
+    #[test]
+    fn test_forward_hessian_vec_f64() {
+        let op = |x: &Vec<f64>| x[0] + x[1].powi(2);
+        let p = vec![1.0f64, 1.0];
+        let diff = p.forward_diff(&op);
+        let hessian = forward_hessian_vec_f64(&p, &|d| d.forward_diff(&op));
+        let res = vec![vec![0.0, 0.0], vec![0.0, 2.0]];
+        // println!("hessian:\n{:?}", hessian);
+        // println!("diff:\n{:?}", diff);
+        (0..2)
+            .zip(0..2)
+            .map(|(i, j)| assert!((res[i][j] - hessian[i][j]).abs() < COMP_ACC))
+            .count();
+    }
 }
