@@ -12,6 +12,8 @@
 #[cfg(feature = "ndarrayl")]
 use ndarray;
 
+const EPS_F64: f64 = std::f64::EPSILON;
+
 pub struct PerturbationVector {
     pub x_idx: Vec<usize>,
     pub r_idx: Vec<Vec<usize>>,
@@ -40,9 +42,9 @@ pub fn forward_diff_vec_f64(p: &Vec<f64>, op: &Fn(&Vec<f64>) -> f64) -> Vec<f64>
     (0..n)
         .map(|i| {
             let mut x1 = p.clone();
-            x1[i] += std::f64::EPSILON;
+            x1[i] += EPS_F64.sqrt();
             let fx1 = (op)(&x1);
-            (fx1 - fx) / std::f64::EPSILON
+            (fx1 - fx) / (EPS_F64.sqrt())
         })
         .collect()
 }
@@ -57,9 +59,9 @@ pub fn forward_diff_ndarray_f64(
     (0..n)
         .map(|i| {
             let mut x1 = p.clone();
-            x1[i] += std::f64::EPSILON;
+            x1[i] += EPS_F64.sqrt();
             let fx1 = (op)(&x1);
-            (fx1 - fx) / std::f64::EPSILON
+            (fx1 - fx) / (EPS_F64.sqrt())
         })
         .collect()
 }
@@ -70,11 +72,11 @@ pub fn forward_jacobian_vec_f64(p: &Vec<f64>, op: &Fn(&Vec<f64>) -> Vec<f64>) ->
     (0..n)
         .map(|i| {
             let mut x1 = p.clone();
-            x1[i] += std::f64::EPSILON;
+            x1[i] += EPS_F64.sqrt();
             let fx1 = (op)(&x1);
             fx1.iter()
                 .zip(fx.iter())
-                .map(|(a, b)| (a - b) / std::f64::EPSILON)
+                .map(|(a, b)| (a - b) / EPS_F64.sqrt())
                 .collect::<Vec<f64>>()
         })
         .collect()
@@ -91,10 +93,10 @@ pub fn forward_jacobian_ndarray_f64(
     let mut out = ndarray::Array2::zeros((rn, n));
     for i in 0..n {
         let mut x1 = p.clone();
-        x1[i] += std::f64::EPSILON;
+        x1[i] += EPS_F64.sqrt();
         let fx1 = (op)(&x1);
         for j in 0..rn {
-            out[(j, i)] = (fx1[j] - fx[j]) / std::f64::EPSILON;
+            out[(j, i)] = (fx1[j] - fx[j]) / EPS_F64.sqrt();
         }
     }
     out
@@ -106,11 +108,11 @@ pub fn central_diff_vec_f64(p: &Vec<f64>, op: &Fn(&Vec<f64>) -> f64) -> Vec<f64>
         .map(|i| {
             let mut x1 = p.clone();
             let mut x2 = p.clone();
-            x1[i] += std::f64::EPSILON;
-            x2[i] -= std::f64::EPSILON;
+            x1[i] += EPS_F64.sqrt();
+            x2[i] -= EPS_F64.sqrt();
             let fx1 = (op)(&x1);
             let fx2 = (op)(&x2);
-            (fx1 - fx2) / (2.0 * std::f64::EPSILON)
+            (fx1 - fx2) / (2.0 * EPS_F64.sqrt())
         })
         .collect()
 }
@@ -125,11 +127,11 @@ pub fn central_diff_ndarray_f64(
         .map(|i| {
             let mut x1 = p.clone();
             let mut x2 = p.clone();
-            x1[i] += std::f64::EPSILON;
-            x2[i] -= std::f64::EPSILON;
+            x1[i] += EPS_F64.sqrt();
+            x2[i] -= EPS_F64.sqrt();
             let fx1 = (op)(&x1);
             let fx2 = (op)(&x2);
-            (fx1 - fx2) / (2.0 * std::f64::EPSILON)
+            (fx1 - fx2) / (2.0 * EPS_F64.sqrt())
         })
         .collect()
 }
@@ -140,13 +142,13 @@ pub fn central_jacobian_vec_f64(p: &Vec<f64>, op: &Fn(&Vec<f64>) -> Vec<f64>) ->
         .map(|i| {
             let mut x1 = p.clone();
             let mut x2 = p.clone();
-            x1[i] += std::f64::EPSILON;
-            x2[i] -= std::f64::EPSILON;
+            x1[i] += EPS_F64.sqrt();
+            x2[i] -= EPS_F64.sqrt();
             let fx1 = (op)(&x1);
             let fx2 = (op)(&x2);
             fx1.iter()
                 .zip(fx2.iter())
-                .map(|(a, b)| (a - b) / (2.0 * std::f64::EPSILON))
+                .map(|(a, b)| (a - b) / (2.0 * EPS_F64.sqrt()))
                 .collect::<Vec<f64>>()
         })
         .collect()
@@ -164,12 +166,12 @@ pub fn central_jacobian_ndarray_f64(
     for i in 0..n {
         let mut x1 = p.clone();
         let mut x2 = p.clone();
-        x1[i] += std::f64::EPSILON;
-        x2[i] -= std::f64::EPSILON;
+        x1[i] += EPS_F64.sqrt();
+        x2[i] -= EPS_F64.sqrt();
         let fx1 = (op)(&x1);
         let fx2 = (op)(&x2);
         for j in 0..rn {
-            out[(j, i)] = (fx1[j] - fx2[j]) / (2.0 * std::f64::EPSILON);
+            out[(j, i)] = (fx1[j] - fx2[j]) / (2.0 * EPS_F64.sqrt());
         }
     }
     out
@@ -186,12 +188,12 @@ pub fn forward_jacobian_pert_vec_f64(
     for i in 0..n {
         let mut x1 = p.clone();
         for j in pert[i].x_idx.iter() {
-            x1[*j] += std::f64::EPSILON;
+            x1[*j] += EPS_F64.sqrt();
         }
         let fx1 = (op)(&x1);
         for (k, x_idx) in pert[i].x_idx.iter().enumerate() {
             for j in pert[i].r_idx[k].iter() {
-                out[*x_idx][*j] = (fx1[*j] - fx[*j]) / std::f64::EPSILON;
+                out[*x_idx][*j] = (fx1[*j] - fx[*j]) / EPS_F64.sqrt();
             }
         }
     }
@@ -210,12 +212,12 @@ pub fn forward_jacobian_pert_ndarray_f64(
     for i in 0..n {
         let mut x1 = p.clone();
         for j in pert[i].x_idx.iter() {
-            x1[*j] += std::f64::EPSILON;
+            x1[*j] += EPS_F64.sqrt();
         }
         let fx1 = (op)(&x1);
         for (k, x_idx) in pert[i].x_idx.iter().enumerate() {
             for j in pert[i].r_idx[k].iter() {
-                out[(*x_idx, *j)] = (fx1[*j] - fx[*j]) / std::f64::EPSILON;
+                out[(*x_idx, *j)] = (fx1[*j] - fx[*j]) / EPS_F64.sqrt();
             }
         }
     }
@@ -233,8 +235,8 @@ pub fn central_jacobian_pert_vec_f64(
         let mut x1 = p.clone();
         let mut x2 = p.clone();
         for j in pert[i].x_idx.iter() {
-            x1[*j] += std::f64::EPSILON;
-            x2[*j] -= std::f64::EPSILON;
+            x1[*j] += EPS_F64.sqrt();
+            x2[*j] -= EPS_F64.sqrt();
         }
         let fx1 = (op)(&x1);
         let fx2 = (op)(&x2);
@@ -243,7 +245,7 @@ pub fn central_jacobian_pert_vec_f64(
         }
         for (k, x_idx) in pert[i].x_idx.iter().enumerate() {
             for j in pert[i].r_idx[k].iter() {
-                out[*x_idx][*j] = (fx1[*j] - fx2[*j]) / (2.0 * std::f64::EPSILON);
+                out[*x_idx][*j] = (fx1[*j] - fx2[*j]) / (2.0 * EPS_F64.sqrt());
             }
         }
     }
@@ -262,8 +264,8 @@ pub fn central_jacobian_pert_ndarray_f64(
         let mut x1 = p.clone();
         let mut x2 = p.clone();
         for j in pert[i].x_idx.iter() {
-            x1[*j] += std::f64::EPSILON;
-            x2[*j] -= std::f64::EPSILON;
+            x1[*j] += EPS_F64.sqrt();
+            x2[*j] -= EPS_F64.sqrt();
         }
         let fx1 = (op)(&x1);
         let fx2 = (op)(&x2);
@@ -272,7 +274,7 @@ pub fn central_jacobian_pert_ndarray_f64(
         }
         for (k, x_idx) in pert[i].x_idx.iter().enumerate() {
             for j in pert[i].r_idx[k].iter() {
-                out[(*x_idx, *j)] = (fx1[*j] - fx2[*j]) / (2.0 * std::f64::EPSILON);
+                out[(*x_idx, *j)] = (fx1[*j] - fx2[*j]) / (2.0 * EPS_F64.sqrt());
             }
         }
     }
@@ -383,6 +385,42 @@ where
     }
 }
 
+pub fn forward_hessian_vec_f64(p: &Vec<f64>, grad: &Fn(&Vec<f64>) -> Vec<f64>) -> Vec<Vec<f64>> {
+    let fx = (grad)(p);
+    let n = p.len();
+    (0..n)
+        .map(|i| {
+            let mut x1 = p.clone();
+            x1[i] += EPS_F64.sqrt();
+            let fx1 = (grad)(&x1);
+            fx1.iter()
+                .zip(fx.iter())
+                .map(|(a, b)| (a - b) / (EPS_F64.sqrt()))
+                .collect::<Vec<f64>>()
+        })
+        .collect()
+}
+
+// #[cfg(feature = "ndarrayl")]
+// pub fn forward_jacobian_ndarray_f64(
+//     p: &ndarray::Array1<f64>,
+//     op: &Fn(&ndarray::Array1<f64>) -> ndarray::Array1<f64>,
+// ) -> ndarray::Array2<f64> {
+//     let fx = (op)(&p);
+//     let rn = fx.len();
+//     let n = p.len();
+//     let mut out = ndarray::Array2::zeros((rn, n));
+//     for i in 0..n {
+//         let mut x1 = p.clone();
+//         x1[i] += std::f64::EPSILON;
+//         let fx1 = (op)(&x1);
+//         for j in 0..rn {
+//             out[(j, i)] = (fx1[j] - fx[j]) / std::f64::EPSILON;
+//         }
+//     }
+//     out
+// }
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -408,10 +446,12 @@ mod tests {
             }
         }
         let prob = Problem {};
-        let p = vec![0.0f64, 1.0f64];
-        // println!("{:?}", prob.gradient(&p).unwrap());
-        assert!((1.0 - prob.gradient(&p).unwrap()[0]).abs() < std::f64::EPSILON);
-        assert!((2.0 - prob.gradient(&p).unwrap()[1]).abs() < std::f64::EPSILON);
+        let p = vec![1.0f64, 1.0f64];
+        assert!((1.0 - prob.gradient(&p).unwrap()[0]).abs() < 10.0 * EPS_F64.sqrt());
+        assert!((2.0 - prob.gradient(&p).unwrap()[1]).abs() < 10.0 * EPS_F64.sqrt());
+        let p = vec![1.0f64, 2.0f64];
+        assert!((1.0 - prob.gradient(&p).unwrap()[0]).abs() < 10.0 * EPS_F64.sqrt());
+        assert!((4.0 - prob.gradient(&p).unwrap()[1]).abs() < 10.0 * EPS_F64.sqrt());
     }
 
     #[cfg(feature = "ndarrayl")]
@@ -436,10 +476,10 @@ mod tests {
             }
         }
         let prob = Problem {};
-        let p = ndarray::Array1::from_vec(vec![0.0f64, 1.0f64]);
+        let p = ndarray::Array1::from_vec(vec![1.0f64, 1.0f64]);
         // println!("{:?}", prob.gradient(&p).unwrap());
-        assert!((1.0 - prob.gradient(&p).unwrap()[0]).abs() < std::f64::EPSILON);
-        assert!((2.0 - prob.gradient(&p).unwrap()[1]).abs() < std::f64::EPSILON);
+        assert!((1.0 - prob.gradient(&p).unwrap()[0]).abs() < 10.0 * EPS_F64.sqrt());
+        assert!((2.0 - prob.gradient(&p).unwrap()[1]).abs() < 10.0 * EPS_F64.sqrt());
     }
 
     #[test]
@@ -461,10 +501,10 @@ mod tests {
             }
         }
         let prob = Problem {};
-        let p = vec![0.0f64, 1.0f64];
+        let p = vec![1.0f64, 1.0f64];
         // println!("{:?}", prob.gradient(&p).unwrap());
-        assert!((1.0 - prob.gradient(&p).unwrap()[0]).abs() < std::f64::EPSILON);
-        assert!((2.0 - prob.gradient(&p).unwrap()[1]).abs() < std::f64::EPSILON);
+        assert!((1.0 - prob.gradient(&p).unwrap()[0]).abs() < 10.0 * EPS_F64.sqrt());
+        assert!((2.0 - prob.gradient(&p).unwrap()[1]).abs() < 10.0 * EPS_F64.sqrt());
     }
 
     #[test]
@@ -486,10 +526,10 @@ mod tests {
             }
         }
         let prob = Problem {};
-        let p = vec![0.0f64, 1.0f64];
+        let p = vec![1.0f64, 1.0f64];
         // println!("{:?}", prob.gradient(&p).unwrap());
-        assert!((1.0 - prob.gradient(&p).unwrap()[0]).abs() < std::f64::EPSILON);
-        assert!((2.0 - prob.gradient(&p).unwrap()[1]).abs() < std::f64::EPSILON);
+        assert!((1.0 - prob.gradient(&p).unwrap()[0]).abs() < 10.0 * EPS_F64.sqrt());
+        assert!((2.0 - prob.gradient(&p).unwrap()[1]).abs() < 10.0 * EPS_F64.sqrt());
     }
 
     #[test]
@@ -517,7 +557,7 @@ mod tests {
         // println!("{:?}", jacobian);
         (0..6)
             .zip(0..6)
-            .map(|(i, j)| assert!((res[i][j] - jacobian[i][j]).abs() < std::f64::EPSILON))
+            .map(|(i, j)| assert!((res[i][j] - jacobian[i][j]).abs() < 10.0 * EPS_F64.sqrt()))
             .count();
     }
 
@@ -546,7 +586,7 @@ mod tests {
         // println!("{:?}", jacobian);
         (0..6)
             .zip(0..6)
-            .map(|(i, j)| assert!((res[i][j] - jacobian[i][j]).abs() < std::f64::EPSILON))
+            .map(|(i, j)| assert!((res[i][j] - jacobian[i][j]).abs() < 10.0 * EPS_F64.sqrt()))
             .count();
     }
 
@@ -576,7 +616,7 @@ mod tests {
         // println!("{:?}", jacobian);
         (0..6)
             .zip(0..6)
-            .map(|(i, j)| assert!((res[i][j] - jacobian[(i, j)]).abs() < std::f64::EPSILON))
+            .map(|(i, j)| assert!((res[i][j] - jacobian[(i, j)]).abs() < 10.0 * EPS_F64.sqrt()))
             .count();
     }
 
@@ -606,7 +646,7 @@ mod tests {
         // println!("{:?}", jacobian);
         (0..6)
             .zip(0..6)
-            .map(|(i, j)| assert!((res[i][j] - jacobian[(i, j)]).abs() < std::f64::EPSILON))
+            .map(|(i, j)| assert!((res[i][j] - jacobian[(i, j)]).abs() < 10.0 * EPS_F64.sqrt()))
             .count();
     }
 
@@ -635,7 +675,7 @@ mod tests {
         // println!("{:?}", jacobian);
         (0..6)
             .zip(0..6)
-            .map(|(i, j)| assert!((res[i][j] - jacobian[i][j]).abs() < std::f64::EPSILON))
+            .map(|(i, j)| assert!((res[i][j] - jacobian[i][j]).abs() < 10.0 * EPS_F64.sqrt()))
             .count();
     }
 
@@ -665,7 +705,7 @@ mod tests {
         // println!("{:?}", jacobian);
         (0..6)
             .zip(0..6)
-            .map(|(i, j)| assert!((res[i][j] - jacobian[(i, j)]).abs() < std::f64::EPSILON))
+            .map(|(i, j)| assert!((res[i][j] - jacobian[(i, j)]).abs() < 10.0 * EPS_F64.sqrt()))
             .count();
     }
 
@@ -694,7 +734,7 @@ mod tests {
         // println!("{:?}", jacobian);
         (0..6)
             .zip(0..6)
-            .map(|(i, j)| assert!((res[i][j] - jacobian[i][j]).abs() < std::f64::EPSILON))
+            .map(|(i, j)| assert!((res[i][j] - jacobian[i][j]).abs() < 10.0 * EPS_F64.sqrt()))
             .count();
     }
 
@@ -724,7 +764,7 @@ mod tests {
         // println!("{:?}", jacobian);
         (0..6)
             .zip(0..6)
-            .map(|(i, j)| assert!((res[i][j] - jacobian[(i, j)]).abs() < std::f64::EPSILON))
+            .map(|(i, j)| assert!((res[i][j] - jacobian[(i, j)]).abs() < 10.0 * EPS_F64.sqrt()))
             .count();
     }
 
@@ -765,7 +805,7 @@ mod tests {
         // println!("res:\n{:?}", res);
         (0..6)
             .zip(0..6)
-            .map(|(i, j)| assert!((res[i][j] - jacobian[i][j]).abs() < std::f64::EPSILON))
+            .map(|(i, j)| assert!((res[i][j] - jacobian[i][j]).abs() < 10.0 * EPS_F64.sqrt()))
             .count();
     }
 
@@ -807,7 +847,7 @@ mod tests {
         // println!("res:\n{:?}", res);
         (0..6)
             .zip(0..6)
-            .map(|(i, j)| assert!((res[i][j] - jacobian[(i, j)]).abs() < std::f64::EPSILON))
+            .map(|(i, j)| assert!((res[i][j] - jacobian[(i, j)]).abs() < 10.0 * EPS_F64.sqrt()))
             .count();
     }
 
@@ -848,7 +888,7 @@ mod tests {
         // println!("res:\n{:?}", res);
         (0..6)
             .zip(0..6)
-            .map(|(i, j)| assert!((res[i][j] - jacobian[i][j]).abs() < std::f64::EPSILON))
+            .map(|(i, j)| assert!((res[i][j] - jacobian[i][j]).abs() < 10.0 * EPS_F64.sqrt()))
             .count();
     }
 
@@ -890,7 +930,7 @@ mod tests {
         // println!("res:\n{:?}", res);
         (0..6)
             .zip(0..6)
-            .map(|(i, j)| assert!((res[i][j] - jacobian[(i, j)]).abs() < std::f64::EPSILON))
+            .map(|(i, j)| assert!((res[i][j] - jacobian[(i, j)]).abs() < 10.0 * EPS_F64.sqrt()))
             .count();
     }
 
@@ -931,7 +971,7 @@ mod tests {
         // println!("res:\n{:?}", res);
         (0..6)
             .zip(0..6)
-            .map(|(i, j)| assert!((res[i][j] - jacobian[i][j]).abs() < std::f64::EPSILON))
+            .map(|(i, j)| assert!((res[i][j] - jacobian[i][j]).abs() < 10.0 * EPS_F64.sqrt()))
             .count();
     }
 
@@ -973,7 +1013,7 @@ mod tests {
         // println!("res:\n{:?}", res);
         (0..6)
             .zip(0..6)
-            .map(|(i, j)| assert!((res[i][j] - jacobian[(i, j)]).abs() < std::f64::EPSILON))
+            .map(|(i, j)| assert!((res[i][j] - jacobian[(i, j)]).abs() < 10.0 * EPS_F64.sqrt()))
             .count();
     }
 
@@ -1014,7 +1054,7 @@ mod tests {
         // println!("res:\n{:?}", res);
         (0..6)
             .zip(0..6)
-            .map(|(i, j)| assert!((res[i][j] - jacobian[i][j]).abs() < std::f64::EPSILON))
+            .map(|(i, j)| assert!((res[i][j] - jacobian[i][j]).abs() < 10.0 * EPS_F64.sqrt()))
             .count();
     }
 
@@ -1056,7 +1096,29 @@ mod tests {
         // println!("res:\n{:?}", res);
         (0..6)
             .zip(0..6)
-            .map(|(i, j)| assert!((res[i][j] - jacobian[(i, j)]).abs() < std::f64::EPSILON))
+            .map(|(i, j)| assert!((res[i][j] - jacobian[(i, j)]).abs() < 10.0 * EPS_F64.sqrt()))
             .count();
     }
+
+    // #[test]
+    // fn test_forward_hessian_vec_f64() {
+    //     let op = |x: &Vec<f64>| x[0] + x[1].powi(2);
+    //     let p = vec![1.0f64, 1.0];
+    //     let diff = p.forward_diff(&op);
+    //     let hessian = forward_hessian_vec_f64(&p, &|d| d.forward_diff(&op));
+    //     // let res = vec![
+    //     //     vec![-4.0, -6.0, 0.0, 0.0, 0.0, 0.0],
+    //     //     vec![6.0, 5.0, -6.0, 0.0, 0.0, 0.0],
+    //     //     vec![0.0, 6.0, 5.0, -6.0, 0.0, 0.0],
+    //     //     vec![0.0, 0.0, 6.0, 5.0, -6.0, 0.0],
+    //     //     vec![0.0, 0.0, 0.0, 6.0, 5.0, -6.0],
+    //     //     vec![0.0, 0.0, 0.0, 0.0, 6.0, 9.0],
+    //     // ];
+    //     println!("hessian:\n{:?}", hessian);
+    //     println!("diff:\n{:?}", diff);
+    //     // (0..6)
+    //     //     .zip(0..6)
+    //     //     .map(|(i, j)| assert!((res[i][j] - jacobian[i][j]).abs() < 10.0* EPS_F64.sqrt()))
+    //     //     .count();
+    // }
 }
