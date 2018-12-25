@@ -12,6 +12,28 @@
 #[cfg(feature = "ndarrayl")]
 use ndarray;
 
+pub struct PerturbationVector {
+    pub x_idx: Vec<usize>,
+    pub r_idx: Vec<Vec<usize>>,
+}
+
+impl PerturbationVector {
+    pub fn new() -> Self {
+        PerturbationVector {
+            x_idx: vec![],
+            r_idx: vec![],
+        }
+    }
+
+    pub fn add(mut self, x_idx: usize, r_idx: Vec<usize>) -> Self {
+        self.x_idx.push(x_idx);
+        self.r_idx.push(r_idx);
+        self
+    }
+}
+
+pub type PerturbationVectors = Vec<PerturbationVector>;
+
 pub fn forward_diff_vec_f64(p: &Vec<f64>, op: &Fn(&Vec<f64>) -> f64) -> Vec<f64> {
     let fx = (op)(&p);
     let n = p.len();
@@ -153,26 +175,28 @@ pub fn central_jacobian_ndarray_f64(
     out
 }
 
-// pub fn forward_jacobian_pert_vec_f64(
-//     p: &Vec<f64>,
-//     op: &Fn(&Vec<f64>) -> Vec<f64>,
-//     pert: Vec<Vec<usize>>,
-// ) -> Vec<Vec<f64>> {
-//     let fx = (op)(&p);
-//     let n = pert.len();
-//     let mut out = vec![vec![0.0; p.len()]; fx.len()];
-//     for i in 0..n {
-//         let mut x1 = p.clone();
-//         for j in pert[i].iter() {
-//             x1[*j] += std::f64::EPSILON;
-//         }
-//         let fx1 = (op)(&x1);
-//         for j in pert[i].iter() {
-//             out[*j][i] = (fx1[*j] - fx[*j]) / std::f64::EPSILON;
-//         }
-//     }
-//     out
-// }
+pub fn forward_jacobian_pert_vec_f64(
+    p: &Vec<f64>,
+    op: &Fn(&Vec<f64>) -> Vec<f64>,
+    pert: PerturbationVectors,
+) -> Vec<Vec<f64>> {
+    let fx = (op)(&p);
+    let n = pert.len();
+    let mut out = vec![vec![0.0; p.len()]; fx.len()];
+    for i in 0..n {
+        let mut x1 = p.clone();
+        for j in pert[i].x_idx.iter() {
+            x1[*j] += std::f64::EPSILON;
+        }
+        let fx1 = (op)(&x1);
+        for (k, x_idx) in pert[i].x_idx.iter().enumerate() {
+            for j in pert[i].r_idx[k].iter() {
+                out[*x_idx][*j] = (fx1[*j] - fx[*j]) / std::f64::EPSILON;
+            }
+        }
+    }
+    out
+}
 
 pub trait ArgminFiniteDiff
 where
@@ -581,34 +605,44 @@ mod tests {
             .count();
     }
 
-    // #[test]
-    // fn test_forward_jacobian_pert_vec_f64() {
-    //     let op = |x: &Vec<f64>| {
-    //         vec![
-    //             2.0 * (x[1].powi(3) - x[0].powi(2)),
-    //             3.0 * (x[1].powi(3) - x[0].powi(2)) + 2.0 * (x[2].powi(3) - x[1].powi(2)),
-    //             3.0 * (x[2].powi(3) - x[1].powi(2)) + 2.0 * (x[3].powi(3) - x[2].powi(2)),
-    //             3.0 * (x[3].powi(3) - x[2].powi(2)) + 2.0 * (x[4].powi(3) - x[3].powi(2)),
-    //             3.0 * (x[4].powi(3) - x[3].powi(2)) + 2.0 * (x[5].powi(3) - x[4].powi(2)),
-    //             3.0 * (x[5].powi(3) - x[4].powi(2)),
-    //         ]
-    //     };
-    //     let p = vec![1.0f64, 1.0, 1.0, 1.0, 1.0, 1.0];
-    //     // let pert = vec![vec![0], vec![1], vec![2], vec![3], vec![4], vec![5]];
-    //     let pert = vec![vec![0, 3], vec![1, 4], vec![2, 5]];
-    //     let jacobian = forward_jacobian_pert_vec_f64(&p, &op, pert);
-    //     let res = vec![
-    //         vec![-4.0, -6.0, 0.0, 0.0, 0.0, 0.0],
-    //         vec![6.0, 5.0, -6.0, 0.0, 0.0, 0.0],
-    //         vec![0.0, 6.0, 5.0, -6.0, 0.0, 0.0],
-    //         vec![0.0, 0.0, 6.0, 5.0, -6.0, 0.0],
-    //         vec![0.0, 0.0, 0.0, 6.0, 5.0, -6.0],
-    //         vec![0.0, 0.0, 0.0, 0.0, 6.0, 9.0],
-    //     ];
-    //     println!("{:?}", jacobian);
-    //     (0..6)
-    //         .zip(0..6)
-    //         .map(|(i, j)| assert!((res[i][j] - jacobian[i][j]).abs() < std::f64::EPSILON))
-    //         .count();
-    // }
+    #[test]
+    fn test_forward_jacobian_pert_vec_f64() {
+        let op = |x: &Vec<f64>| {
+            vec![
+                2.0 * (x[1].powi(3) - x[0].powi(2)),
+                3.0 * (x[1].powi(3) - x[0].powi(2)) + 2.0 * (x[2].powi(3) - x[1].powi(2)),
+                3.0 * (x[2].powi(3) - x[1].powi(2)) + 2.0 * (x[3].powi(3) - x[2].powi(2)),
+                3.0 * (x[3].powi(3) - x[2].powi(2)) + 2.0 * (x[4].powi(3) - x[3].powi(2)),
+                3.0 * (x[4].powi(3) - x[3].powi(2)) + 2.0 * (x[5].powi(3) - x[4].powi(2)),
+                3.0 * (x[5].powi(3) - x[4].powi(2)),
+            ]
+        };
+        let p = vec![1.0f64, 1.0, 1.0, 1.0, 1.0, 1.0];
+        let pert = vec![
+            PerturbationVector::new()
+                .add(0, vec![0, 1])
+                .add(3, vec![2, 3, 4]),
+            PerturbationVector::new()
+                .add(1, vec![0, 1, 2])
+                .add(4, vec![3, 4, 5]),
+            PerturbationVector::new()
+                .add(2, vec![1, 2, 3])
+                .add(5, vec![4, 5]),
+        ];
+        let jacobian = forward_jacobian_pert_vec_f64(&p, &op, pert);
+        let res = vec![
+            vec![-4.0, -6.0, 0.0, 0.0, 0.0, 0.0],
+            vec![6.0, 5.0, -6.0, 0.0, 0.0, 0.0],
+            vec![0.0, 6.0, 5.0, -6.0, 0.0, 0.0],
+            vec![0.0, 0.0, 6.0, 5.0, -6.0, 0.0],
+            vec![0.0, 0.0, 0.0, 6.0, 5.0, -6.0],
+            vec![0.0, 0.0, 0.0, 0.0, 6.0, 9.0],
+        ];
+        // println!("jacobian:\n{:?}", jacobian);
+        // println!("res:\n{:?}", res);
+        (0..6)
+            .zip(0..6)
+            .map(|(i, j)| assert!((res[i][j] - jacobian[i][j]).abs() < std::f64::EPSILON))
+            .count();
+    }
 }
