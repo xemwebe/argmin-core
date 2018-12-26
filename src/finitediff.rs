@@ -395,6 +395,55 @@ pub fn central_hessian_ndarray_f64(
     out
 }
 
+pub fn forward_hessian_vec_prod_vec_f64(
+    p: &Vec<f64>,
+    grad: &Fn(&Vec<f64>) -> Vec<f64>,
+    x: &Vec<f64>,
+) -> Vec<f64> {
+    let fx = (grad)(p);
+    let out: Vec<f64> = {
+        let x1 = p
+            .iter()
+            .zip(x.iter())
+            .map(|(pi, xi)| pi + xi * EPS_F64.sqrt())
+            .collect();
+        let fx1 = (grad)(&x1);
+        fx1.iter()
+            .zip(fx.iter())
+            .map(|(a, b)| (a - b) / (EPS_F64.sqrt()))
+            .collect::<Vec<f64>>()
+    };
+    out
+}
+
+// #[cfg(feature = "ndarrayl")]
+// pub fn forward_hessian_vec_prod_ndarray_f64(
+//     p: &ndarray::Array1<f64>,
+//     grad: &Fn(&ndarray::Array1<f64>) -> ndarray::Array1<f64>,
+// ) -> ndarray::Array2<f64> {
+//     let fx = (grad)(&p);
+//     let rn = fx.len();
+//     let n = p.len();
+//     let mut out = ndarray::Array2::zeros((rn, n));
+//     for i in 0..n {
+//         let mut x1 = p.clone();
+//         x1[i] += EPS_F64.sqrt();
+//         let fx1 = (grad)(&x1);
+//         for j in 0..rn {
+//             out[(j, i)] = (fx1[j] - fx[j]) / EPS_F64.sqrt();
+//         }
+//     }
+//     // restore symmetry
+//     for i in 0..n {
+//         for j in (i + 1)..n {
+//             let t = (out[(i, j)] + out[(j, i)]) / 2.0;
+//             out[(i, j)] = t;
+//             out[(j, i)] = t;
+//         }
+//     }
+//     out
+// }
+
 pub trait ArgminFiniteDiff
 where
     Self: Sized,
@@ -1351,6 +1400,20 @@ mod tests {
         (0..4)
             .zip(0..4)
             .map(|(i, j)| assert!((res[i][j] - hessian[(i, j)]).abs() < COMP_ACC))
+            .count();
+    }
+
+    #[test]
+    fn test_forward_hessian_vec_prod_vec_f64() {
+        let op = |x: &Vec<f64>| x[0] + x[1].powi(2) + x[2] * x[3].powi(2);
+        let p = vec![1.0f64, 1.0, 1.0, 1.0];
+        let x = vec![2.0, 3.0, 4.0, 5.0];
+        let hessian = forward_hessian_vec_prod_vec_f64(&p, &|d| d.forward_diff(&op), &x);
+        let res = vec![0.0, 6.0, 10.0, 18.0];
+        // println!("hessian:\n{:#?}", hessian);
+        // println!("diff:\n{:#?}", diff);
+        (0..4)
+            .map(|i| assert!((res[i] - hessian[i]).abs() < COMP_ACC))
             .count();
     }
 }
