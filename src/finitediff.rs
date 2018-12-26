@@ -460,6 +460,7 @@ where
     ) -> Self::Jacobian;
     fn forward_hessian(&self, grad: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian;
     fn central_hessian(&self, grad: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian;
+    fn forward_hessian_vec_prod(&self, grad: &Fn(&Self) -> Self::OperatorOutput, x: &Self) -> Self;
 }
 
 impl ArgminFiniteDiff for Vec<f64>
@@ -507,6 +508,10 @@ where
 
     fn central_hessian(&self, grad: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian {
         central_hessian_vec_f64(self, grad)
+    }
+
+    fn forward_hessian_vec_prod(&self, grad: &Fn(&Self) -> Self::OperatorOutput, x: &Self) -> Self {
+        forward_hessian_vec_prod_vec_f64(self, grad, x)
     }
 }
 
@@ -556,6 +561,10 @@ where
 
     fn central_hessian(&self, grad: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian {
         central_hessian_ndarray_f64(self, grad)
+    }
+
+    fn forward_hessian_vec_prod(&self, grad: &Fn(&Self) -> Self::OperatorOutput, x: &Self) -> Self {
+        forward_hessian_vec_prod_ndarray_f64(self, grad, x)
     }
 }
 
@@ -1417,6 +1426,35 @@ mod tests {
         let p = ndarray::Array1::from_vec(vec![1.0f64, 1.0, 1.0, 1.0]);
         let x = ndarray::Array1::from_vec(vec![2.0, 3.0, 4.0, 5.0]);
         let hessian = forward_hessian_vec_prod_ndarray_f64(&p, &|d| d.forward_diff(&op), &x);
+        let res = vec![0.0, 6.0, 10.0, 18.0];
+        // println!("hessian:\n{:#?}", hessian);
+        // println!("diff:\n{:#?}", diff);
+        (0..4)
+            .map(|i| assert!((res[i] - hessian[i]).abs() < COMP_ACC))
+            .count();
+    }
+
+    #[test]
+    fn test_forward_hessian_vec_prod_vec_f64_trait() {
+        let op = |x: &Vec<f64>| x[0] + x[1].powi(2) + x[2] * x[3].powi(2);
+        let p = vec![1.0f64, 1.0, 1.0, 1.0];
+        let x = vec![2.0, 3.0, 4.0, 5.0];
+        let hessian = p.forward_hessian_vec_prod(&|d| d.forward_diff(&op), &x);
+        let res = vec![0.0, 6.0, 10.0, 18.0];
+        // println!("hessian:\n{:#?}", hessian);
+        // println!("diff:\n{:#?}", diff);
+        (0..4)
+            .map(|i| assert!((res[i] - hessian[i]).abs() < COMP_ACC))
+            .count();
+    }
+
+    #[cfg(feature = "ndarrayl")]
+    #[test]
+    fn test_forward_hessian_vec_prod_ndarray_f64_trait() {
+        let op = |x: &ndarray::Array1<f64>| x[0] + x[1].powi(2) + x[2] * x[3].powi(2);
+        let p = ndarray::Array1::from_vec(vec![1.0f64, 1.0, 1.0, 1.0]);
+        let x = ndarray::Array1::from_vec(vec![2.0, 3.0, 4.0, 5.0]);
+        let hessian = p.forward_hessian_vec_prod(&|d| d.forward_diff(&op), &x);
         let res = vec![0.0, 6.0, 10.0, 18.0];
         // println!("hessian:\n{:#?}", hessian);
         // println!("diff:\n{:#?}", diff);
