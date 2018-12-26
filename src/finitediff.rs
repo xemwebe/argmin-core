@@ -417,6 +417,7 @@ where
         pert: PerturbationVectors,
     ) -> Self::Jacobian;
     fn forward_hessian(&self, grad: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian;
+    fn central_hessian(&self, grad: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian;
 }
 
 impl ArgminFiniteDiff for Vec<f64>
@@ -460,6 +461,10 @@ where
 
     fn forward_hessian(&self, grad: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian {
         forward_hessian_vec_f64(self, grad)
+    }
+
+    fn central_hessian(&self, grad: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian {
+        central_hessian_vec_f64(self, grad)
     }
 }
 
@@ -505,6 +510,10 @@ where
 
     fn forward_hessian(&self, grad: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian {
         forward_hessian_ndarray_f64(self, grad)
+    }
+
+    fn central_hessian(&self, grad: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian {
+        central_hessian_ndarray_f64(self, grad)
     }
 }
 
@@ -1305,43 +1314,43 @@ mod tests {
             .map(|(i, j)| assert!((res[i][j] - hessian[(i, j)]).abs() < COMP_ACC))
             .count();
     }
-    //
-    // #[test]
-    // fn test_central_hessian_vec_f64_trait() {
-    //     let op = |x: &Vec<f64>| x[0] + x[1].powi(2) + x[2] * x[3].powi(2);
-    //     let p = vec![1.0f64, 1.0, 1.0, 1.0];
-    //     let hessian = p.central_hessian(&|d| d.forward_diff(&op));
-    //     let res = vec![
-    //         vec![0.0, 0.0, 0.0, 0.0],
-    //         vec![0.0, 2.0, 0.0, 0.0],
-    //         vec![0.0, 0.0, 0.0, 2.0],
-    //         vec![0.0, 0.0, 2.0, 2.0],
-    //     ];
-    //     // println!("hessian:\n{:#?}", hessian);
-    //     // println!("diff:\n{:#?}", diff);
-    //     (0..4)
-    //         .zip(0..4)
-    //         .map(|(i, j)| assert!((res[i][j] - hessian[i][j]).abs() < COMP_ACC))
-    //         .count();
-    // }
-    //
-    // #[cfg(feature = "ndarrayl")]
-    // #[test]
-    // fn test_central_hessian_ndarray_f64_trait() {
-    //     let op = |x: &ndarray::Array1<f64>| x[0] + x[1].powi(2) + x[2] * x[3].powi(2);
-    //     let p = ndarray::Array1::from_vec(vec![1.0f64, 1.0, 1.0, 1.0]);
-    //     let hessian = p.central_hessian(&|d| d.forward_diff(&op));
-    //     let res = vec![
-    //         vec![0.0, 0.0, 0.0, 0.0],
-    //         vec![0.0, 2.0, 0.0, 0.0],
-    //         vec![0.0, 0.0, 0.0, 2.0],
-    //         vec![0.0, 0.0, 2.0, 2.0],
-    //     ];
-    //     // println!("hessian:\n{:#?}", hessian);
-    //     // println!("diff:\n{:#?}", diff);
-    //     (0..4)
-    //         .zip(0..4)
-    //         .map(|(i, j)| assert!((res[i][j] - hessian[(i, j)]).abs() < COMP_ACC))
-    //         .count();
-    // }
+
+    #[test]
+    fn test_central_hessian_vec_f64_trait() {
+        let op = |x: &Vec<f64>| x[0] + x[1].powi(2) + x[2] * x[3].powi(2);
+        let p = vec![1.0f64, 1.0, 1.0, 1.0];
+        let hessian = p.central_hessian(&|d| d.central_diff(&op));
+        let res = vec![
+            vec![0.0, 0.0, 0.0, 0.0],
+            vec![0.0, 2.0, 0.0, 0.0],
+            vec![0.0, 0.0, 0.0, 2.0],
+            vec![0.0, 0.0, 2.0, 2.0],
+        ];
+        // println!("hessian:\n{:#?}", hessian);
+        // println!("diff:\n{:#?}", diff);
+        (0..4)
+            .zip(0..4)
+            .map(|(i, j)| assert!((res[i][j] - hessian[i][j]).abs() < COMP_ACC))
+            .count();
+    }
+
+    #[cfg(feature = "ndarrayl")]
+    #[test]
+    fn test_central_hessian_ndarray_f64_trait() {
+        let op = |x: &ndarray::Array1<f64>| x[0] + x[1].powi(2) + x[2] * x[3].powi(2);
+        let p = ndarray::Array1::from_vec(vec![1.0f64, 1.0, 1.0, 1.0]);
+        let hessian = p.central_hessian(&|d| d.central_diff(&op));
+        let res = vec![
+            vec![0.0, 0.0, 0.0, 0.0],
+            vec![0.0, 2.0, 0.0, 0.0],
+            vec![0.0, 0.0, 0.0, 2.0],
+            vec![0.0, 0.0, 2.0, 2.0],
+        ];
+        // println!("hessian:\n{:#?}", hessian);
+        // println!("diff:\n{:#?}", diff);
+        (0..4)
+            .zip(0..4)
+            .map(|(i, j)| assert!((res[i][j] - hessian[(i, j)]).abs() < COMP_ACC))
+            .count();
+    }
 }
