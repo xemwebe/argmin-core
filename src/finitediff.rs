@@ -346,8 +346,6 @@ pub fn central_hessian_vec_f64(p: &Vec<f64>, grad: &Fn(&Vec<f64>) -> Vec<f64>) -
             x2[i] -= EPS_F64.sqrt();
             let fx1 = (grad)(&x1);
             let fx2 = (grad)(&x2);
-            println!("fx1:\n{:?}", fx1);
-            println!("fx2:\n{:?}", fx2);
             fx1.iter()
                 .zip(fx2.iter())
                 .map(|(a, b)| (a - b) / (2.0 * EPS_F64.sqrt()))
@@ -366,33 +364,36 @@ pub fn central_hessian_vec_f64(p: &Vec<f64>, grad: &Fn(&Vec<f64>) -> Vec<f64>) -
     out
 }
 
-// #[cfg(feature = "ndarrayl")]
-// pub fn central_hessian_ndarray_f64(
-//     p: &ndarray::Array1<f64>,
-//     grad: &Fn(&ndarray::Array1<f64>) -> ndarray::Array1<f64>,
-// ) -> ndarray::Array2<f64> {
-//     let fx = (grad)(&p);
-//     let rn = fx.len();
-//     let n = p.len();
-//     let mut out = ndarray::Array2::zeros((rn, n));
-//     for i in 0..n {
-//         let mut x1 = p.clone();
-//         x1[i] += EPS_F64.sqrt();
-//         let fx1 = (grad)(&x1);
-//         for j in 0..rn {
-//             out[(j, i)] = (fx1[j] - fx[j]) / EPS_F64.sqrt();
-//         }
-//     }
-//     // restore symmetry
-//     for i in 0..n {
-//         for j in (i + 1)..n {
-//             let t = (out[(i, j)] + out[(j, i)]) / 2.0;
-//             out[(i, j)] = t;
-//             out[(j, i)] = t;
-//         }
-//     }
-//     out
-// }
+#[cfg(feature = "ndarrayl")]
+pub fn central_hessian_ndarray_f64(
+    p: &ndarray::Array1<f64>,
+    grad: &Fn(&ndarray::Array1<f64>) -> ndarray::Array1<f64>,
+) -> ndarray::Array2<f64> {
+    let fx = (grad)(&p);
+    let rn = fx.len();
+    let n = p.len();
+    let mut out = ndarray::Array2::zeros((rn, n));
+    for i in 0..n {
+        let mut x1 = p.clone();
+        let mut x2 = p.clone();
+        x1[i] += EPS_F64.sqrt();
+        x2[i] -= EPS_F64.sqrt();
+        let fx1 = (grad)(&x1);
+        let fx2 = (grad)(&x2);
+        for j in 0..rn {
+            out[(j, i)] = (fx1[j] - fx2[j]) / (2.0 * EPS_F64.sqrt());
+        }
+    }
+    // restore symmetry
+    for i in 0..n {
+        for j in (i + 1)..n {
+            let t = (out[(i, j)] + out[(j, i)]) / 2.0;
+            out[(i, j)] = t;
+            out[(j, i)] = t;
+        }
+    }
+    out
+}
 
 pub trait ArgminFiniteDiff
 where
@@ -1277,7 +1278,7 @@ mod tests {
             vec![0.0, 0.0, 0.0, 2.0],
             vec![0.0, 0.0, 2.0, 2.0],
         ];
-        println!("hessian:\n{:#?}", hessian);
+        // println!("hessian:\n{:#?}", hessian);
         // println!("diff:\n{:#?}", diff);
         (0..4)
             .zip(0..4)
@@ -1285,25 +1286,25 @@ mod tests {
             .count();
     }
 
-    // #[cfg(feature = "ndarrayl")]
-    // #[test]
-    // fn test_central_hessian_ndarray_f64() {
-    //     let op = |x: &ndarray::Array1<f64>| x[0] + x[1].powi(2) + x[2] * x[3].powi(2);
-    //     let p = ndarray::Array1::from_vec(vec![1.0f64, 1.0, 1.0, 1.0]);
-    //     let hessian = central_hessian_ndarray_f64(&p, &|d| d.forward_diff(&op));
-    //     let res = vec![
-    //         vec![0.0, 0.0, 0.0, 0.0],
-    //         vec![0.0, 2.0, 0.0, 0.0],
-    //         vec![0.0, 0.0, 0.0, 2.0],
-    //         vec![0.0, 0.0, 2.0, 2.0],
-    //     ];
-    //     // println!("hessian:\n{:#?}", hessian);
-    //     // println!("diff:\n{:#?}", diff);
-    //     (0..4)
-    //         .zip(0..4)
-    //         .map(|(i, j)| assert!((res[i][j] - hessian[(i, j)]).abs() < COMP_ACC))
-    //         .count();
-    // }
+    #[cfg(feature = "ndarrayl")]
+    #[test]
+    fn test_central_hessian_ndarray_f64() {
+        let op = |x: &ndarray::Array1<f64>| x[0] + x[1].powi(2) + x[2] * x[3].powi(2);
+        let p = ndarray::Array1::from_vec(vec![1.0f64, 1.0, 1.0, 1.0]);
+        let hessian = central_hessian_ndarray_f64(&p, &|d| d.central_diff(&op));
+        let res = vec![
+            vec![0.0, 0.0, 0.0, 0.0],
+            vec![0.0, 2.0, 0.0, 0.0],
+            vec![0.0, 0.0, 0.0, 2.0],
+            vec![0.0, 0.0, 2.0, 2.0],
+        ];
+        // println!("hessian:\n{:#?}", hessian);
+        // println!("diff:\n{:#?}", diff);
+        (0..4)
+            .zip(0..4)
+            .map(|(i, j)| assert!((res[i][j] - hessian[(i, j)]).abs() < COMP_ACC))
+            .count();
+    }
     //
     // #[test]
     // fn test_central_hessian_vec_f64_trait() {
