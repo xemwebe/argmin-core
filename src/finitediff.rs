@@ -411,25 +411,33 @@ pub fn forward_hessian_vec_f64(p: &Vec<f64>, grad: &Fn(&Vec<f64>) -> Vec<f64>) -
     out
 }
 
-// #[cfg(feature = "ndarrayl")]
-// pub fn forward_jacobian_ndarray_f64(
-//     p: &ndarray::Array1<f64>,
-//     op: &Fn(&ndarray::Array1<f64>) -> ndarray::Array1<f64>,
-// ) -> ndarray::Array2<f64> {
-//     let fx = (op)(&p);
-//     let rn = fx.len();
-//     let n = p.len();
-//     let mut out = ndarray::Array2::zeros((rn, n));
-//     for i in 0..n {
-//         let mut x1 = p.clone();
-//         x1[i] += std::f64::EPSILON;
-//         let fx1 = (op)(&x1);
-//         for j in 0..rn {
-//             out[(j, i)] = (fx1[j] - fx[j]) / std::f64::EPSILON;
-//         }
-//     }
-//     out
-// }
+#[cfg(feature = "ndarrayl")]
+pub fn forward_hessian_ndarray_f64(
+    p: &ndarray::Array1<f64>,
+    grad: &Fn(&ndarray::Array1<f64>) -> ndarray::Array1<f64>,
+) -> ndarray::Array2<f64> {
+    let fx = (grad)(&p);
+    let rn = fx.len();
+    let n = p.len();
+    let mut out = ndarray::Array2::zeros((rn, n));
+    for i in 0..n {
+        let mut x1 = p.clone();
+        x1[i] += EPS_F64.sqrt();
+        let fx1 = (grad)(&x1);
+        for j in 0..rn {
+            out[(j, i)] = (fx1[j] - fx[j]) / EPS_F64.sqrt();
+        }
+    }
+    // restore symmetry
+    for i in 0..n {
+        for j in (i + 1)..n {
+            let t = (out[(i, j)] + out[(j, i)]) / 2.0;
+            out[(i, j)] = t;
+            out[(j, i)] = t;
+        }
+    }
+    out
+}
 
 #[cfg(test)]
 mod tests {
@@ -1128,6 +1136,26 @@ mod tests {
         (0..4)
             .zip(0..4)
             .map(|(i, j)| assert!((res[i][j] - hessian[i][j]).abs() < COMP_ACC))
+            .count();
+    }
+
+    #[cfg(feature = "ndarrayl")]
+    #[test]
+    fn test_forward_hessian_ndarray_f64() {
+        let op = |x: &ndarray::Array1<f64>| x[0] + x[1].powi(2) + x[2] * x[3].powi(2);
+        let p = ndarray::Array1::from_vec(vec![1.0f64, 1.0, 1.0, 1.0]);
+        let hessian = forward_hessian_ndarray_f64(&p, &|d| d.forward_diff(&op));
+        let res = vec![
+            vec![0.0, 0.0, 0.0, 0.0],
+            vec![0.0, 2.0, 0.0, 0.0],
+            vec![0.0, 0.0, 0.0, 2.0],
+            vec![0.0, 0.0, 2.0, 2.0],
+        ];
+        // println!("hessian:\n{:#?}", hessian);
+        // println!("diff:\n{:#?}", diff);
+        (0..4)
+            .zip(0..4)
+            .map(|(i, j)| assert!((res[i][j] - hessian[(i, j)]).abs() < COMP_ACC))
             .count();
     }
 }
