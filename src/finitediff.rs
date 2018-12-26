@@ -573,36 +573,34 @@ pub fn forward_hessian_nograd_sparse_vec_f64(
     out
 }
 
-// #[cfg(feature = "ndarrayl")]
-// pub fn forward_hessian_nograd_sparse_ndarray_f64(
-//     p: &ndarray::Array1<f64>,
-//     op: &Fn(&ndarray::Array1<f64>) -> f64,
-//     indices: Vec<(usize, usize)>,
-// ) -> ndarray::Array2<f64> {
-//     let fx = (op)(p);
-//     let n = p.len();
-//     let mut out = ndarray::Array2::zeros((n, n));
-//     for i in 0..n {
-//         for j in 0..=i {
-//             let t = {
-//                 let mut xi = p.clone();
-//                 xi[i] += EPS_F64.sqrt();
-//                 let mut xj = p.clone();
-//                 xj[j] += EPS_F64.sqrt();
-//                 let mut xij = p.clone();
-//                 xij[i] += EPS_F64.sqrt();
-//                 xij[j] += EPS_F64.sqrt();
-//                 let fxi = (op)(&xi);
-//                 let fxj = (op)(&xj);
-//                 let fxij = (op)(&xij);
-//                 (fxij - fxi - fxj + fx) / EPS_F64
-//             };
-//             out[(i, j)] = t;
-//             out[(j, i)] = t;
-//         }
-//     }
-//     out
-// }
+#[cfg(feature = "ndarrayl")]
+pub fn forward_hessian_nograd_sparse_ndarray_f64(
+    p: &ndarray::Array1<f64>,
+    op: &Fn(&ndarray::Array1<f64>) -> f64,
+    indices: Vec<(usize, usize)>,
+) -> ndarray::Array2<f64> {
+    let fx = (op)(p);
+    let n = p.len();
+    let mut out = ndarray::Array2::zeros((n, n));
+    for (i, j) in indices {
+        let t = {
+            let mut xi = p.clone();
+            xi[i] += EPS_F64.sqrt();
+            let mut xj = p.clone();
+            xj[j] += EPS_F64.sqrt();
+            let mut xij = p.clone();
+            xij[i] += EPS_F64.sqrt();
+            xij[j] += EPS_F64.sqrt();
+            let fxi = (op)(&xi);
+            let fxj = (op)(&xj);
+            let fxij = (op)(&xij);
+            (fxij - fxi - fxj + fx) / EPS_F64
+        };
+        out[(i, j)] = t;
+        out[(j, i)] = t;
+    }
+    out
+}
 
 pub trait ArgminFiniteDiff
 where
@@ -1807,26 +1805,27 @@ mod tests {
             .count();
     }
 
-    // #[cfg(feature = "ndarrayl")]
-    // #[test]
-    // fn test_forward_hessian_nograd_ndarray_f64() {
-    //     let op = |x: &ndarray::Array1<f64>| x[0] + x[1].powi(2) + x[2] * x[3].powi(2);
-    //     let p = ndarray::Array1::from_vec(vec![1.0f64, 1.0, 1.0, 1.0]);
-    //     let hessian = forward_hessian_nograd_ndarray_f64(&p, &op);
-    //     let res = vec![
-    //         vec![0.0, 0.0, 0.0, 0.0],
-    //         vec![0.0, 2.0, 0.0, 0.0],
-    //         vec![0.0, 0.0, 0.0, 2.0],
-    //         vec![0.0, 0.0, 2.0, 2.0],
-    //     ];
-    //     // println!("hessian:\n{:#?}", hessian);
-    //     // println!("diff:\n{:#?}", diff);
-    //     (0..4)
-    //         .zip(0..4)
-    //         .map(|(i, j)| assert!((res[i][j] - hessian[(i, j)]).abs() < COMP_ACC))
-    //         .count();
-    // }
-    //
+    #[cfg(feature = "ndarrayl")]
+    #[test]
+    fn test_forward_hessian_nograd_sparse_ndarray_f64() {
+        let op = |x: &ndarray::Array1<f64>| x[0] + x[1].powi(2) + x[2] * x[3].powi(2);
+        let p = ndarray::Array1::from_vec(vec![1.0f64, 1.0, 1.0, 1.0]);
+        let indices = vec![(1, 1), (2, 3), (3, 3)];
+        let hessian = forward_hessian_nograd_sparse_ndarray_f64(&p, &op, indices);
+        let res = vec![
+            vec![0.0, 0.0, 0.0, 0.0],
+            vec![0.0, 2.0, 0.0, 0.0],
+            vec![0.0, 0.0, 0.0, 2.0],
+            vec![0.0, 0.0, 2.0, 2.0],
+        ];
+        // println!("hessian:\n{:#?}", hessian);
+        // println!("diff:\n{:#?}", diff);
+        (0..4)
+            .zip(0..4)
+            .map(|(i, j)| assert!((res[i][j] - hessian[(i, j)]).abs() < COMP_ACC))
+            .count();
+    }
+
     // #[test]
     // fn test_forward_hessian_nograd_vec_f64_trait() {
     //     let op = |x: &Vec<f64>| x[0] + x[1].powi(2) + x[2] * x[3].powi(2);
