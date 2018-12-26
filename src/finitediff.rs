@@ -281,110 +281,6 @@ pub fn central_jacobian_pert_ndarray_f64(
     out
 }
 
-pub trait ArgminFiniteDiff
-where
-    Self: Sized,
-{
-    type Jacobian;
-    type OperatorOutput;
-
-    fn forward_diff(&self, op: &Fn(&Self) -> f64) -> Self;
-    fn central_diff(&self, op: &Fn(&Self) -> f64) -> Self;
-    fn forward_jacobian(&self, op: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian;
-    fn central_jacobian(&self, op: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian;
-    fn forward_jacobian_pert(
-        &self,
-        op: &Fn(&Self) -> Self::OperatorOutput,
-        pert: PerturbationVectors,
-    ) -> Self::Jacobian;
-    fn central_jacobian_pert(
-        &self,
-        op: &Fn(&Self) -> Self::OperatorOutput,
-        pert: PerturbationVectors,
-    ) -> Self::Jacobian;
-}
-
-impl ArgminFiniteDiff for Vec<f64>
-where
-    Self: Sized,
-{
-    type Jacobian = Vec<Vec<f64>>;
-    type OperatorOutput = Vec<f64>;
-
-    fn forward_diff(&self, op: &Fn(&Self) -> f64) -> Self {
-        forward_diff_vec_f64(self, op)
-    }
-
-    fn central_diff(&self, op: &Fn(&Vec<f64>) -> f64) -> Self {
-        central_diff_vec_f64(self, op)
-    }
-
-    fn forward_jacobian(&self, op: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian {
-        forward_jacobian_vec_f64(self, op)
-    }
-
-    fn central_jacobian(&self, op: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian {
-        central_jacobian_vec_f64(self, op)
-    }
-
-    fn forward_jacobian_pert(
-        &self,
-        op: &Fn(&Self) -> Self::OperatorOutput,
-        pert: PerturbationVectors,
-    ) -> Self::Jacobian {
-        forward_jacobian_pert_vec_f64(self, op, pert)
-    }
-
-    fn central_jacobian_pert(
-        &self,
-        op: &Fn(&Self) -> Self::OperatorOutput,
-        pert: PerturbationVectors,
-    ) -> Self::Jacobian {
-        central_jacobian_pert_vec_f64(self, op, pert)
-    }
-}
-
-#[cfg(feature = "ndarrayl")]
-impl ArgminFiniteDiff for ndarray::Array1<f64>
-where
-    Self: Sized,
-{
-    type Jacobian = ndarray::Array2<f64>;
-    type OperatorOutput = ndarray::Array1<f64>;
-
-    fn forward_diff(&self, op: &Fn(&Self) -> f64) -> Self {
-        forward_diff_ndarray_f64(self, op)
-    }
-
-    fn central_diff(&self, op: &Fn(&ndarray::Array1<f64>) -> f64) -> Self {
-        central_diff_ndarray_f64(self, op)
-    }
-
-    fn forward_jacobian(&self, op: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian {
-        forward_jacobian_ndarray_f64(self, op)
-    }
-
-    fn central_jacobian(&self, op: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian {
-        central_jacobian_ndarray_f64(self, op)
-    }
-
-    fn forward_jacobian_pert(
-        &self,
-        op: &Fn(&Self) -> Self::OperatorOutput,
-        pert: PerturbationVectors,
-    ) -> Self::Jacobian {
-        forward_jacobian_pert_ndarray_f64(self, op, pert)
-    }
-
-    fn central_jacobian_pert(
-        &self,
-        op: &Fn(&Self) -> Self::OperatorOutput,
-        pert: PerturbationVectors,
-    ) -> Self::Jacobian {
-        central_jacobian_pert_ndarray_f64(self, op, pert)
-    }
-}
-
 pub fn forward_hessian_vec_f64(p: &Vec<f64>, grad: &Fn(&Vec<f64>) -> Vec<f64>) -> Vec<Vec<f64>> {
     let fx = (grad)(p);
     let n = p.len();
@@ -437,6 +333,173 @@ pub fn forward_hessian_ndarray_f64(
         }
     }
     out
+}
+
+// pub fn central_hessian_vec_f64(p: &Vec<f64>, grad: &Fn(&Vec<f64>) -> Vec<f64>) -> Vec<Vec<f64>> {
+//     let fx = (grad)(p);
+//     let n = p.len();
+//     let mut out: Vec<Vec<f64>> = (0..n)
+//         .map(|i| {
+//             let mut x1 = p.clone();
+//             x1[i] += EPS_F64.sqrt();
+//             let fx1 = (grad)(&x1);
+//             fx1.iter()
+//                 .zip(fx.iter())
+//                 .map(|(a, b)| (a - b) / (EPS_F64.sqrt()))
+//                 .collect::<Vec<f64>>()
+//         })
+//         .collect();
+//
+//     // restore symmetry
+//     for i in 0..n {
+//         for j in (i + 1)..n {
+//             let t = (out[i][j] + out[j][i]) / 2.0;
+//             out[i][j] = t;
+//             out[j][i] = t;
+//         }
+//     }
+//     out
+// }
+//
+// #[cfg(feature = "ndarrayl")]
+// pub fn central_hessian_ndarray_f64(
+//     p: &ndarray::Array1<f64>,
+//     grad: &Fn(&ndarray::Array1<f64>) -> ndarray::Array1<f64>,
+// ) -> ndarray::Array2<f64> {
+//     let fx = (grad)(&p);
+//     let rn = fx.len();
+//     let n = p.len();
+//     let mut out = ndarray::Array2::zeros((rn, n));
+//     for i in 0..n {
+//         let mut x1 = p.clone();
+//         x1[i] += EPS_F64.sqrt();
+//         let fx1 = (grad)(&x1);
+//         for j in 0..rn {
+//             out[(j, i)] = (fx1[j] - fx[j]) / EPS_F64.sqrt();
+//         }
+//     }
+//     // restore symmetry
+//     for i in 0..n {
+//         for j in (i + 1)..n {
+//             let t = (out[(i, j)] + out[(j, i)]) / 2.0;
+//             out[(i, j)] = t;
+//             out[(j, i)] = t;
+//         }
+//     }
+//     out
+// }
+
+pub trait ArgminFiniteDiff
+where
+    Self: Sized,
+{
+    type Jacobian;
+    type OperatorOutput;
+
+    fn forward_diff(&self, op: &Fn(&Self) -> f64) -> Self;
+    fn central_diff(&self, op: &Fn(&Self) -> f64) -> Self;
+    fn forward_jacobian(&self, op: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian;
+    fn central_jacobian(&self, op: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian;
+    fn forward_jacobian_pert(
+        &self,
+        op: &Fn(&Self) -> Self::OperatorOutput,
+        pert: PerturbationVectors,
+    ) -> Self::Jacobian;
+    fn central_jacobian_pert(
+        &self,
+        op: &Fn(&Self) -> Self::OperatorOutput,
+        pert: PerturbationVectors,
+    ) -> Self::Jacobian;
+    fn forward_hessian(&self, grad: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian;
+}
+
+impl ArgminFiniteDiff for Vec<f64>
+where
+    Self: Sized,
+{
+    type Jacobian = Vec<Vec<f64>>;
+    type OperatorOutput = Vec<f64>;
+
+    fn forward_diff(&self, op: &Fn(&Self) -> f64) -> Self {
+        forward_diff_vec_f64(self, op)
+    }
+
+    fn central_diff(&self, op: &Fn(&Vec<f64>) -> f64) -> Self {
+        central_diff_vec_f64(self, op)
+    }
+
+    fn forward_jacobian(&self, op: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian {
+        forward_jacobian_vec_f64(self, op)
+    }
+
+    fn central_jacobian(&self, op: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian {
+        central_jacobian_vec_f64(self, op)
+    }
+
+    fn forward_jacobian_pert(
+        &self,
+        op: &Fn(&Self) -> Self::OperatorOutput,
+        pert: PerturbationVectors,
+    ) -> Self::Jacobian {
+        forward_jacobian_pert_vec_f64(self, op, pert)
+    }
+
+    fn central_jacobian_pert(
+        &self,
+        op: &Fn(&Self) -> Self::OperatorOutput,
+        pert: PerturbationVectors,
+    ) -> Self::Jacobian {
+        central_jacobian_pert_vec_f64(self, op, pert)
+    }
+
+    fn forward_hessian(&self, grad: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian {
+        forward_hessian_vec_f64(self, grad)
+    }
+}
+
+#[cfg(feature = "ndarrayl")]
+impl ArgminFiniteDiff for ndarray::Array1<f64>
+where
+    Self: Sized,
+{
+    type Jacobian = ndarray::Array2<f64>;
+    type OperatorOutput = ndarray::Array1<f64>;
+
+    fn forward_diff(&self, op: &Fn(&Self) -> f64) -> Self {
+        forward_diff_ndarray_f64(self, op)
+    }
+
+    fn central_diff(&self, op: &Fn(&ndarray::Array1<f64>) -> f64) -> Self {
+        central_diff_ndarray_f64(self, op)
+    }
+
+    fn forward_jacobian(&self, op: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian {
+        forward_jacobian_ndarray_f64(self, op)
+    }
+
+    fn central_jacobian(&self, op: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian {
+        central_jacobian_ndarray_f64(self, op)
+    }
+
+    fn forward_jacobian_pert(
+        &self,
+        op: &Fn(&Self) -> Self::OperatorOutput,
+        pert: PerturbationVectors,
+    ) -> Self::Jacobian {
+        forward_jacobian_pert_ndarray_f64(self, op, pert)
+    }
+
+    fn central_jacobian_pert(
+        &self,
+        op: &Fn(&Self) -> Self::OperatorOutput,
+        pert: PerturbationVectors,
+    ) -> Self::Jacobian {
+        central_jacobian_pert_ndarray_f64(self, op, pert)
+    }
+
+    fn forward_hessian(&self, grad: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian {
+        forward_hessian_ndarray_f64(self, grad)
+    }
 }
 
 #[cfg(test)]
@@ -1145,6 +1208,45 @@ mod tests {
         let op = |x: &ndarray::Array1<f64>| x[0] + x[1].powi(2) + x[2] * x[3].powi(2);
         let p = ndarray::Array1::from_vec(vec![1.0f64, 1.0, 1.0, 1.0]);
         let hessian = forward_hessian_ndarray_f64(&p, &|d| d.forward_diff(&op));
+        let res = vec![
+            vec![0.0, 0.0, 0.0, 0.0],
+            vec![0.0, 2.0, 0.0, 0.0],
+            vec![0.0, 0.0, 0.0, 2.0],
+            vec![0.0, 0.0, 2.0, 2.0],
+        ];
+        // println!("hessian:\n{:#?}", hessian);
+        // println!("diff:\n{:#?}", diff);
+        (0..4)
+            .zip(0..4)
+            .map(|(i, j)| assert!((res[i][j] - hessian[(i, j)]).abs() < COMP_ACC))
+            .count();
+    }
+
+    #[test]
+    fn test_forward_hessian_vec_f64_trait() {
+        let op = |x: &Vec<f64>| x[0] + x[1].powi(2) + x[2] * x[3].powi(2);
+        let p = vec![1.0f64, 1.0, 1.0, 1.0];
+        let hessian = p.forward_hessian(&|d| d.forward_diff(&op));
+        let res = vec![
+            vec![0.0, 0.0, 0.0, 0.0],
+            vec![0.0, 2.0, 0.0, 0.0],
+            vec![0.0, 0.0, 0.0, 2.0],
+            vec![0.0, 0.0, 2.0, 2.0],
+        ];
+        // println!("hessian:\n{:#?}", hessian);
+        // println!("diff:\n{:#?}", diff);
+        (0..4)
+            .zip(0..4)
+            .map(|(i, j)| assert!((res[i][j] - hessian[i][j]).abs() < COMP_ACC))
+            .count();
+    }
+
+    #[cfg(feature = "ndarrayl")]
+    #[test]
+    fn test_forward_hessian_ndarray_f64_trait() {
+        let op = |x: &ndarray::Array1<f64>| x[0] + x[1].powi(2) + x[2] * x[3].powi(2);
+        let p = ndarray::Array1::from_vec(vec![1.0f64, 1.0, 1.0, 1.0]);
+        let hessian = p.forward_hessian(&|d| d.forward_diff(&op));
         let res = vec![
             vec![0.0, 0.0, 0.0, 0.0],
             vec![0.0, 2.0, 0.0, 0.0],
