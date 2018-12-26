@@ -550,6 +550,7 @@ where
     Self: Sized,
 {
     type Jacobian;
+    type Hessian;
     type OperatorOutput;
 
     fn forward_diff(&self, op: &Fn(&Self) -> f64) -> Self;
@@ -566,10 +567,11 @@ where
         op: &Fn(&Self) -> Self::OperatorOutput,
         pert: PerturbationVectors,
     ) -> Self::Jacobian;
-    fn forward_hessian(&self, grad: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian;
-    fn central_hessian(&self, grad: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian;
+    fn forward_hessian(&self, grad: &Fn(&Self) -> Self::OperatorOutput) -> Self::Hessian;
+    fn central_hessian(&self, grad: &Fn(&Self) -> Self::OperatorOutput) -> Self::Hessian;
     fn forward_hessian_vec_prod(&self, grad: &Fn(&Self) -> Self::OperatorOutput, x: &Self) -> Self;
     fn central_hessian_vec_prod(&self, grad: &Fn(&Self) -> Self::OperatorOutput, x: &Self) -> Self;
+    fn forward_hessian_nograd(&self, op: &Fn(&Self) -> f64) -> Self::Hessian;
 }
 
 impl ArgminFiniteDiff for Vec<f64>
@@ -577,6 +579,7 @@ where
     Self: Sized,
 {
     type Jacobian = Vec<Vec<f64>>;
+    type Hessian = Vec<Vec<f64>>;
     type OperatorOutput = Vec<f64>;
 
     fn forward_diff(&self, op: &Fn(&Self) -> f64) -> Self {
@@ -611,11 +614,11 @@ where
         central_jacobian_pert_vec_f64(self, op, pert)
     }
 
-    fn forward_hessian(&self, grad: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian {
+    fn forward_hessian(&self, grad: &Fn(&Self) -> Self::OperatorOutput) -> Self::Hessian {
         forward_hessian_vec_f64(self, grad)
     }
 
-    fn central_hessian(&self, grad: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian {
+    fn central_hessian(&self, grad: &Fn(&Self) -> Self::OperatorOutput) -> Self::Hessian {
         central_hessian_vec_f64(self, grad)
     }
 
@@ -626,6 +629,10 @@ where
     fn central_hessian_vec_prod(&self, grad: &Fn(&Self) -> Self::OperatorOutput, x: &Self) -> Self {
         central_hessian_vec_prod_vec_f64(self, grad, x)
     }
+
+    fn forward_hessian_nograd(&self, op: &Fn(&Self) -> f64) -> Self::Hessian {
+        forward_hessian_nograd_vec_f64(self, op)
+    }
 }
 
 #[cfg(feature = "ndarrayl")]
@@ -634,6 +641,7 @@ where
     Self: Sized,
 {
     type Jacobian = ndarray::Array2<f64>;
+    type Hessian = ndarray::Array2<f64>;
     type OperatorOutput = ndarray::Array1<f64>;
 
     fn forward_diff(&self, op: &Fn(&Self) -> f64) -> Self {
@@ -682,6 +690,10 @@ where
 
     fn central_hessian_vec_prod(&self, grad: &Fn(&Self) -> Self::OperatorOutput, x: &Self) -> Self {
         central_hessian_vec_prod_ndarray_f64(self, grad, x)
+    }
+
+    fn forward_hessian_nograd(&self, op: &Fn(&Self) -> f64) -> Self::Hessian {
+        forward_hessian_nograd_ndarray_f64(self, op)
     }
 }
 
@@ -1663,6 +1675,45 @@ mod tests {
         let op = |x: &ndarray::Array1<f64>| x[0] + x[1].powi(2) + x[2] * x[3].powi(2);
         let p = ndarray::Array1::from_vec(vec![1.0f64, 1.0, 1.0, 1.0]);
         let hessian = forward_hessian_nograd_ndarray_f64(&p, &op);
+        let res = vec![
+            vec![0.0, 0.0, 0.0, 0.0],
+            vec![0.0, 2.0, 0.0, 0.0],
+            vec![0.0, 0.0, 0.0, 2.0],
+            vec![0.0, 0.0, 2.0, 2.0],
+        ];
+        // println!("hessian:\n{:#?}", hessian);
+        // println!("diff:\n{:#?}", diff);
+        (0..4)
+            .zip(0..4)
+            .map(|(i, j)| assert!((res[i][j] - hessian[(i, j)]).abs() < COMP_ACC))
+            .count();
+    }
+
+    #[test]
+    fn test_forward_hessian_nograd_vec_f64_trait() {
+        let op = |x: &Vec<f64>| x[0] + x[1].powi(2) + x[2] * x[3].powi(2);
+        let p = vec![1.0f64, 1.0, 1.0, 1.0];
+        let hessian = p.forward_hessian_nograd(&op);
+        let res = vec![
+            vec![0.0, 0.0, 0.0, 0.0],
+            vec![0.0, 2.0, 0.0, 0.0],
+            vec![0.0, 0.0, 0.0, 2.0],
+            vec![0.0, 0.0, 2.0, 2.0],
+        ];
+        // println!("hessian:\n{:#?}", hessian);
+        // println!("diff:\n{:#?}", diff);
+        (0..4)
+            .zip(0..4)
+            .map(|(i, j)| assert!((res[i][j] - hessian[i][j]).abs() < COMP_ACC))
+            .count();
+    }
+
+    #[cfg(feature = "ndarrayl")]
+    #[test]
+    fn test_forward_hessian_nograd_ndarray_f64_trait() {
+        let op = |x: &ndarray::Array1<f64>| x[0] + x[1].powi(2) + x[2] * x[3].powi(2);
+        let p = ndarray::Array1::from_vec(vec![1.0f64, 1.0, 1.0, 1.0]);
+        let hessian = p.forward_hessian_nograd(&op);
         let res = vec![
             vec![0.0, 0.0, 0.0, 0.0],
             vec![0.0, 2.0, 0.0, 0.0],
