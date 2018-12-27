@@ -144,6 +144,44 @@ pub fn central_diff_ndarray_f64(
         .collect()
 }
 
+pub fn forward_jacobian_vec_prod_vec_f64(
+    p: &Vec<f64>,
+    f: &Fn(&Vec<f64>) -> Vec<f64>,
+    x: &Vec<f64>,
+) -> Vec<f64> {
+    let fx = (f)(&p);
+    let x1 = p
+        .iter()
+        .zip(x.iter())
+        .map(|(pi, xi)| pi + EPS_F64.sqrt() * xi)
+        .collect();
+    let fx1 = (f)(&x1);
+    fx1.iter()
+        .zip(fx.iter())
+        .map(|(a, b)| (a - b) / EPS_F64.sqrt())
+        .collect::<Vec<f64>>()
+}
+
+// #[cfg(feature = "ndarrayl")]
+// pub fn forward_jacobian_vec_prod_ndarray_f64(
+//     p: &ndarray::Array1<f64>,
+//     f: &Fn(&ndarray::Array1<f64>) -> ndarray::Array1<f64>,
+// ) -> ndarray::Array2<f64> {
+//     let fx = (f)(&p);
+//     let rn = fx.len();
+//     let n = p.len();
+//     let mut out = ndarray::Array2::zeros((rn, n));
+//     for i in 0..n {
+//         let mut x1 = p.clone();
+//         x1[i] += EPS_F64.sqrt();
+//         let fx1 = (f)(&x1);
+//         for j in 0..rn {
+//             out[(j, i)] = (fx1[j] - fx[j]) / EPS_F64.sqrt();
+//         }
+//     }
+//     out
+// }
+
 pub fn central_jacobian_vec_f64(p: &Vec<f64>, f: &Fn(&Vec<f64>) -> Vec<f64>) -> Vec<Vec<f64>> {
     let n = p.len();
     (0..n)
@@ -624,24 +662,40 @@ where
     ///
     /// where `e_i` is the `i`th unit vector.
     fn forward_diff(&self, f: &Fn(&Self) -> f64) -> Self;
+
+    /// Central difference calculated as
+    ///
+    /// `df/dx_i (x) = (f(x + EPS_F64 * e_i) - f(x - EPS_F64 * e_i))/EPS_F64  \forall i`
+    ///
+    /// where `e_i` is the `i`th unit vector.
     fn central_diff(&self, f: &Fn(&Self) -> f64) -> Self;
+
     fn forward_jacobian(&self, f: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian;
+
     fn central_jacobian(&self, f: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian;
+
     fn forward_jacobian_pert(
         &self,
         f: &Fn(&Self) -> Self::OperatorOutput,
         pert: PerturbationVectors,
     ) -> Self::Jacobian;
+
     fn central_jacobian_pert(
         &self,
         f: &Fn(&Self) -> Self::OperatorOutput,
         pert: PerturbationVectors,
     ) -> Self::Jacobian;
+
     fn forward_hessian(&self, grad: &Fn(&Self) -> Self::OperatorOutput) -> Self::Hessian;
+
     fn central_hessian(&self, grad: &Fn(&Self) -> Self::OperatorOutput) -> Self::Hessian;
+
     fn forward_hessian_vec_prod(&self, grad: &Fn(&Self) -> Self::OperatorOutput, x: &Self) -> Self;
+
     fn central_hessian_vec_prod(&self, grad: &Fn(&Self) -> Self::OperatorOutput, x: &Self) -> Self;
+
     fn forward_hessian_nograd(&self, f: &Fn(&Self) -> f64) -> Self::Hessian;
+
     fn forward_hessian_nograd_sparse(
         &self,
         f: &Fn(&Self) -> f64,
@@ -1134,6 +1188,29 @@ mod tests {
         (0..6)
             .zip(0..6)
             .map(|(i, j)| assert!((res[i][j] - jacobian[(i, j)]).abs() < COMP_ACC))
+            .count();
+    }
+
+    #[test]
+    fn test_forward_jacobian_vec_prod_vec_f64() {
+        let f = |x: &Vec<f64>| {
+            vec![
+                2.0 * (x[1].powi(3) - x[0].powi(2)),
+                3.0 * (x[1].powi(3) - x[0].powi(2)) + 2.0 * (x[2].powi(3) - x[1].powi(2)),
+                3.0 * (x[2].powi(3) - x[1].powi(2)) + 2.0 * (x[3].powi(3) - x[2].powi(2)),
+                3.0 * (x[3].powi(3) - x[2].powi(2)) + 2.0 * (x[4].powi(3) - x[3].powi(2)),
+                3.0 * (x[4].powi(3) - x[3].powi(2)) + 2.0 * (x[5].powi(3) - x[4].powi(2)),
+                3.0 * (x[5].powi(3) - x[4].powi(2)),
+            ]
+        };
+        let p = vec![1.0f64, 1.0, 1.0, 1.0, 1.0, 1.0];
+        let x = vec![1.0f64, 2.0, 3.0, 4.0, 5.0, 6.0];
+        let jacobian = forward_jacobian_vec_prod_vec_f64(&p, &f, &x);
+        let res = vec![8.0, 22.0, 27.0, 32.0, 37.0, 24.0];
+        // println!("{:?}", jacobian);
+        // the accuracy for this is pretty bad!!
+        (0..6)
+            .map(|i| assert!((res[i] - jacobian[i]).abs() < 100.0 * COMP_ACC))
             .count();
     }
 
