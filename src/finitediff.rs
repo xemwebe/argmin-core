@@ -162,25 +162,21 @@ pub fn forward_jacobian_vec_prod_vec_f64(
         .collect::<Vec<f64>>()
 }
 
-// #[cfg(feature = "ndarrayl")]
-// pub fn forward_jacobian_vec_prod_ndarray_f64(
-//     p: &ndarray::Array1<f64>,
-//     f: &Fn(&ndarray::Array1<f64>) -> ndarray::Array1<f64>,
-// ) -> ndarray::Array2<f64> {
-//     let fx = (f)(&p);
-//     let rn = fx.len();
-//     let n = p.len();
-//     let mut out = ndarray::Array2::zeros((rn, n));
-//     for i in 0..n {
-//         let mut x1 = p.clone();
-//         x1[i] += EPS_F64.sqrt();
-//         let fx1 = (f)(&x1);
-//         for j in 0..rn {
-//             out[(j, i)] = (fx1[j] - fx[j]) / EPS_F64.sqrt();
-//         }
-//     }
-//     out
-// }
+#[cfg(feature = "ndarrayl")]
+pub fn forward_jacobian_vec_prod_ndarray_f64(
+    p: &ndarray::Array1<f64>,
+    f: &Fn(&ndarray::Array1<f64>) -> ndarray::Array1<f64>,
+    x: &ndarray::Array1<f64>,
+) -> ndarray::Array1<f64> {
+    let fx = (f)(&p);
+    let x1 = p
+        .iter()
+        .zip(x.iter())
+        .map(|(pi, xi)| pi + EPS_F64.sqrt() * xi)
+        .collect();
+    let fx1 = (f)(&x1);
+    (fx1 - fx) / EPS_F64.sqrt()
+}
 
 pub fn central_jacobian_vec_f64(p: &Vec<f64>, f: &Fn(&Vec<f64>) -> Vec<f64>) -> Vec<Vec<f64>> {
     let n = p.len();
@@ -1206,6 +1202,30 @@ mod tests {
         let p = vec![1.0f64, 1.0, 1.0, 1.0, 1.0, 1.0];
         let x = vec![1.0f64, 2.0, 3.0, 4.0, 5.0, 6.0];
         let jacobian = forward_jacobian_vec_prod_vec_f64(&p, &f, &x);
+        let res = vec![8.0, 22.0, 27.0, 32.0, 37.0, 24.0];
+        // println!("{:?}", jacobian);
+        // the accuracy for this is pretty bad!!
+        (0..6)
+            .map(|i| assert!((res[i] - jacobian[i]).abs() < 100.0 * COMP_ACC))
+            .count();
+    }
+
+    #[cfg(feature = "ndarrayl")]
+    #[test]
+    fn test_forward_jacobian_vec_prod_ndarray_f64() {
+        let f = |x: &ndarray::Array1<f64>| {
+            ndarray::Array1::from_vec(vec![
+                2.0 * (x[1].powi(3) - x[0].powi(2)),
+                3.0 * (x[1].powi(3) - x[0].powi(2)) + 2.0 * (x[2].powi(3) - x[1].powi(2)),
+                3.0 * (x[2].powi(3) - x[1].powi(2)) + 2.0 * (x[3].powi(3) - x[2].powi(2)),
+                3.0 * (x[3].powi(3) - x[2].powi(2)) + 2.0 * (x[4].powi(3) - x[3].powi(2)),
+                3.0 * (x[4].powi(3) - x[3].powi(2)) + 2.0 * (x[5].powi(3) - x[4].powi(2)),
+                3.0 * (x[5].powi(3) - x[4].powi(2)),
+            ])
+        };
+        let p = ndarray::Array1::from_vec(vec![1.0f64, 1.0, 1.0, 1.0, 1.0, 1.0]);
+        let x = ndarray::Array1::from_vec(vec![1.0f64, 2.0, 3.0, 4.0, 5.0, 6.0]);
+        let jacobian = forward_jacobian_vec_prod_ndarray_f64(&p, &f, &x);
         let res = vec![8.0, 22.0, 27.0, 32.0, 37.0, 24.0];
         // println!("{:?}", jacobian);
         // the accuracy for this is pretty bad!!
