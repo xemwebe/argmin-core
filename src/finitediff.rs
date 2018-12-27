@@ -710,23 +710,23 @@ where
     /// where `e_i` is the `i`th unit vector.
     fn central_diff(&self, f: &Fn(&Self) -> f64) -> Self;
 
-    fn forward_jacobian(&self, f: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian;
+    fn forward_jacobian(&self, fs: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian;
 
-    fn central_jacobian(&self, f: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian;
+    fn central_jacobian(&self, fs: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian;
 
-    fn forward_jacobian_vec_prod(&self, f: &Fn(&Self) -> Self::OperatorOutput, x: &Self) -> Self;
+    fn forward_jacobian_vec_prod(&self, fs: &Fn(&Self) -> Self::OperatorOutput, x: &Self) -> Self;
 
-    fn central_jacobian_vec_prod(&self, f: &Fn(&Self) -> Self::OperatorOutput, x: &Self) -> Self;
+    fn central_jacobian_vec_prod(&self, fs: &Fn(&Self) -> Self::OperatorOutput, x: &Self) -> Self;
 
     fn forward_jacobian_pert(
         &self,
-        f: &Fn(&Self) -> Self::OperatorOutput,
+        fs: &Fn(&Self) -> Self::OperatorOutput,
         pert: PerturbationVectors,
     ) -> Self::Jacobian;
 
     fn central_jacobian_pert(
         &self,
-        f: &Fn(&Self) -> Self::OperatorOutput,
+        fs: &Fn(&Self) -> Self::OperatorOutput,
         pert: PerturbationVectors,
     ) -> Self::Jacobian;
 
@@ -763,36 +763,36 @@ where
         central_diff_vec_f64(self, f)
     }
 
-    fn forward_jacobian(&self, f: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian {
-        forward_jacobian_vec_f64(self, f)
+    fn forward_jacobian(&self, fs: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian {
+        forward_jacobian_vec_f64(self, fs)
     }
 
-    fn central_jacobian(&self, f: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian {
-        central_jacobian_vec_f64(self, f)
+    fn central_jacobian(&self, fs: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian {
+        central_jacobian_vec_f64(self, fs)
     }
 
-    fn forward_jacobian_vec_prod(&self, f: &Fn(&Self) -> Self::OperatorOutput, x: &Self) -> Self {
-        forward_jacobian_vec_prod_vec_f64(self, f, x)
+    fn forward_jacobian_vec_prod(&self, fs: &Fn(&Self) -> Self::OperatorOutput, x: &Self) -> Self {
+        forward_jacobian_vec_prod_vec_f64(self, fs, x)
     }
 
-    fn central_jacobian_vec_prod(&self, f: &Fn(&Self) -> Self::OperatorOutput, x: &Self) -> Self {
-        central_jacobian_vec_prod_vec_f64(self, f, x)
+    fn central_jacobian_vec_prod(&self, fs: &Fn(&Self) -> Self::OperatorOutput, x: &Self) -> Self {
+        central_jacobian_vec_prod_vec_f64(self, fs, x)
     }
 
     fn forward_jacobian_pert(
         &self,
-        f: &Fn(&Self) -> Self::OperatorOutput,
+        fs: &Fn(&Self) -> Self::OperatorOutput,
         pert: PerturbationVectors,
     ) -> Self::Jacobian {
-        forward_jacobian_pert_vec_f64(self, f, pert)
+        forward_jacobian_pert_vec_f64(self, fs, pert)
     }
 
     fn central_jacobian_pert(
         &self,
-        f: &Fn(&Self) -> Self::OperatorOutput,
+        fs: &Fn(&Self) -> Self::OperatorOutput,
         pert: PerturbationVectors,
     ) -> Self::Jacobian {
-        central_jacobian_pert_vec_f64(self, f, pert)
+        central_jacobian_pert_vec_f64(self, fs, pert)
     }
 
     fn forward_hessian(&self, grad: &Fn(&Self) -> Self::OperatorOutput) -> Self::Hessian {
@@ -841,36 +841,36 @@ where
         central_diff_ndarray_f64(self, f)
     }
 
-    fn forward_jacobian(&self, f: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian {
-        forward_jacobian_ndarray_f64(self, f)
+    fn forward_jacobian(&self, fs: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian {
+        forward_jacobian_ndarray_f64(self, fs)
     }
 
-    fn central_jacobian(&self, f: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian {
-        central_jacobian_ndarray_f64(self, f)
+    fn central_jacobian(&self, fs: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian {
+        central_jacobian_ndarray_f64(self, fs)
     }
 
-    fn forward_jacobian_vec_prod(&self, f: &Fn(&Self) -> Self::OperatorOutput, x: &Self) -> Self {
-        forward_jacobian_vec_prod_ndarray_f64(self, f, x)
+    fn forward_jacobian_vec_prod(&self, fs: &Fn(&Self) -> Self::OperatorOutput, x: &Self) -> Self {
+        forward_jacobian_vec_prod_ndarray_f64(self, fs, x)
     }
 
-    fn central_jacobian_vec_prod(&self, f: &Fn(&Self) -> Self::OperatorOutput, x: &Self) -> Self {
-        central_jacobian_vec_prod_ndarray_f64(self, f, x)
+    fn central_jacobian_vec_prod(&self, fs: &Fn(&Self) -> Self::OperatorOutput, x: &Self) -> Self {
+        central_jacobian_vec_prod_ndarray_f64(self, fs, x)
     }
 
     fn forward_jacobian_pert(
         &self,
-        f: &Fn(&Self) -> Self::OperatorOutput,
+        fs: &Fn(&Self) -> Self::OperatorOutput,
         pert: PerturbationVectors,
     ) -> Self::Jacobian {
-        forward_jacobian_pert_ndarray_f64(self, f, pert)
+        forward_jacobian_pert_ndarray_f64(self, fs, pert)
     }
 
     fn central_jacobian_pert(
         &self,
-        f: &Fn(&Self) -> Self::OperatorOutput,
+        fs: &Fn(&Self) -> Self::OperatorOutput,
         pert: PerturbationVectors,
     ) -> Self::Jacobian {
-        central_jacobian_pert_ndarray_f64(self, f, pert)
+        central_jacobian_pert_ndarray_f64(self, fs, pert)
     }
 
     fn forward_hessian(&self, grad: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian {
