@@ -698,14 +698,14 @@ where
 
     /// Forward difference calculated as
     ///
-    /// `df/dx_i (x) = (f(x + EPS_F64 * e_i) - f(x))/EPS_F64  \forall i`
+    /// `df/dx_i (x) = (f(x + sqrt(EPS_F64) * e_i) - f(x))/sqrt(EPS_F64)  \forall i`
     ///
     /// where `e_i` is the `i`th unit vector.
     fn forward_diff(&self, f: &Fn(&Self) -> f64) -> Self;
 
     /// Central difference calculated as
     ///
-    /// `df/dx_i (x) = (f(x + EPS_F64 * e_i) - f(x - EPS_F64 * e_i))/EPS_F64  \forall i`
+    /// `df/dx_i (x) = (f(x + sqrt(EPS_F64) * e_i) - f(x - sqrt(EPS_F64) * e_i))/(2.0 * sqrt(EPS_F64))  \forall i`
     ///
     /// where `e_i` is the `i`th unit vector.
     fn central_diff(&self, f: &Fn(&Self) -> f64) -> Self;
@@ -730,13 +730,25 @@ where
         pert: PerturbationVectors,
     ) -> Self::Jacobian;
 
-    fn forward_hessian(&self, grad: &Fn(&Self) -> Self::OperatorOutput) -> Self::Hessian;
+    /// Calculation of the Hessian using forward differences
+    ///
+    /// `df/dx_i (x) = (g(x + sqrt(EPS_F64) * e_i) - g(x))/sqrt(EPS_F64)  \forall i`
+    ///
+    /// where `g` is a function which computes the gradient of some other function f and `e_i` is
+    /// the `i`th unit vector.
+    fn forward_hessian(&self, g: &Fn(&Self) -> Self::OperatorOutput) -> Self::Hessian;
 
-    fn central_hessian(&self, grad: &Fn(&Self) -> Self::OperatorOutput) -> Self::Hessian;
+    /// Calculation of the Hessian using central differences
+    ///
+    /// `df/dx_i (x) = (g(x + sqrt(EPS_F64) * e_i) - g(x - sqrt(EPS_F64) * e_i))/(2.0 * sqrt(EPS_F64))  \forall i`
+    ///
+    /// where `g` is a function which computes the gradient of some other function f and `e_i` is
+    /// the `i`th unit vector.
+    fn central_hessian(&self, g: &Fn(&Self) -> Self::OperatorOutput) -> Self::Hessian;
 
-    fn forward_hessian_vec_prod(&self, grad: &Fn(&Self) -> Self::OperatorOutput, x: &Self) -> Self;
+    fn forward_hessian_vec_prod(&self, g: &Fn(&Self) -> Self::OperatorOutput, x: &Self) -> Self;
 
-    fn central_hessian_vec_prod(&self, grad: &Fn(&Self) -> Self::OperatorOutput, x: &Self) -> Self;
+    fn central_hessian_vec_prod(&self, g: &Fn(&Self) -> Self::OperatorOutput, x: &Self) -> Self;
 
     fn forward_hessian_nograd(&self, f: &Fn(&Self) -> f64) -> Self::Hessian;
 
