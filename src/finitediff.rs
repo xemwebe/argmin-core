@@ -59,14 +59,14 @@ pub fn forward_diff_vec_f64(p: &Vec<f64>, f: &Fn(&Vec<f64>) -> f64) -> Vec<f64> 
 
 #[cfg(feature = "ndarrayl")]
 pub fn forward_diff_ndarray_f64(
-    p: &ndarray::Array1<f64>,
+    x: &ndarray::Array1<f64>,
     f: &Fn(&ndarray::Array1<f64>) -> f64,
 ) -> ndarray::Array1<f64> {
-    let fx = (f)(&p);
-    let n = p.len();
+    let fx = (f)(&x);
+    let n = x.len();
     (0..n)
         .map(|i| {
-            let mut x1 = p.clone();
+            let mut x1 = x.clone();
             x1[i] += EPS_F64.sqrt();
             let fx1 = (f)(&x1);
             (fx1 - fx) / (EPS_F64.sqrt())
@@ -74,12 +74,12 @@ pub fn forward_diff_ndarray_f64(
         .collect()
 }
 
-pub fn forward_jacobian_vec_f64(p: &Vec<f64>, fs: &Fn(&Vec<f64>) -> Vec<f64>) -> Vec<Vec<f64>> {
-    let fx = (fs)(&p);
-    let n = p.len();
+pub fn forward_jacobian_vec_f64(x: &Vec<f64>, fs: &Fn(&Vec<f64>) -> Vec<f64>) -> Vec<Vec<f64>> {
+    let fx = (fs)(&x);
+    let n = x.len();
     (0..n)
         .map(|i| {
-            let mut x1 = p.clone();
+            let mut x1 = x.clone();
             x1[i] += EPS_F64.sqrt();
             let fx1 = (fs)(&x1);
             fx1.iter()
@@ -92,15 +92,15 @@ pub fn forward_jacobian_vec_f64(p: &Vec<f64>, fs: &Fn(&Vec<f64>) -> Vec<f64>) ->
 
 #[cfg(feature = "ndarrayl")]
 pub fn forward_jacobian_ndarray_f64(
-    p: &ndarray::Array1<f64>,
+    x: &ndarray::Array1<f64>,
     fs: &Fn(&ndarray::Array1<f64>) -> ndarray::Array1<f64>,
 ) -> ndarray::Array2<f64> {
-    let fx = (fs)(&p);
+    let fx = (fs)(&x);
     let rn = fx.len();
-    let n = p.len();
+    let n = x.len();
     let mut out = ndarray::Array2::zeros((rn, n));
     for i in 0..n {
-        let mut x1 = p.clone();
+        let mut x1 = x.clone();
         x1[i] += EPS_F64.sqrt();
         let fx1 = (fs)(&x1);
         for j in 0..rn {
@@ -110,12 +110,12 @@ pub fn forward_jacobian_ndarray_f64(
     out
 }
 
-pub fn central_diff_vec_f64(p: &Vec<f64>, f: &Fn(&Vec<f64>) -> f64) -> Vec<f64> {
-    let n = p.len();
+pub fn central_diff_vec_f64(x: &Vec<f64>, f: &Fn(&Vec<f64>) -> f64) -> Vec<f64> {
+    let n = x.len();
     (0..n)
         .map(|i| {
-            let mut x1 = p.clone();
-            let mut x2 = p.clone();
+            let mut x1 = x.clone();
+            let mut x2 = x.clone();
             x1[i] += EPS_F64.sqrt();
             x2[i] -= EPS_F64.sqrt();
             let fx1 = (f)(&x1);
@@ -127,14 +127,14 @@ pub fn central_diff_vec_f64(p: &Vec<f64>, f: &Fn(&Vec<f64>) -> f64) -> Vec<f64> 
 
 #[cfg(feature = "ndarrayl")]
 pub fn central_diff_ndarray_f64(
-    p: &ndarray::Array1<f64>,
+    x: &ndarray::Array1<f64>,
     f: &Fn(&ndarray::Array1<f64>) -> f64,
 ) -> ndarray::Array1<f64> {
-    let n = p.len();
+    let n = x.len();
     (0..n)
         .map(|i| {
-            let mut x1 = p.clone();
-            let mut x2 = p.clone();
+            let mut x1 = x.clone();
+            let mut x2 = x.clone();
             x1[i] += EPS_F64.sqrt();
             x2[i] -= EPS_F64.sqrt();
             let fx1 = (f)(&x1);
@@ -144,12 +144,12 @@ pub fn central_diff_ndarray_f64(
         .collect()
 }
 
-pub fn central_jacobian_vec_f64(p: &Vec<f64>, fs: &Fn(&Vec<f64>) -> Vec<f64>) -> Vec<Vec<f64>> {
-    let n = p.len();
+pub fn central_jacobian_vec_f64(x: &Vec<f64>, fs: &Fn(&Vec<f64>) -> Vec<f64>) -> Vec<Vec<f64>> {
+    let n = x.len();
     (0..n)
         .map(|i| {
-            let mut x1 = p.clone();
-            let mut x2 = p.clone();
+            let mut x1 = x.clone();
+            let mut x2 = x.clone();
             x1[i] += EPS_F64.sqrt();
             x2[i] -= EPS_F64.sqrt();
             let fx1 = (fs)(&x1);
@@ -164,16 +164,17 @@ pub fn central_jacobian_vec_f64(p: &Vec<f64>, fs: &Fn(&Vec<f64>) -> Vec<f64>) ->
 
 #[cfg(feature = "ndarrayl")]
 pub fn central_jacobian_ndarray_f64(
-    p: &ndarray::Array1<f64>,
+    x: &ndarray::Array1<f64>,
     fs: &Fn(&ndarray::Array1<f64>) -> ndarray::Array1<f64>,
 ) -> ndarray::Array2<f64> {
-    let fx = (fs)(&p);
+    // TODO: get rid of this!
+    let fx = (fs)(&x);
     let rn = fx.len();
-    let n = p.len();
+    let n = x.len();
     let mut out = ndarray::Array2::zeros((rn, n));
     for i in 0..n {
-        let mut x1 = p.clone();
-        let mut x2 = p.clone();
+        let mut x1 = x.clone();
+        let mut x2 = x.clone();
         x1[i] += EPS_F64.sqrt();
         x2[i] -= EPS_F64.sqrt();
         let fx1 = (fs)(&x1);
@@ -186,15 +187,15 @@ pub fn central_jacobian_ndarray_f64(
 }
 
 pub fn forward_jacobian_vec_prod_vec_f64(
-    p: &Vec<f64>,
-    fs: &Fn(&Vec<f64>) -> Vec<f64>,
     x: &Vec<f64>,
+    fs: &Fn(&Vec<f64>) -> Vec<f64>,
+    p: &Vec<f64>,
 ) -> Vec<f64> {
-    let fx = (fs)(&p);
-    let x1 = p
+    let fx = (fs)(&x);
+    let x1 = x
         .iter()
-        .zip(x.iter())
-        .map(|(pi, xi)| pi + EPS_F64.sqrt() * xi)
+        .zip(p.iter())
+        .map(|(xi, pi)| xi + EPS_F64.sqrt() * pi)
         .collect();
     let fx1 = (fs)(&x1);
     fx1.iter()
@@ -205,34 +206,34 @@ pub fn forward_jacobian_vec_prod_vec_f64(
 
 #[cfg(feature = "ndarrayl")]
 pub fn forward_jacobian_vec_prod_ndarray_f64(
-    p: &ndarray::Array1<f64>,
-    fs: &Fn(&ndarray::Array1<f64>) -> ndarray::Array1<f64>,
     x: &ndarray::Array1<f64>,
+    fs: &Fn(&ndarray::Array1<f64>) -> ndarray::Array1<f64>,
+    p: &ndarray::Array1<f64>,
 ) -> ndarray::Array1<f64> {
-    let fx = (fs)(&p);
-    let x1 = p
+    let fx = (fs)(&x);
+    let x1 = x
         .iter()
-        .zip(x.iter())
-        .map(|(pi, xi)| pi + EPS_F64.sqrt() * xi)
+        .zip(p.iter())
+        .map(|(xi, pi)| xi + EPS_F64.sqrt() * pi)
         .collect();
     let fx1 = (fs)(&x1);
     (fx1 - fx) / EPS_F64.sqrt()
 }
 
 pub fn central_jacobian_vec_prod_vec_f64(
-    p: &Vec<f64>,
-    fs: &Fn(&Vec<f64>) -> Vec<f64>,
     x: &Vec<f64>,
+    fs: &Fn(&Vec<f64>) -> Vec<f64>,
+    p: &Vec<f64>,
 ) -> Vec<f64> {
-    let x1 = p
+    let x1 = x
         .iter()
-        .zip(x.iter())
-        .map(|(pi, xi)| pi + EPS_F64.sqrt() * xi)
+        .zip(p.iter())
+        .map(|(xi, pi)| xi + EPS_F64.sqrt() * pi)
         .collect();
-    let x2 = p
+    let x2 = x
         .iter()
-        .zip(x.iter())
-        .map(|(pi, xi)| pi - EPS_F64.sqrt() * xi)
+        .zip(p.iter())
+        .map(|(xi, pi)| xi - EPS_F64.sqrt() * pi)
         .collect();
     let fx1 = (fs)(&x1);
     let fx2 = (fs)(&x2);
@@ -244,19 +245,19 @@ pub fn central_jacobian_vec_prod_vec_f64(
 
 #[cfg(feature = "ndarrayl")]
 pub fn central_jacobian_vec_prod_ndarray_f64(
-    p: &ndarray::Array1<f64>,
-    fs: &Fn(&ndarray::Array1<f64>) -> ndarray::Array1<f64>,
     x: &ndarray::Array1<f64>,
+    fs: &Fn(&ndarray::Array1<f64>) -> ndarray::Array1<f64>,
+    p: &ndarray::Array1<f64>,
 ) -> ndarray::Array1<f64> {
-    let x1 = p
+    let x1 = x
         .iter()
-        .zip(x.iter())
-        .map(|(pi, xi)| pi + EPS_F64.sqrt() * xi)
+        .zip(p.iter())
+        .map(|(xi, pi)| xi + EPS_F64.sqrt() * pi)
         .collect();
-    let x2 = p
+    let x2 = x
         .iter()
-        .zip(x.iter())
-        .map(|(pi, xi)| pi - EPS_F64.sqrt() * xi)
+        .zip(p.iter())
+        .map(|(xi, pi)| xi - EPS_F64.sqrt() * pi)
         .collect();
     let fx1 = (fs)(&x1);
     let fx2 = (fs)(&x2);
@@ -264,15 +265,15 @@ pub fn central_jacobian_vec_prod_ndarray_f64(
 }
 
 pub fn forward_jacobian_pert_vec_f64(
-    p: &Vec<f64>,
+    x: &Vec<f64>,
     fs: &Fn(&Vec<f64>) -> Vec<f64>,
     pert: PerturbationVectors,
 ) -> Vec<Vec<f64>> {
-    let fx = (fs)(&p);
+    let fx = (fs)(&x);
     let n = pert.len();
-    let mut out = vec![vec![0.0; p.len()]; fx.len()];
+    let mut out = vec![vec![0.0; x.len()]; fx.len()];
     for i in 0..n {
-        let mut x1 = p.clone();
+        let mut x1 = x.clone();
         for j in pert[i].x_idx.iter() {
             x1[*j] += EPS_F64.sqrt();
         }
@@ -288,15 +289,15 @@ pub fn forward_jacobian_pert_vec_f64(
 
 #[cfg(feature = "ndarrayl")]
 pub fn forward_jacobian_pert_ndarray_f64(
-    p: &ndarray::Array1<f64>,
+    x: &ndarray::Array1<f64>,
     fs: &Fn(&ndarray::Array1<f64>) -> ndarray::Array1<f64>,
     pert: PerturbationVectors,
 ) -> ndarray::Array2<f64> {
-    let fx = (fs)(&p);
+    let fx = (fs)(&x);
     let n = pert.len();
-    let mut out = ndarray::Array2::zeros((fx.len(), p.len()));
+    let mut out = ndarray::Array2::zeros((fx.len(), x.len()));
     for i in 0..n {
-        let mut x1 = p.clone();
+        let mut x1 = x.clone();
         for j in pert[i].x_idx.iter() {
             x1[*j] += EPS_F64.sqrt();
         }
@@ -311,15 +312,15 @@ pub fn forward_jacobian_pert_ndarray_f64(
 }
 
 pub fn central_jacobian_pert_vec_f64(
-    p: &Vec<f64>,
+    x: &Vec<f64>,
     fs: &Fn(&Vec<f64>) -> Vec<f64>,
     pert: PerturbationVectors,
 ) -> Vec<Vec<f64>> {
     let n = pert.len();
     let mut out = vec![];
     for i in 0..n {
-        let mut x1 = p.clone();
-        let mut x2 = p.clone();
+        let mut x1 = x.clone();
+        let mut x2 = x.clone();
         for j in pert[i].x_idx.iter() {
             x1[*j] += EPS_F64.sqrt();
             x2[*j] -= EPS_F64.sqrt();
@@ -327,7 +328,7 @@ pub fn central_jacobian_pert_vec_f64(
         let fx1 = (fs)(&x1);
         let fx2 = (fs)(&x2);
         if i == 0 {
-            out = vec![vec![0.0; p.len()]; fx1.len()];
+            out = vec![vec![0.0; x.len()]; fx1.len()];
         }
         for (k, x_idx) in pert[i].x_idx.iter().enumerate() {
             for j in pert[i].r_idx[k].iter() {
@@ -340,15 +341,15 @@ pub fn central_jacobian_pert_vec_f64(
 
 #[cfg(feature = "ndarrayl")]
 pub fn central_jacobian_pert_ndarray_f64(
-    p: &ndarray::Array1<f64>,
+    x: &ndarray::Array1<f64>,
     fs: &Fn(&ndarray::Array1<f64>) -> ndarray::Array1<f64>,
     pert: PerturbationVectors,
 ) -> ndarray::Array2<f64> {
     let n = pert.len();
     let mut out = ndarray::Array2::zeros((1, 1));
     for i in 0..n {
-        let mut x1 = p.clone();
-        let mut x2 = p.clone();
+        let mut x1 = x.clone();
+        let mut x2 = x.clone();
         for j in pert[i].x_idx.iter() {
             x1[*j] += EPS_F64.sqrt();
             x2[*j] -= EPS_F64.sqrt();
@@ -356,7 +357,7 @@ pub fn central_jacobian_pert_ndarray_f64(
         let fx1 = (fs)(&x1);
         let fx2 = (fs)(&x2);
         if i == 0 {
-            out = ndarray::Array2::zeros((fx1.len(), p.len()));
+            out = ndarray::Array2::zeros((fx1.len(), x.len()));
         }
         for (k, x_idx) in pert[i].x_idx.iter().enumerate() {
             for j in pert[i].r_idx[k].iter() {
@@ -367,12 +368,12 @@ pub fn central_jacobian_pert_ndarray_f64(
     out
 }
 
-pub fn forward_hessian_vec_f64(p: &Vec<f64>, grad: &Fn(&Vec<f64>) -> Vec<f64>) -> Vec<Vec<f64>> {
-    let fx = (grad)(p);
-    let n = p.len();
+pub fn forward_hessian_vec_f64(x: &Vec<f64>, grad: &Fn(&Vec<f64>) -> Vec<f64>) -> Vec<Vec<f64>> {
+    let fx = (grad)(x);
+    let n = x.len();
     let mut out: Vec<Vec<f64>> = (0..n)
         .map(|i| {
-            let mut x1 = p.clone();
+            let mut x1 = x.clone();
             x1[i] += EPS_F64.sqrt();
             let fx1 = (grad)(&x1);
             fx1.iter()
@@ -395,15 +396,15 @@ pub fn forward_hessian_vec_f64(p: &Vec<f64>, grad: &Fn(&Vec<f64>) -> Vec<f64>) -
 
 #[cfg(feature = "ndarrayl")]
 pub fn forward_hessian_ndarray_f64(
-    p: &ndarray::Array1<f64>,
+    x: &ndarray::Array1<f64>,
     grad: &Fn(&ndarray::Array1<f64>) -> ndarray::Array1<f64>,
 ) -> ndarray::Array2<f64> {
-    let fx = (grad)(&p);
+    let fx = (grad)(&x);
     let rn = fx.len();
-    let n = p.len();
+    let n = x.len();
     let mut out = ndarray::Array2::zeros((rn, n));
     for i in 0..n {
-        let mut x1 = p.clone();
+        let mut x1 = x.clone();
         x1[i] += EPS_F64.sqrt();
         let fx1 = (grad)(&x1);
         for j in 0..rn {
@@ -421,13 +422,12 @@ pub fn forward_hessian_ndarray_f64(
     out
 }
 
-pub fn central_hessian_vec_f64(p: &Vec<f64>, grad: &Fn(&Vec<f64>) -> Vec<f64>) -> Vec<Vec<f64>> {
-    // let fx = (grad)(p);
-    let n = p.len();
+pub fn central_hessian_vec_f64(x: &Vec<f64>, grad: &Fn(&Vec<f64>) -> Vec<f64>) -> Vec<Vec<f64>> {
+    let n = x.len();
     let mut out: Vec<Vec<f64>> = (0..n)
         .map(|i| {
-            let mut x1 = p.clone();
-            let mut x2 = p.clone();
+            let mut x1 = x.clone();
+            let mut x2 = x.clone();
             x1[i] += EPS_F64.sqrt();
             x2[i] -= EPS_F64.sqrt();
             let fx1 = (grad)(&x1);
@@ -452,16 +452,17 @@ pub fn central_hessian_vec_f64(p: &Vec<f64>, grad: &Fn(&Vec<f64>) -> Vec<f64>) -
 
 #[cfg(feature = "ndarrayl")]
 pub fn central_hessian_ndarray_f64(
-    p: &ndarray::Array1<f64>,
+    x: &ndarray::Array1<f64>,
     grad: &Fn(&ndarray::Array1<f64>) -> ndarray::Array1<f64>,
 ) -> ndarray::Array2<f64> {
-    let fx = (grad)(&p);
+    // TODO: get rid of this!
+    let fx = (grad)(&x);
     let rn = fx.len();
-    let n = p.len();
+    let n = x.len();
     let mut out = ndarray::Array2::zeros((rn, n));
     for i in 0..n {
-        let mut x1 = p.clone();
-        let mut x2 = p.clone();
+        let mut x1 = x.clone();
+        let mut x2 = x.clone();
         x1[i] += EPS_F64.sqrt();
         x2[i] -= EPS_F64.sqrt();
         let fx1 = (grad)(&x1);
@@ -482,16 +483,16 @@ pub fn central_hessian_ndarray_f64(
 }
 
 pub fn forward_hessian_vec_prod_vec_f64(
-    p: &Vec<f64>,
-    grad: &Fn(&Vec<f64>) -> Vec<f64>,
     x: &Vec<f64>,
+    grad: &Fn(&Vec<f64>) -> Vec<f64>,
+    p: &Vec<f64>,
 ) -> Vec<f64> {
-    let fx = (grad)(p);
+    let fx = (grad)(x);
     let out: Vec<f64> = {
-        let x1 = p
+        let x1 = x
             .iter()
-            .zip(x.iter())
-            .map(|(pi, xi)| pi + xi * EPS_F64.sqrt())
+            .zip(p.iter())
+            .map(|(xi, pi)| xi + pi * EPS_F64.sqrt())
             .collect();
         let fx1 = (grad)(&x1);
         fx1.iter()
@@ -504,17 +505,17 @@ pub fn forward_hessian_vec_prod_vec_f64(
 
 #[cfg(feature = "ndarrayl")]
 pub fn forward_hessian_vec_prod_ndarray_f64(
-    p: &ndarray::Array1<f64>,
-    grad: &Fn(&ndarray::Array1<f64>) -> ndarray::Array1<f64>,
     x: &ndarray::Array1<f64>,
+    grad: &Fn(&ndarray::Array1<f64>) -> ndarray::Array1<f64>,
+    p: &ndarray::Array1<f64>,
 ) -> ndarray::Array1<f64> {
-    let fx = (grad)(&p);
+    let fx = (grad)(&x);
     let rn = fx.len();
     let mut out = ndarray::Array1::zeros(rn);
-    let x1 = p
+    let x1 = x
         .iter()
-        .zip(x.iter())
-        .map(|(pi, xi)| pi + xi * EPS_F64.sqrt())
+        .zip(p.iter())
+        .map(|(xi, pi)| xi + pi * EPS_F64.sqrt())
         .collect();
     let fx1 = (grad)(&x1);
     for j in 0..rn {
@@ -524,20 +525,20 @@ pub fn forward_hessian_vec_prod_ndarray_f64(
 }
 
 pub fn central_hessian_vec_prod_vec_f64(
-    p: &Vec<f64>,
-    grad: &Fn(&Vec<f64>) -> Vec<f64>,
     x: &Vec<f64>,
+    grad: &Fn(&Vec<f64>) -> Vec<f64>,
+    p: &Vec<f64>,
 ) -> Vec<f64> {
     let out: Vec<f64> = {
-        let x1 = p
+        let x1 = x
             .iter()
-            .zip(x.iter())
-            .map(|(pi, xi)| pi + xi * EPS_F64.sqrt())
+            .zip(p.iter())
+            .map(|(xi, pi)| xi + pi * EPS_F64.sqrt())
             .collect();
-        let x2 = p
+        let x2 = x
             .iter()
-            .zip(x.iter())
-            .map(|(pi, xi)| pi - xi * EPS_F64.sqrt())
+            .zip(p.iter())
+            .map(|(xi, pi)| xi - pi * EPS_F64.sqrt())
             .collect();
         let fx1 = (grad)(&x1);
         let fx2 = (grad)(&x2);
@@ -551,21 +552,21 @@ pub fn central_hessian_vec_prod_vec_f64(
 
 #[cfg(feature = "ndarrayl")]
 pub fn central_hessian_vec_prod_ndarray_f64(
-    p: &ndarray::Array1<f64>,
-    grad: &Fn(&ndarray::Array1<f64>) -> ndarray::Array1<f64>,
     x: &ndarray::Array1<f64>,
+    grad: &Fn(&ndarray::Array1<f64>) -> ndarray::Array1<f64>,
+    p: &ndarray::Array1<f64>,
 ) -> ndarray::Array1<f64> {
-    let rn = p.len();
+    let rn = x.len();
     let mut out = ndarray::Array1::zeros(rn);
-    let x1 = p
+    let x1 = x
         .iter()
-        .zip(x.iter())
-        .map(|(pi, xi)| pi + xi * EPS_F64.sqrt())
+        .zip(p.iter())
+        .map(|(xi, pi)| xi + pi * EPS_F64.sqrt())
         .collect();
-    let x2 = p
+    let x2 = x
         .iter()
-        .zip(x.iter())
-        .map(|(pi, xi)| pi - xi * EPS_F64.sqrt())
+        .zip(p.iter())
+        .map(|(xi, pi)| xi - pi * EPS_F64.sqrt())
         .collect();
     let fx1 = (grad)(&x1);
     let fx2 = (grad)(&x2);
@@ -575,18 +576,18 @@ pub fn central_hessian_vec_prod_ndarray_f64(
     out
 }
 
-pub fn forward_hessian_nograd_vec_f64(p: &Vec<f64>, f: &Fn(&Vec<f64>) -> f64) -> Vec<Vec<f64>> {
-    let fx = (f)(p);
-    let n = p.len();
+pub fn forward_hessian_nograd_vec_f64(x: &Vec<f64>, f: &Fn(&Vec<f64>) -> f64) -> Vec<Vec<f64>> {
+    let fx = (f)(x);
+    let n = x.len();
     let mut out: Vec<Vec<f64>> = vec![vec![0.0; n]; n];
     for i in 0..n {
         for j in 0..=i {
             let t = {
-                let mut xi = p.clone();
+                let mut xi = x.clone();
                 xi[i] += EPS_F64.sqrt();
-                let mut xj = p.clone();
+                let mut xj = x.clone();
                 xj[j] += EPS_F64.sqrt();
-                let mut xij = p.clone();
+                let mut xij = x.clone();
                 xij[i] += EPS_F64.sqrt();
                 xij[j] += EPS_F64.sqrt();
                 let fxi = (f)(&xi);
@@ -603,20 +604,20 @@ pub fn forward_hessian_nograd_vec_f64(p: &Vec<f64>, f: &Fn(&Vec<f64>) -> f64) ->
 
 #[cfg(feature = "ndarrayl")]
 pub fn forward_hessian_nograd_ndarray_f64(
-    p: &ndarray::Array1<f64>,
+    x: &ndarray::Array1<f64>,
     f: &Fn(&ndarray::Array1<f64>) -> f64,
 ) -> ndarray::Array2<f64> {
-    let fx = (f)(p);
-    let n = p.len();
+    let fx = (f)(x);
+    let n = x.len();
     let mut out = ndarray::Array2::zeros((n, n));
     for i in 0..n {
         for j in 0..=i {
             let t = {
-                let mut xi = p.clone();
+                let mut xi = x.clone();
                 xi[i] += EPS_F64.sqrt();
-                let mut xj = p.clone();
+                let mut xj = x.clone();
                 xj[j] += EPS_F64.sqrt();
-                let mut xij = p.clone();
+                let mut xij = x.clone();
                 xij[i] += EPS_F64.sqrt();
                 xij[j] += EPS_F64.sqrt();
                 let fxi = (f)(&xi);
@@ -632,20 +633,20 @@ pub fn forward_hessian_nograd_ndarray_f64(
 }
 
 pub fn forward_hessian_nograd_sparse_vec_f64(
-    p: &Vec<f64>,
+    x: &Vec<f64>,
     f: &Fn(&Vec<f64>) -> f64,
     indices: Vec<(usize, usize)>,
 ) -> Vec<Vec<f64>> {
-    let fx = (f)(p);
-    let n = p.len();
+    let fx = (f)(x);
+    let n = x.len();
     let mut out: Vec<Vec<f64>> = vec![vec![0.0; n]; n];
     for (i, j) in indices {
         let t = {
-            let mut xi = p.clone();
+            let mut xi = x.clone();
             xi[i] += EPS_F64.sqrt();
-            let mut xj = p.clone();
+            let mut xj = x.clone();
             xj[j] += EPS_F64.sqrt();
-            let mut xij = p.clone();
+            let mut xij = x.clone();
             xij[i] += EPS_F64.sqrt();
             xij[j] += EPS_F64.sqrt();
             let fxi = (f)(&xi);
@@ -661,20 +662,20 @@ pub fn forward_hessian_nograd_sparse_vec_f64(
 
 #[cfg(feature = "ndarrayl")]
 pub fn forward_hessian_nograd_sparse_ndarray_f64(
-    p: &ndarray::Array1<f64>,
+    x: &ndarray::Array1<f64>,
     f: &Fn(&ndarray::Array1<f64>) -> f64,
     indices: Vec<(usize, usize)>,
 ) -> ndarray::Array2<f64> {
-    let fx = (f)(p);
-    let n = p.len();
+    let fx = (f)(x);
+    let n = x.len();
     let mut out = ndarray::Array2::zeros((n, n));
     for (i, j) in indices {
         let t = {
-            let mut xi = p.clone();
+            let mut xi = x.clone();
             xi[i] += EPS_F64.sqrt();
-            let mut xj = p.clone();
+            let mut xj = x.clone();
             xj[j] += EPS_F64.sqrt();
-            let mut xij = p.clone();
+            let mut xij = x.clone();
             xij[i] += EPS_F64.sqrt();
             xij[j] += EPS_F64.sqrt();
             let fxi = (f)(&xi);
@@ -735,9 +736,9 @@ where
     ///
     /// where `e_i` is the `i`th unit vector.
     /// For a parameter vector of length `n`, this requires `n+1` evaluations of `fs`.
-    fn forward_jacobian_vec_prod(&self, fs: &Fn(&Self) -> Self::OperatorOutput, x: &Self) -> Self;
+    fn forward_jacobian_vec_prod(&self, fs: &Fn(&Self) -> Self::OperatorOutput, p: &Self) -> Self;
 
-    fn central_jacobian_vec_prod(&self, fs: &Fn(&Self) -> Self::OperatorOutput, x: &Self) -> Self;
+    fn central_jacobian_vec_prod(&self, fs: &Fn(&Self) -> Self::OperatorOutput, p: &Self) -> Self;
 
     fn forward_jacobian_pert(
         &self,
@@ -769,9 +770,9 @@ where
     /// For a parameter vector of length `n`, this requires `2*n` evaluations of `g`.
     fn central_hessian(&self, g: &Fn(&Self) -> Self::OperatorOutput) -> Self::Hessian;
 
-    fn forward_hessian_vec_prod(&self, g: &Fn(&Self) -> Self::OperatorOutput, x: &Self) -> Self;
+    fn forward_hessian_vec_prod(&self, g: &Fn(&Self) -> Self::OperatorOutput, p: &Self) -> Self;
 
-    fn central_hessian_vec_prod(&self, g: &Fn(&Self) -> Self::OperatorOutput, x: &Self) -> Self;
+    fn central_hessian_vec_prod(&self, g: &Fn(&Self) -> Self::OperatorOutput, p: &Self) -> Self;
 
     fn forward_hessian_nograd(&self, f: &Fn(&Self) -> f64) -> Self::Hessian;
 
@@ -806,12 +807,12 @@ where
         central_jacobian_vec_f64(self, fs)
     }
 
-    fn forward_jacobian_vec_prod(&self, fs: &Fn(&Self) -> Self::OperatorOutput, x: &Self) -> Self {
-        forward_jacobian_vec_prod_vec_f64(self, fs, x)
+    fn forward_jacobian_vec_prod(&self, fs: &Fn(&Self) -> Self::OperatorOutput, p: &Self) -> Self {
+        forward_jacobian_vec_prod_vec_f64(self, fs, p)
     }
 
-    fn central_jacobian_vec_prod(&self, fs: &Fn(&Self) -> Self::OperatorOutput, x: &Self) -> Self {
-        central_jacobian_vec_prod_vec_f64(self, fs, x)
+    fn central_jacobian_vec_prod(&self, fs: &Fn(&Self) -> Self::OperatorOutput, p: &Self) -> Self {
+        central_jacobian_vec_prod_vec_f64(self, fs, p)
     }
 
     fn forward_jacobian_pert(
@@ -838,12 +839,12 @@ where
         central_hessian_vec_f64(self, g)
     }
 
-    fn forward_hessian_vec_prod(&self, g: &Fn(&Self) -> Self::OperatorOutput, x: &Self) -> Self {
-        forward_hessian_vec_prod_vec_f64(self, g, x)
+    fn forward_hessian_vec_prod(&self, g: &Fn(&Self) -> Self::OperatorOutput, p: &Self) -> Self {
+        forward_hessian_vec_prod_vec_f64(self, g, p)
     }
 
-    fn central_hessian_vec_prod(&self, g: &Fn(&Self) -> Self::OperatorOutput, x: &Self) -> Self {
-        central_hessian_vec_prod_vec_f64(self, g, x)
+    fn central_hessian_vec_prod(&self, g: &Fn(&Self) -> Self::OperatorOutput, p: &Self) -> Self {
+        central_hessian_vec_prod_vec_f64(self, g, p)
     }
 
     fn forward_hessian_nograd(&self, f: &Fn(&Self) -> f64) -> Self::Hessian {
@@ -884,12 +885,12 @@ where
         central_jacobian_ndarray_f64(self, fs)
     }
 
-    fn forward_jacobian_vec_prod(&self, fs: &Fn(&Self) -> Self::OperatorOutput, x: &Self) -> Self {
-        forward_jacobian_vec_prod_ndarray_f64(self, fs, x)
+    fn forward_jacobian_vec_prod(&self, fs: &Fn(&Self) -> Self::OperatorOutput, p: &Self) -> Self {
+        forward_jacobian_vec_prod_ndarray_f64(self, fs, p)
     }
 
-    fn central_jacobian_vec_prod(&self, fs: &Fn(&Self) -> Self::OperatorOutput, x: &Self) -> Self {
-        central_jacobian_vec_prod_ndarray_f64(self, fs, x)
+    fn central_jacobian_vec_prod(&self, fs: &Fn(&Self) -> Self::OperatorOutput, p: &Self) -> Self {
+        central_jacobian_vec_prod_ndarray_f64(self, fs, p)
     }
 
     fn forward_jacobian_pert(
@@ -916,12 +917,12 @@ where
         central_hessian_ndarray_f64(self, g)
     }
 
-    fn forward_hessian_vec_prod(&self, g: &Fn(&Self) -> Self::OperatorOutput, x: &Self) -> Self {
-        forward_hessian_vec_prod_ndarray_f64(self, g, x)
+    fn forward_hessian_vec_prod(&self, g: &Fn(&Self) -> Self::OperatorOutput, p: &Self) -> Self {
+        forward_hessian_vec_prod_ndarray_f64(self, g, p)
     }
 
-    fn central_hessian_vec_prod(&self, g: &Fn(&Self) -> Self::OperatorOutput, x: &Self) -> Self {
-        central_hessian_vec_prod_ndarray_f64(self, g, x)
+    fn central_hessian_vec_prod(&self, g: &Fn(&Self) -> Self::OperatorOutput, p: &Self) -> Self {
+        central_hessian_vec_prod_ndarray_f64(self, g, p)
     }
 
     fn forward_hessian_nograd(&self, f: &Fn(&Self) -> f64) -> Self::Hessian {
@@ -1298,9 +1299,9 @@ mod tests {
                 3.0 * (x[5].powi(3) - x[4].powi(2)),
             ]
         };
-        let p = vec![1.0f64, 1.0, 1.0, 1.0, 1.0, 1.0];
-        let x = vec![1.0f64, 2.0, 3.0, 4.0, 5.0, 6.0];
-        let jacobian = forward_jacobian_vec_prod_vec_f64(&p, &f, &x);
+        let x = vec![1.0f64, 1.0, 1.0, 1.0, 1.0, 1.0];
+        let p = vec![1.0f64, 2.0, 3.0, 4.0, 5.0, 6.0];
+        let jacobian = forward_jacobian_vec_prod_vec_f64(&x, &f, &p);
         let res = vec![8.0, 22.0, 27.0, 32.0, 37.0, 24.0];
         // println!("{:?}", jacobian);
         // the accuracy for this is pretty bad!!
