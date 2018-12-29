@@ -807,20 +807,20 @@ where
         central_jacobian_pert_vec_f64(self, fs, pert)
     }
 
-    fn forward_hessian(&self, grad: &Fn(&Self) -> Self::OperatorOutput) -> Self::Hessian {
-        forward_hessian_vec_f64(self, grad)
+    fn forward_hessian(&self, g: &Fn(&Self) -> Self::OperatorOutput) -> Self::Hessian {
+        forward_hessian_vec_f64(self, g)
     }
 
-    fn central_hessian(&self, grad: &Fn(&Self) -> Self::OperatorOutput) -> Self::Hessian {
-        central_hessian_vec_f64(self, grad)
+    fn central_hessian(&self, g: &Fn(&Self) -> Self::OperatorOutput) -> Self::Hessian {
+        central_hessian_vec_f64(self, g)
     }
 
-    fn forward_hessian_vec_prod(&self, grad: &Fn(&Self) -> Self::OperatorOutput, x: &Self) -> Self {
-        forward_hessian_vec_prod_vec_f64(self, grad, x)
+    fn forward_hessian_vec_prod(&self, g: &Fn(&Self) -> Self::OperatorOutput, x: &Self) -> Self {
+        forward_hessian_vec_prod_vec_f64(self, g, x)
     }
 
-    fn central_hessian_vec_prod(&self, grad: &Fn(&Self) -> Self::OperatorOutput, x: &Self) -> Self {
-        central_hessian_vec_prod_vec_f64(self, grad, x)
+    fn central_hessian_vec_prod(&self, g: &Fn(&Self) -> Self::OperatorOutput, x: &Self) -> Self {
+        central_hessian_vec_prod_vec_f64(self, g, x)
     }
 
     fn forward_hessian_nograd(&self, f: &Fn(&Self) -> f64) -> Self::Hessian {
@@ -885,20 +885,20 @@ where
         central_jacobian_pert_ndarray_f64(self, fs, pert)
     }
 
-    fn forward_hessian(&self, grad: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian {
-        forward_hessian_ndarray_f64(self, grad)
+    fn forward_hessian(&self, g: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian {
+        forward_hessian_ndarray_f64(self, g)
     }
 
-    fn central_hessian(&self, grad: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian {
-        central_hessian_ndarray_f64(self, grad)
+    fn central_hessian(&self, g: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian {
+        central_hessian_ndarray_f64(self, g)
     }
 
-    fn forward_hessian_vec_prod(&self, grad: &Fn(&Self) -> Self::OperatorOutput, x: &Self) -> Self {
-        forward_hessian_vec_prod_ndarray_f64(self, grad, x)
+    fn forward_hessian_vec_prod(&self, g: &Fn(&Self) -> Self::OperatorOutput, x: &Self) -> Self {
+        forward_hessian_vec_prod_ndarray_f64(self, g, x)
     }
 
-    fn central_hessian_vec_prod(&self, grad: &Fn(&Self) -> Self::OperatorOutput, x: &Self) -> Self {
-        central_hessian_vec_prod_ndarray_f64(self, grad, x)
+    fn central_hessian_vec_prod(&self, g: &Fn(&Self) -> Self::OperatorOutput, x: &Self) -> Self {
+        central_hessian_vec_prod_ndarray_f64(self, g, x)
     }
 
     fn forward_hessian_nograd(&self, f: &Fn(&Self) -> f64) -> Self::Hessian {
