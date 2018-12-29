@@ -1323,9 +1323,9 @@ mod tests {
                 3.0 * (x[5].powi(3) - x[4].powi(2)),
             ])
         };
-        let p = ndarray::Array1::from_vec(vec![1.0f64, 1.0, 1.0, 1.0, 1.0, 1.0]);
-        let x = ndarray::Array1::from_vec(vec![1.0f64, 2.0, 3.0, 4.0, 5.0, 6.0]);
-        let jacobian = forward_jacobian_vec_prod_ndarray_f64(&p, &f, &x);
+        let x = ndarray::Array1::from_vec(vec![1.0f64, 1.0, 1.0, 1.0, 1.0, 1.0]);
+        let p = ndarray::Array1::from_vec(vec![1.0f64, 2.0, 3.0, 4.0, 5.0, 6.0]);
+        let jacobian = forward_jacobian_vec_prod_ndarray_f64(&x, &f, &p);
         let res = vec![8.0, 22.0, 27.0, 32.0, 37.0, 24.0];
         // println!("{:?}", jacobian);
         // the accuracy for this is pretty bad!!
@@ -1346,9 +1346,9 @@ mod tests {
                 3.0 * (x[5].powi(3) - x[4].powi(2)),
             ]
         };
-        let p = vec![1.0f64, 1.0, 1.0, 1.0, 1.0, 1.0];
-        let x = vec![1.0f64, 2.0, 3.0, 4.0, 5.0, 6.0];
-        let jacobian = p.forward_jacobian_vec_prod(&f, &x);
+        let x = vec![1.0f64, 1.0, 1.0, 1.0, 1.0, 1.0];
+        let p = vec![1.0f64, 2.0, 3.0, 4.0, 5.0, 6.0];
+        let jacobian = x.forward_jacobian_vec_prod(&f, &p);
         let res = vec![8.0, 22.0, 27.0, 32.0, 37.0, 24.0];
         // println!("{:?}", jacobian);
         // the accuracy for this is pretty bad!!
@@ -1370,9 +1370,9 @@ mod tests {
                 3.0 * (x[5].powi(3) - x[4].powi(2)),
             ])
         };
-        let p = ndarray::Array1::from_vec(vec![1.0f64, 1.0, 1.0, 1.0, 1.0, 1.0]);
-        let x = ndarray::Array1::from_vec(vec![1.0f64, 2.0, 3.0, 4.0, 5.0, 6.0]);
-        let jacobian = p.forward_jacobian_vec_prod(&f, &x);
+        let x = ndarray::Array1::from_vec(vec![1.0f64, 1.0, 1.0, 1.0, 1.0, 1.0]);
+        let p = ndarray::Array1::from_vec(vec![1.0f64, 2.0, 3.0, 4.0, 5.0, 6.0]);
+        let jacobian = x.forward_jacobian_vec_prod(&f, &p);
         let res = vec![8.0, 22.0, 27.0, 32.0, 37.0, 24.0];
         // println!("{:?}", jacobian);
         // the accuracy for this is pretty bad!!
@@ -1393,9 +1393,9 @@ mod tests {
                 3.0 * (x[5].powi(3) - x[4].powi(2)),
             ]
         };
-        let p = vec![1.0f64, 1.0, 1.0, 1.0, 1.0, 1.0];
-        let x = vec![1.0f64, 2.0, 3.0, 4.0, 5.0, 6.0];
-        let jacobian = central_jacobian_vec_prod_vec_f64(&p, &f, &x);
+        let x = vec![1.0f64, 1.0, 1.0, 1.0, 1.0, 1.0];
+        let p = vec![1.0f64, 2.0, 3.0, 4.0, 5.0, 6.0];
+        let jacobian = central_jacobian_vec_prod_vec_f64(&x, &f, &p);
         let res = vec![8.0, 22.0, 27.0, 32.0, 37.0, 24.0];
         // println!("{:?}", jacobian);
         // the accuracy for this is pretty bad!!
@@ -1417,9 +1417,9 @@ mod tests {
                 3.0 * (x[5].powi(3) - x[4].powi(2)),
             ])
         };
-        let p = ndarray::Array1::from_vec(vec![1.0f64, 1.0, 1.0, 1.0, 1.0, 1.0]);
-        let x = ndarray::Array1::from_vec(vec![1.0f64, 2.0, 3.0, 4.0, 5.0, 6.0]);
-        let jacobian = central_jacobian_vec_prod_ndarray_f64(&p, &f, &x);
+        let x = ndarray::Array1::from_vec(vec![1.0f64, 1.0, 1.0, 1.0, 1.0, 1.0]);
+        let p = ndarray::Array1::from_vec(vec![1.0f64, 2.0, 3.0, 4.0, 5.0, 6.0]);
+        let jacobian = central_jacobian_vec_prod_ndarray_f64(&x, &f, &p);
         let res = vec![8.0, 22.0, 27.0, 32.0, 37.0, 24.0];
         // println!("{:?}", jacobian);
         // the accuracy for this is pretty bad!!
@@ -1440,9 +1440,9 @@ mod tests {
                 3.0 * (x[5].powi(3) - x[4].powi(2)),
             ]
         };
-        let p = vec![1.0f64, 1.0, 1.0, 1.0, 1.0, 1.0];
-        let x = vec![1.0f64, 2.0, 3.0, 4.0, 5.0, 6.0];
-        let jacobian = p.central_jacobian_vec_prod(&f, &x);
+        let x = vec![1.0f64, 1.0, 1.0, 1.0, 1.0, 1.0];
+        let p = vec![1.0f64, 2.0, 3.0, 4.0, 5.0, 6.0];
+        let jacobian = x.central_jacobian_vec_prod(&f, &p);
         let res = vec![8.0, 22.0, 27.0, 32.0, 37.0, 24.0];
         // println!("{:?}", jacobian);
         // the accuracy for this is pretty bad!!
@@ -1464,9 +1464,9 @@ mod tests {
                 3.0 * (x[5].powi(3) - x[4].powi(2)),
             ])
         };
-        let p = ndarray::Array1::from_vec(vec![1.0f64, 1.0, 1.0, 1.0, 1.0, 1.0]);
-        let x = ndarray::Array1::from_vec(vec![1.0f64, 2.0, 3.0, 4.0, 5.0, 6.0]);
-        let jacobian = p.central_jacobian_vec_prod(&f, &x);
+        let x = ndarray::Array1::from_vec(vec![1.0f64, 1.0, 1.0, 1.0, 1.0, 1.0]);
+        let p = ndarray::Array1::from_vec(vec![1.0f64, 2.0, 3.0, 4.0, 5.0, 6.0]);
+        let jacobian = x.central_jacobian_vec_prod(&f, &p);
         let res = vec![8.0, 22.0, 27.0, 32.0, 37.0, 24.0];
         // println!("{:?}", jacobian);
         // the accuracy for this is pretty bad!!
@@ -1966,9 +1966,9 @@ mod tests {
     #[test]
     fn test_forward_hessian_vec_prod_vec_f64() {
         let f = |x: &Vec<f64>| x[0] + x[1].powi(2) + x[2] * x[3].powi(2);
-        let p = vec![1.0f64, 1.0, 1.0, 1.0];
-        let x = vec![2.0, 3.0, 4.0, 5.0];
-        let hessian = forward_hessian_vec_prod_vec_f64(&p, &|d| d.forward_diff(&f), &x);
+        let x = vec![1.0f64, 1.0, 1.0, 1.0];
+        let p = vec![2.0, 3.0, 4.0, 5.0];
+        let hessian = forward_hessian_vec_prod_vec_f64(&x, &|d| d.forward_diff(&f), &p);
         let res = vec![0.0, 6.0, 10.0, 18.0];
         // println!("hessian:\n{:#?}", hessian);
         // println!("diff:\n{:#?}", diff);
@@ -1981,9 +1981,9 @@ mod tests {
     #[test]
     fn test_forward_hessian_vec_prod_ndarray_f64() {
         let f = |x: &ndarray::Array1<f64>| x[0] + x[1].powi(2) + x[2] * x[3].powi(2);
-        let p = ndarray::Array1::from_vec(vec![1.0f64, 1.0, 1.0, 1.0]);
-        let x = ndarray::Array1::from_vec(vec![2.0, 3.0, 4.0, 5.0]);
-        let hessian = forward_hessian_vec_prod_ndarray_f64(&p, &|d| d.forward_diff(&f), &x);
+        let x = ndarray::Array1::from_vec(vec![1.0f64, 1.0, 1.0, 1.0]);
+        let p = ndarray::Array1::from_vec(vec![2.0, 3.0, 4.0, 5.0]);
+        let hessian = forward_hessian_vec_prod_ndarray_f64(&x, &|d| d.forward_diff(&f), &p);
         let res = vec![0.0, 6.0, 10.0, 18.0];
         // println!("hessian:\n{:#?}", hessian);
         // println!("diff:\n{:#?}", diff);
@@ -1995,9 +1995,9 @@ mod tests {
     #[test]
     fn test_forward_hessian_vec_prod_vec_f64_trait() {
         let f = |x: &Vec<f64>| x[0] + x[1].powi(2) + x[2] * x[3].powi(2);
-        let p = vec![1.0f64, 1.0, 1.0, 1.0];
-        let x = vec![2.0, 3.0, 4.0, 5.0];
-        let hessian = p.forward_hessian_vec_prod(&|d| d.forward_diff(&f), &x);
+        let x = vec![1.0f64, 1.0, 1.0, 1.0];
+        let p = vec![2.0, 3.0, 4.0, 5.0];
+        let hessian = x.forward_hessian_vec_prod(&|d| d.forward_diff(&f), &p);
         let res = vec![0.0, 6.0, 10.0, 18.0];
         // println!("hessian:\n{:#?}", hessian);
         // println!("diff:\n{:#?}", diff);
@@ -2010,9 +2010,9 @@ mod tests {
     #[test]
     fn test_forward_hessian_vec_prod_ndarray_f64_trait() {
         let f = |x: &ndarray::Array1<f64>| x[0] + x[1].powi(2) + x[2] * x[3].powi(2);
-        let p = ndarray::Array1::from_vec(vec![1.0f64, 1.0, 1.0, 1.0]);
-        let x = ndarray::Array1::from_vec(vec![2.0, 3.0, 4.0, 5.0]);
-        let hessian = p.forward_hessian_vec_prod(&|d| d.forward_diff(&f), &x);
+        let x = ndarray::Array1::from_vec(vec![1.0f64, 1.0, 1.0, 1.0]);
+        let p = ndarray::Array1::from_vec(vec![2.0, 3.0, 4.0, 5.0]);
+        let hessian = x.forward_hessian_vec_prod(&|d| d.forward_diff(&f), &p);
         let res = vec![0.0, 6.0, 10.0, 18.0];
         // println!("hessian:\n{:#?}", hessian);
         // println!("diff:\n{:#?}", diff);
@@ -2024,9 +2024,9 @@ mod tests {
     #[test]
     fn test_central_hessian_vec_prod_vec_f64() {
         let f = |x: &Vec<f64>| x[0] + x[1].powi(2) + x[2] * x[3].powi(2);
-        let p = vec![1.0f64, 1.0, 1.0, 1.0];
-        let x = vec![2.0, 3.0, 4.0, 5.0];
-        let hessian = central_hessian_vec_prod_vec_f64(&p, &|d| d.forward_diff(&f), &x);
+        let x = vec![1.0f64, 1.0, 1.0, 1.0];
+        let p = vec![2.0, 3.0, 4.0, 5.0];
+        let hessian = central_hessian_vec_prod_vec_f64(&x, &|d| d.forward_diff(&f), &p);
         let res = vec![0.0, 6.0, 10.0, 18.0];
         // println!("hessian:\n{:#?}", hessian);
         // println!("diff:\n{:#?}", diff);
@@ -2039,9 +2039,9 @@ mod tests {
     #[test]
     fn test_central_hessian_vec_prod_ndarray_f64() {
         let f = |x: &ndarray::Array1<f64>| x[0] + x[1].powi(2) + x[2] * x[3].powi(2);
-        let p = ndarray::Array1::from_vec(vec![1.0f64, 1.0, 1.0, 1.0]);
-        let x = ndarray::Array1::from_vec(vec![2.0, 3.0, 4.0, 5.0]);
-        let hessian = central_hessian_vec_prod_ndarray_f64(&p, &|d| d.forward_diff(&f), &x);
+        let x = ndarray::Array1::from_vec(vec![1.0f64, 1.0, 1.0, 1.0]);
+        let p = ndarray::Array1::from_vec(vec![2.0, 3.0, 4.0, 5.0]);
+        let hessian = central_hessian_vec_prod_ndarray_f64(&x, &|d| d.forward_diff(&f), &p);
         let res = vec![0.0, 6.0, 10.0, 18.0];
         // println!("hessian:\n{:#?}", hessian);
         // println!("diff:\n{:#?}", diff);
@@ -2053,9 +2053,9 @@ mod tests {
     #[test]
     fn test_central_hessian_vec_prod_vec_f64_trait() {
         let f = |x: &Vec<f64>| x[0] + x[1].powi(2) + x[2] * x[3].powi(2);
-        let p = vec![1.0f64, 1.0, 1.0, 1.0];
-        let x = vec![2.0, 3.0, 4.0, 5.0];
-        let hessian = p.central_hessian_vec_prod(&|d| d.central_diff(&f), &x);
+        let x = vec![1.0f64, 1.0, 1.0, 1.0];
+        let p = vec![2.0, 3.0, 4.0, 5.0];
+        let hessian = x.central_hessian_vec_prod(&|d| d.central_diff(&f), &p);
         let res = vec![0.0, 6.0, 10.0, 18.0];
         // println!("hessian:\n{:#?}", hessian);
         // println!("diff:\n{:#?}", diff);
@@ -2068,9 +2068,9 @@ mod tests {
     #[test]
     fn test_central_hessian_vec_prod_ndarray_f64_trait() {
         let f = |x: &ndarray::Array1<f64>| x[0] + x[1].powi(2) + x[2] * x[3].powi(2);
-        let p = ndarray::Array1::from_vec(vec![1.0f64, 1.0, 1.0, 1.0]);
-        let x = ndarray::Array1::from_vec(vec![2.0, 3.0, 4.0, 5.0]);
-        let hessian = p.central_hessian_vec_prod(&|d| d.central_diff(&f), &x);
+        let x = ndarray::Array1::from_vec(vec![1.0f64, 1.0, 1.0, 1.0]);
+        let p = ndarray::Array1::from_vec(vec![2.0, 3.0, 4.0, 5.0]);
+        let hessian = x.central_hessian_vec_prod(&|d| d.central_diff(&f), &p);
         let res = vec![0.0, 6.0, 10.0, 18.0];
         // println!("hessian:\n{:#?}", hessian);
         // println!("diff:\n{:#?}", diff);
