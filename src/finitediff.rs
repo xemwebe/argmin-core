@@ -698,22 +698,43 @@ where
 
     /// Forward difference calculated as
     ///
-    /// `df/dx_i (x) = (f(x + sqrt(EPS_F64) * e_i) - f(x))/sqrt(EPS_F64)  \forall i`
+    /// `df/dx_i (x) \approx (f(x + sqrt(EPS_F64) * e_i) - f(x))/sqrt(EPS_F64)  \forall i`
     ///
-    /// where `e_i` is the `i`th unit vector.
+    /// where `f` is the cost function and `e_i` is the `i`th unit vector.
+    /// For a parameter vector of length `n`, this requires `n+1` evaluations of `f`.
     fn forward_diff(&self, f: &Fn(&Self) -> f64) -> Self;
 
     /// Central difference calculated as
     ///
-    /// `df/dx_i (x) = (f(x + sqrt(EPS_F64) * e_i) - f(x - sqrt(EPS_F64) * e_i))/(2.0 * sqrt(EPS_F64))  \forall i`
+    /// `df/dx_i (x) \approx (f(x + sqrt(EPS_F64) * e_i) - f(x - sqrt(EPS_F64) * e_i))/(2.0 * sqrt(EPS_F64))  \forall i`
     ///
-    /// where `e_i` is the `i`th unit vector.
+    /// where `f` is the cost function and `e_i` is the `i`th unit vector.
+    /// For a parameter vector of length `n`, this requires `2*n` evaluations of `f`.
     fn central_diff(&self, f: &Fn(&Self) -> f64) -> Self;
 
+    /// Calculation of the Jacobian J(x) of a vector function `fs` using forward differences:
+    ///
+    /// `dfs/dx_i (x) \approx (fs(x + sqrt(EPS_F64) * e_i) - fs(x))/sqrt(EPS_F64)  \forall i`
+    ///
+    /// where `e_i` is the `i`th unit vector.
+    /// For a parameter vector of length `n`, this requires `n+1` evaluations of `fs`.
     fn forward_jacobian(&self, fs: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian;
 
+    /// Calculation of the Jacobian J(x) of a vector function `fs` using central differences:
+    ///
+    /// `dfs/dx_i (x) \approx (fs(x + sqrt(EPS_F64) * e_i) - fs(x - sqrt(EPS_F64) * e_i))/(2.0 * sqrt(EPS_F64))  \forall i`
+    ///
+    /// where `e_i` is the `i`th unit vector.
+    /// For a parameter vector of length `n`, this requires `2*n` evaluations of `fs`.
     fn central_jacobian(&self, fs: &Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian;
 
+    /// Calculation of the product of the Jacobian J(x) of a vector function `fs` with a vector `p`
+    /// using forward differences:
+    ///
+    /// `J(x)p \approx (fs(x + sqrt(EPS_F64) * p) - fs(x))/sqrt(EPS_F64)  \forall i`
+    ///
+    /// where `e_i` is the `i`th unit vector.
+    /// For a parameter vector of length `n`, this requires `n+1` evaluations of `fs`.
     fn forward_jacobian_vec_prod(&self, fs: &Fn(&Self) -> Self::OperatorOutput, x: &Self) -> Self;
 
     fn central_jacobian_vec_prod(&self, fs: &Fn(&Self) -> Self::OperatorOutput, x: &Self) -> Self;
@@ -732,18 +753,20 @@ where
 
     /// Calculation of the Hessian using forward differences
     ///
-    /// `df/dx_i (x) = (g(x + sqrt(EPS_F64) * e_i) - g(x))/sqrt(EPS_F64)  \forall i`
+    /// `df/dx_i (x) \approx (g(x + sqrt(EPS_F64) * e_i) - g(x))/sqrt(EPS_F64)  \forall i`
     ///
     /// where `g` is a function which computes the gradient of some other function f and `e_i` is
     /// the `i`th unit vector.
+    /// For a parameter vector of length `n`, this requires `n+1` evaluations of `g`.
     fn forward_hessian(&self, g: &Fn(&Self) -> Self::OperatorOutput) -> Self::Hessian;
 
     /// Calculation of the Hessian using central differences
     ///
-    /// `df/dx_i (x) = (g(x + sqrt(EPS_F64) * e_i) - g(x - sqrt(EPS_F64) * e_i))/(2.0 * sqrt(EPS_F64))  \forall i`
+    /// `df/dx_i (x) \approx (g(x + sqrt(EPS_F64) * e_i) - g(x - sqrt(EPS_F64) * e_i))/(2.0 * sqrt(EPS_F64))  \forall i`
     ///
     /// where `g` is a function which computes the gradient of some other function f and `e_i` is
     /// the `i`th unit vector.
+    /// For a parameter vector of length `n`, this requires `2*n` evaluations of `g`.
     fn central_hessian(&self, g: &Fn(&Self) -> Self::OperatorOutput) -> Self::Hessian;
 
     fn forward_hessian_vec_prod(&self, g: &Fn(&Self) -> Self::OperatorOutput, x: &Self) -> Self;
