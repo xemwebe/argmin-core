@@ -9,6 +9,7 @@
 //!
 //! TODO: Text.
 
+#![allow(clippy::ptr_arg)]
 #[cfg(feature = "ndarrayl")]
 use ndarray;
 
@@ -17,6 +18,7 @@ use ndarray;
 const EPS_F64: f64 = 4.0 * std::f64::EPSILON;
 
 /// Perturbation Vector for the accelerated computation of the Jacobian.
+#[derive(Clone, Default)]
 pub struct PerturbationVector {
     /// x indices
     pub x_idx: Vec<usize>,
@@ -270,16 +272,15 @@ pub fn forward_jacobian_pert_vec_f64(
     pert: PerturbationVectors,
 ) -> Vec<Vec<f64>> {
     let fx = (fs)(&x);
-    let n = pert.len();
     let mut out = vec![vec![0.0; x.len()]; fx.len()];
-    for i in 0..n {
+    for pert_item in pert.iter() {
         let mut x1 = x.clone();
-        for j in pert[i].x_idx.iter() {
+        for j in pert_item.x_idx.iter() {
             x1[*j] += EPS_F64.sqrt();
         }
         let fx1 = (fs)(&x1);
-        for (k, x_idx) in pert[i].x_idx.iter().enumerate() {
-            for j in pert[i].r_idx[k].iter() {
+        for (k, x_idx) in pert_item.x_idx.iter().enumerate() {
+            for j in pert_item.r_idx[k].iter() {
                 out[*x_idx][*j] = (fx1[*j] - fx[*j]) / EPS_F64.sqrt();
             }
         }
@@ -294,16 +295,15 @@ pub fn forward_jacobian_pert_ndarray_f64(
     pert: PerturbationVectors,
 ) -> ndarray::Array2<f64> {
     let fx = (fs)(&x);
-    let n = pert.len();
     let mut out = ndarray::Array2::zeros((fx.len(), x.len()));
-    for i in 0..n {
+    for pert_item in pert.iter() {
         let mut x1 = x.clone();
-        for j in pert[i].x_idx.iter() {
+        for j in pert_item.x_idx.iter() {
             x1[*j] += EPS_F64.sqrt();
         }
         let fx1 = (fs)(&x1);
-        for (k, x_idx) in pert[i].x_idx.iter().enumerate() {
-            for j in pert[i].r_idx[k].iter() {
+        for (k, x_idx) in pert_item.x_idx.iter().enumerate() {
+            for j in pert_item.r_idx[k].iter() {
                 out[(*x_idx, *j)] = (fx1[*j] - fx[*j]) / EPS_F64.sqrt();
             }
         }
@@ -316,12 +316,11 @@ pub fn central_jacobian_pert_vec_f64(
     fs: &Fn(&Vec<f64>) -> Vec<f64>,
     pert: PerturbationVectors,
 ) -> Vec<Vec<f64>> {
-    let n = pert.len();
     let mut out = vec![];
-    for i in 0..n {
+    for (i, pert_item) in pert.iter().enumerate() {
         let mut x1 = x.clone();
         let mut x2 = x.clone();
-        for j in pert[i].x_idx.iter() {
+        for j in pert_item.x_idx.iter() {
             x1[*j] += EPS_F64.sqrt();
             x2[*j] -= EPS_F64.sqrt();
         }
@@ -330,8 +329,8 @@ pub fn central_jacobian_pert_vec_f64(
         if i == 0 {
             out = vec![vec![0.0; x.len()]; fx1.len()];
         }
-        for (k, x_idx) in pert[i].x_idx.iter().enumerate() {
-            for j in pert[i].r_idx[k].iter() {
+        for (k, x_idx) in pert_item.x_idx.iter().enumerate() {
+            for j in pert_item.r_idx[k].iter() {
                 out[*x_idx][*j] = (fx1[*j] - fx2[*j]) / (2.0 * EPS_F64.sqrt());
             }
         }
@@ -345,12 +344,11 @@ pub fn central_jacobian_pert_ndarray_f64(
     fs: &Fn(&ndarray::Array1<f64>) -> ndarray::Array1<f64>,
     pert: PerturbationVectors,
 ) -> ndarray::Array2<f64> {
-    let n = pert.len();
     let mut out = ndarray::Array2::zeros((1, 1));
-    for i in 0..n {
+    for (i, pert_item) in pert.iter().enumerate() {
         let mut x1 = x.clone();
         let mut x2 = x.clone();
-        for j in pert[i].x_idx.iter() {
+        for j in pert_item.x_idx.iter() {
             x1[*j] += EPS_F64.sqrt();
             x2[*j] -= EPS_F64.sqrt();
         }
@@ -359,8 +357,8 @@ pub fn central_jacobian_pert_ndarray_f64(
         if i == 0 {
             out = ndarray::Array2::zeros((fx1.len(), x.len()));
         }
-        for (k, x_idx) in pert[i].x_idx.iter().enumerate() {
-            for j in pert[i].r_idx[k].iter() {
+        for (k, x_idx) in pert_item.x_idx.iter().enumerate() {
+            for j in pert_item.r_idx[k].iter() {
                 out[(*x_idx, *j)] = (fx1[*j] - fx2[*j]) / (2.0 * EPS_F64.sqrt());
             }
         }
