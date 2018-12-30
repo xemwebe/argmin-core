@@ -732,12 +732,19 @@ where
     /// Calculation of the product of the Jacobian J(x) of a vector function `fs` with a vector `p`
     /// using forward differences:
     ///
-    /// `J(x)p \approx (fs(x + sqrt(EPS_F64) * p) - fs(x))/sqrt(EPS_F64)  \forall i`
+    /// `J(x)*p \approx (fs(x + sqrt(EPS_F64) * p) - fs(x))/sqrt(EPS_F64)  \forall i`
     ///
     /// where `e_i` is the `i`th unit vector.
-    /// For a parameter vector of length `n`, this requires `n+1` evaluations of `fs`.
+    /// This requires 2 evaluations of `fs`.
     fn forward_jacobian_vec_prod(&self, fs: &Fn(&Self) -> Self::OperatorOutput, p: &Self) -> Self;
 
+    /// Calculation of the product of the Jacobian J(x) of a vector function `fs` with a vector `p`
+    /// using central differences:
+    ///
+    /// `J(x)*p \approx (fs(x + sqrt(EPS_F64) * p) - fs(x - sqrt(EPS_F64) * p))/(2.0 * sqrt(EPS_F64))  \forall i`
+    ///
+    /// where `e_i` is the `i`th unit vector.
+    /// This requires 2 evaluations of `fs`.
     fn central_jacobian_vec_prod(&self, fs: &Fn(&Self) -> Self::OperatorOutput, p: &Self) -> Self;
 
     fn forward_jacobian_pert(
@@ -770,8 +777,24 @@ where
     /// For a parameter vector of length `n`, this requires `2*n` evaluations of `g`.
     fn central_hessian(&self, g: &Fn(&Self) -> Self::OperatorOutput) -> Self::Hessian;
 
+    /// Calculation of the product of the Hessian H(x) of a function `g` with a vector `p`
+    /// using forward differences:
+    ///
+    /// `H(x)*p \approx (g(x + sqrt(EPS_F64) * p) - g(x))/sqrt(EPS_F64)  \forall i`
+    ///
+    /// where `g` is a function which computes the gradient of some other function f and `e_i` is
+    /// the `i`th unit vector.
+    /// This requires 2 evaluations of `g`.
     fn forward_hessian_vec_prod(&self, g: &Fn(&Self) -> Self::OperatorOutput, p: &Self) -> Self;
 
+    /// Calculation of the product of the Hessian H(x) of a function `g` with a vector `p`
+    /// using central differences:
+    ///
+    /// `H(x)*p \approx (g(x + sqrt(EPS_F64) * p) - g(x - sqrt(EPS_F64) * p))/(2.0 * sqrt(EPS_F64))  \forall i`
+    ///
+    /// where `g` is a function which computes the gradient of some other function f and `e_i` is
+    /// the `i`th unit vector.
+    /// This requires 2 evaluations of `g`.
     fn central_hessian_vec_prod(&self, g: &Fn(&Self) -> Self::OperatorOutput, p: &Self) -> Self;
 
     fn forward_hessian_nograd(&self, f: &Fn(&Self) -> f64) -> Self::Hessian;
