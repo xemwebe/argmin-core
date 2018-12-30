@@ -761,7 +761,7 @@ where
 
     /// Calculation of the Hessian using forward differences
     ///
-    /// `df/dx_i (x) \approx (g(x + sqrt(EPS_F64) * e_i) - g(x))/sqrt(EPS_F64)  \forall i`
+    /// `dg/dx_i (x) \approx (g(x + sqrt(EPS_F64) * e_i) - g(x))/sqrt(EPS_F64)  \forall i`
     ///
     /// where `g` is a function which computes the gradient of some other function f and `e_i` is
     /// the `i`th unit vector.
@@ -770,7 +770,7 @@ where
 
     /// Calculation of the Hessian using central differences
     ///
-    /// `df/dx_i (x) \approx (g(x + sqrt(EPS_F64) * e_i) - g(x - sqrt(EPS_F64) * e_i))/(2.0 * sqrt(EPS_F64))  \forall i`
+    /// `dg/dx_i (x) \approx (g(x + sqrt(EPS_F64) * e_i) - g(x - sqrt(EPS_F64) * e_i))/(2.0 * sqrt(EPS_F64))  \forall i`
     ///
     /// where `g` is a function which computes the gradient of some other function f and `e_i` is
     /// the `i`th unit vector.
@@ -797,8 +797,23 @@ where
     /// This requires 2 evaluations of `g`.
     fn central_hessian_vec_prod(&self, g: &Fn(&Self) -> Self::OperatorOutput, p: &Self) -> Self;
 
+    /// Calculation of the Hessian using forward differences without knowledge of the gradient:
+    ///
+    /// `df/(dx_i dx_j) (x) \approx (f(x + sqrt(EPS_F64) * e_i + sqrt(EPS_F64) * e_j) - f(x + sqrt(EPS_F64) + e_i) - f(x + sqrt(EPS_F64) * e_j) + f(x))/EPS_F64  \forall i`
+    ///
+    /// where `e_i` and `e_j` are the `i`th and `j`th unit vector, respectively.
+    // /// For a parameter vector of length `n`, this requires `n*(n+1)/2` evaluations of `g`.
     fn forward_hessian_nograd(&self, f: &Fn(&Self) -> f64) -> Self::Hessian;
 
+    /// Calculation of a sparse Hessian using forward differences without knowledge of the gradient:
+    ///
+    /// `df/(dx_i dx_j) (x) \approx (f(x + sqrt(EPS_F64) * e_i + sqrt(EPS_F64) * e_j) - f(x + sqrt(EPS_F64) + e_i) - f(x + sqrt(EPS_F64) * e_j) + f(x))/EPS_F64  \forall i`
+    ///
+    /// where `e_i` and `e_j` are the `i`th and `j`th unit vector, respectively.
+    /// The indices which are to be evaluated need to be provided via `indices`. Note that due to
+    /// the symmetry of the Hessian, an index `(a, b)` will also compute the value of the Hessian at
+    /// `(b, a)`.
+    // /// For a parameter vector of length `n`, this requires `n*(n+1)/2` evaluations of `g`.
     fn forward_hessian_nograd_sparse(
         &self,
         f: &Fn(&Self) -> f64,
