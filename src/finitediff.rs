@@ -577,6 +577,7 @@ pub fn central_hessian_vec_prod_ndarray_f64(
 }
 
 pub fn forward_hessian_nograd_vec_f64(x: &Vec<f64>, f: &Fn(&Vec<f64>) -> f64) -> Vec<Vec<f64>> {
+    // TODO: f(x + EPS * e_i) needs to be precomputed!!
     let fx = (f)(x);
     let n = x.len();
     let mut out: Vec<Vec<f64>> = vec![vec![0.0; n]; n];
@@ -607,6 +608,7 @@ pub fn forward_hessian_nograd_ndarray_f64(
     x: &ndarray::Array1<f64>,
     f: &Fn(&ndarray::Array1<f64>) -> f64,
 ) -> ndarray::Array2<f64> {
+    // TODO: f(x + EPS * e_i) needs to be precomputed!!
     let fx = (f)(x);
     let n = x.len();
     let mut out = ndarray::Array2::zeros((n, n));
@@ -833,7 +835,7 @@ where
         forward_diff_vec_f64(self, f)
     }
 
-    fn central_diff(&self, f: &Fn(&Vec<f64>) -> f64) -> Self {
+    fn central_diff(&self, f: &Fn(&Self) -> f64) -> Self {
         central_diff_vec_f64(self, f)
     }
 
