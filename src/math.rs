@@ -33,7 +33,6 @@ pub trait ArgminMul<T, U> {
     fn amul(&self, other: &T) -> U;
 }
 
-
 impl ArgminMul<f64, Vec<f64>> for Vec<f64> {
     fn amul(&self, f: &f64) -> Vec<f64> {
         self.iter().map(|x| f * x).collect::<Vec<f64>>()
@@ -354,18 +353,18 @@ make_math!(Vec<u32>, u32, Vec<u32>);
 make_math!(Vec<u64>, u64, Vec<u64>);
 make_math!(Vec<isize>, isize, Vec<isize>);
 make_math!(Vec<usize>, usize, Vec<usize>);
-make_math!(&'a Vec<f32>, f32, Vec<f32>);
-make_math!(&'a Vec<f64>, f64, Vec<f64>);
-make_math!(&'a Vec<i8>, i8, Vec<i8>);
-make_math!(&'a Vec<i16>, i16, Vec<i16>);
-make_math!(&'a Vec<i32>, i32, Vec<i32>);
-make_math!(&'a Vec<i64>, i64, Vec<i64>);
-make_math!(&'a Vec<u8>, u8, Vec<u8>);
-make_math!(&'a Vec<u16>, u16, Vec<u16>);
-make_math!(&'a Vec<u32>, u32, Vec<u32>);
-make_math!(&'a Vec<u64>, u64, Vec<u64>);
-make_math!(&'a Vec<isize>, isize, Vec<isize>);
-make_math!(&'a Vec<usize>, usize, Vec<usize>);
+// make_math!(&'a Vec<f32>, f32, Vec<f32>);
+// make_math!(&'a Vec<f64>, f64, Vec<f64>);
+// make_math!(&'a Vec<i8>, i8, Vec<i8>);
+// make_math!(&'a Vec<i16>, i16, Vec<i16>);
+// make_math!(&'a Vec<i32>, i32, Vec<i32>);
+// make_math!(&'a Vec<i64>, i64, Vec<i64>);
+// make_math!(&'a Vec<u8>, u8, Vec<u8>);
+// make_math!(&'a Vec<u16>, u16, Vec<u16>);
+// make_math!(&'a Vec<u32>, u32, Vec<u32>);
+// make_math!(&'a Vec<u64>, u64, Vec<u64>);
+// make_math!(&'a Vec<isize>, isize, Vec<isize>);
+// make_math!(&'a Vec<usize>, usize, Vec<usize>);
 
 make_math2!(f32, Vec<f32>);
 make_math2!(f64, Vec<f64>);
@@ -407,7 +406,6 @@ make_math_ndarray!(u64);
 make_math_ndarray3!(f32);
 #[cfg(feature = "ndarrayl")]
 make_math_ndarray3!(f64);
-
 
 #[cfg(test)]
 mod tests {
