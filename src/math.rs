@@ -404,39 +404,159 @@ mod tests {
 
     #[test]
     fn test_dot_vec() {
-        let a = vec![1, 2, 3];
-        let b = vec![4, 5, 6];
+        let a = vec![1i32, 2, 3];
+        let b = vec![4i32, 5, 6];
         let product = a.dot(&b);
 
         assert_eq!(product, 32);
+
+        let a = vec![1u32, 2, 3];
+        let b = vec![4u32, 5, 6];
+        let product = a.dot(&b);
+
+        assert_eq!(product, 32);
+
+        let a = vec![1i64, 2, 3];
+        let b = vec![4i64, 5, 6];
+        let product = a.dot(&b);
+
+        assert_eq!(product, 32);
+
+        let a = vec![1u64, 2, 3];
+        let b = vec![4u64, 5, 6];
+        let product = a.dot(&b);
+
+        assert_eq!(product, 32);
+
+        let a = vec![1.0f32, 2.0, 3.0];
+        let b = vec![4.0f32, 5.0, 6.0];
+        let product = a.dot(&b);
+
+        assert!((product - 32.0).abs() < std::f32::EPSILON);
+
+        let a = vec![1.0f64, 2.0, 3.0];
+        let b = vec![4.0f64, 5.0, 6.0];
+        let product = a.dot(&b);
+
+        assert!((product - 32.0).abs() < std::f64::EPSILON);
     }
 
     #[cfg(feature = "ndarrayl")]
     #[test]
     fn test_dot_ndarray() {
-        let a = array![1, 2, 3];
-        let b = array![4, 5, 6];
+        let a = array![1i32, 2, 3];
+        let b = array![4i32, 5, 6];
         let product = a.dot(&b);
 
         assert_eq!(product, 32);
+
+        let a = array![1u32, 2, 3];
+        let b = array![4u32, 5, 6];
+        let product = a.dot(&b);
+
+        assert_eq!(product, 32);
+
+        let a = array![1i64, 2, 3];
+        let b = array![4i64, 5, 6];
+        let product = a.dot(&b);
+
+        assert_eq!(product, 32);
+
+        let a = array![1u64, 2, 3];
+        let b = array![4u64, 5, 6];
+        let product = a.dot(&b);
+
+        assert_eq!(product, 32);
+
+        let a = array![1.0f32, 2.0, 3.0];
+        let b = array![4.0f32, 5.0, 6.0];
+        let product = a.dot(&b);
+
+        assert!((product - 32.0).abs() < std::f32::EPSILON);
+
+        let a = array![1.0f64, 2.0, 3.0];
+        let b = array![4.0f64, 5.0, 6.0];
+        let product = a.dot(&b);
+
+        assert!((product - 32.0).abs() < std::f64::EPSILON);
     }
 
     #[test]
     fn test_amul_vec() {
-        let a = vec![1, 2, 3];
-        let b = vec![4, 5, 6];
+        let a = vec![1i32, 2, 3];
+        let b = vec![4i32, 5, 6];
         let product = a.amul(&b);
 
         assert_eq!(product, 32);
+
+        let a = vec![1u32, 2, 3];
+        let b = vec![4u32, 5, 6];
+        let product = a.amul(&b);
+
+        assert_eq!(product, 32);
+
+        let a = vec![1i64, 2, 3];
+        let b = vec![4i64, 5, 6];
+        let product = a.amul(&b);
+
+        assert_eq!(product, 32);
+
+        let a = vec![1u64, 2, 3];
+        let b = vec![4u64, 5, 6];
+        let product = a.amul(&b);
+
+        assert_eq!(product, 32);
+
+        let a = vec![1.0f32, 2.0, 3.0];
+        let b = vec![4.0f32, 5.0, 6.0];
+        let product = a.amul(&b);
+
+        assert!((product - 32.0).abs() < std::f32::EPSILON);
+
+        let a = vec![1.0f64, 2.0, 3.0];
+        let b = vec![4.0f64, 5.0, 6.0];
+        let product = a.amul(&b);
+
+        assert!((product - 32.0).abs() < std::f64::EPSILON);
     }
 
     #[cfg(feature = "ndarrayl")]
     #[test]
     fn test_amul_ndarray() {
-        let a = array![1, 2, 3];
-        let b = array![4, 5, 6];
+        let a = array![1i32, 2, 3];
+        let b = array![4i32, 5, 6];
         let product = a.amul(&b);
 
         assert_eq!(product, 32);
+
+        let a = array![1u32, 2, 3];
+        let b = array![4u32, 5, 6];
+        let product = a.amul(&b);
+
+        assert_eq!(product, 32);
+
+        let a = array![1i64, 2, 3];
+        let b = array![4i64, 5, 6];
+        let product = a.amul(&b);
+
+        assert_eq!(product, 32);
+
+        let a = array![1u64, 2, 3];
+        let b = array![4u64, 5, 6];
+        let product = a.amul(&b);
+
+        assert_eq!(product, 32);
+
+        let a = array![1.0f32, 2.0, 3.0];
+        let b = array![4.0f32, 5.0, 6.0];
+        let product = a.amul(&b);
+
+        assert!((product - 32.0).abs() < std::f32::EPSILON);
+
+        let a = array![1.0f64, 2.0, 3.0];
+        let b = array![4.0f64, 5.0, 6.0];
+        let product = a.amul(&b);
+
+        assert!((product - 32.0).abs() < std::f64::EPSILON);
     }
 }
