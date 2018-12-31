@@ -42,8 +42,6 @@ pub mod macros;
 mod base;
 /// Error handling
 mod errors;
-/// Finite differentiation
-mod finitediff;
 /// Key value datastructure
 mod kv;
 /// Logging
@@ -60,7 +58,6 @@ mod termination;
 // TODO: Maybe leave logging/output stuff in its namespace
 pub use crate::base::ArgminBase;
 pub use crate::errors::*;
-pub use crate::finitediff::*;
 pub use crate::kv::ArgminKV;
 pub use crate::logging::slog_logger::ArgminSlogLogger;
 pub use crate::logging::ArgminLogger;
