@@ -55,6 +55,13 @@ pub use crate::result::ArgminResult;
 pub use crate::termination::TerminationReason;
 pub use failure::Error;
 
+pub mod finitediff {
+    //! Finite Differentiation
+    //!
+    //! Reexport of `finitediff` crate.
+    pub use finitediff::*;
+}
+
 /// Defines the interface to a solver. Usually, there is no need to implement this manually, use
 /// the `argmin_derive` crate instead.
 #[doc(spotlight)]
