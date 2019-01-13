@@ -9,7 +9,7 @@
 
 use crate::{ArgminKV, ArgminLog, Error};
 use slog;
-use slog::{Drain, Record, Serializer, KV};
+use slog::{info, o, Drain, Record, Serializer, KV};
 use slog_async;
 use slog_async::OverflowStrategy;
 use slog_json;

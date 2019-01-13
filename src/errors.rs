@@ -12,6 +12,8 @@
 //! TODOs:
 //!   * Provide an `impl` to make it easier to create such errors.
 
+use failure_derive::Fail;
+
 #[derive(Debug, Fail)]
 pub enum ArgminError {
     /// Indicates and invalid parameter
