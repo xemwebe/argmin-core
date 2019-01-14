@@ -154,6 +154,24 @@ pub trait ArgminInv<T> {
     fn ainv(&self) -> Result<T, Error>;
 }
 
+pub trait ArgminEye {
+    fn eye(n: usize) -> Self;
+}
+
+#[cfg(feature = "ndarrayl")]
+impl ArgminEye for ndarray::Array2<f64> {
+    fn eye(n: usize) -> Self {
+        ndarray::Array2::eye(n)
+    }
+}
+
+#[cfg(feature = "ndarrayl")]
+impl ArgminEye for ndarray::Array2<f32> {
+    fn eye(n: usize) -> Self {
+        ndarray::Array2::eye(n)
+    }
+}
+
 // impl<'a, T> ArgminInv for T where T: Inverse {}
 
 // impl<'a, T> ArgminInv<T> for T
@@ -168,7 +186,7 @@ pub trait ArgminInv<T> {
 //
 
 // Hacky: This allows a dot product of the form a*b^T for Vec<Vec<f64>>... Rethink this!
-impl<'a> ArgminDot<Vec<f64>, Vec<Vec<f64>>> for Vec<f64> {
+impl ArgminDot<Vec<f64>, Vec<Vec<f64>>> for Vec<f64> {
     fn dot(&self, other: &Vec<f64>) -> Vec<Vec<f64>> {
         other
             .iter()
@@ -178,12 +196,26 @@ impl<'a> ArgminDot<Vec<f64>, Vec<Vec<f64>>> for Vec<f64> {
 }
 
 // Hacky: This allows a dot product of the form a*b^T for Vec<Vec<f32>>... Rethink this!
-impl<'a> ArgminDot<Vec<f32>, Vec<Vec<f32>>> for Vec<f32> {
+impl ArgminDot<Vec<f32>, Vec<Vec<f32>>> for Vec<f32> {
     fn dot(&self, other: &Vec<f32>) -> Vec<Vec<f32>> {
         other
             .iter()
             .map(|b| self.iter().map(|a| a * b).collect())
             .collect()
+    }
+}
+
+// eewwwwww!!! there must be a better way...
+#[cfg(feature = "ndarrayl")]
+impl ArgminDot<ndarray::Array1<f64>, ndarray::Array2<f64>> for ndarray::Array1<f64> {
+    fn dot(&self, other: &ndarray::Array1<f64>) -> ndarray::Array2<f64> {
+        let mut out = ndarray::Array2::zeros((self.len(), other.len()));
+        for i in 0..self.len() {
+            for j in 0..other.len() {
+                out[(i, j)] = self[i] * other[j];
+            }
+        }
+        out
     }
 }
 
