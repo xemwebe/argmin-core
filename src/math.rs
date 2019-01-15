@@ -156,6 +156,7 @@ pub trait ArgminInv<T> {
 
 pub trait ArgminEye {
     fn eye(n: usize) -> Self;
+    fn eye_like(&self) -> Self;
 }
 
 #[cfg(feature = "ndarrayl")]
@@ -163,12 +164,20 @@ impl ArgminEye for ndarray::Array2<f64> {
     fn eye(n: usize) -> Self {
         ndarray::Array2::eye(n)
     }
+
+    fn eye_like(&self) -> Self {
+        ndarray::Array2::eye(self.dim().0)
+    }
 }
 
 #[cfg(feature = "ndarrayl")]
 impl ArgminEye for ndarray::Array2<f32> {
     fn eye(n: usize) -> Self {
         ndarray::Array2::eye(n)
+    }
+
+    fn eye_like(&self) -> Self {
+        ndarray::Array2::eye(self.dim().0)
     }
 }
 
