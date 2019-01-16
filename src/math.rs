@@ -62,6 +62,7 @@ pub trait ArgminWeightedDot<T, U, V> {
 
 /// TEMPORARY: only for testing!
 impl ArgminWeightedDot<Vec<f64>, f64, Vec<Vec<f64>>> for Vec<f64> {
+    #[inline]
     fn weighted_dot(&self, w: &Vec<Vec<f64>>, v: &Vec<f64>) -> f64 {
         self.dot(&w.iter().map(|x| v.dot(x)).collect::<Vec<f64>>())
     }
@@ -69,6 +70,7 @@ impl ArgminWeightedDot<Vec<f64>, f64, Vec<Vec<f64>>> for Vec<f64> {
 
 #[cfg(feature = "ndarrayl")]
 impl ArgminWeightedDot<ndarray::Array1<f64>, f64, ndarray::Array2<f64>> for ndarray::Array1<f64> {
+    #[inline]
     fn weighted_dot(&self, w: &ndarray::Array2<f64>, v: &ndarray::Array1<f64>) -> f64 {
         self.dot(&w.dot(v))
     }
@@ -81,6 +83,7 @@ pub trait ArgminZero {
 }
 
 impl ArgminZero for Vec<f64> {
+    #[inline]
     fn zero(&self) -> Vec<f64> {
         self.iter().map(|_| 0.0).collect::<Self>()
     }
@@ -88,8 +91,10 @@ impl ArgminZero for Vec<f64> {
 
 #[cfg(feature = "ndarrayl")]
 impl ArgminZero for ndarray::Array1<f64> {
+    #[inline]
     fn zero(&self) -> ndarray::Array1<f64> {
-        self.iter().map(|_| 0.0).collect::<Self>()
+        // self.iter().map(|_| 0.0).collect::<Self>()
+        ndarray::Array1::zeros(self.len())
     }
 }
 
@@ -161,10 +166,12 @@ pub trait ArgminEye {
 
 #[cfg(feature = "ndarrayl")]
 impl ArgminEye for ndarray::Array2<f64> {
+    #[inline]
     fn eye(n: usize) -> Self {
         ndarray::Array2::eye(n)
     }
 
+    #[inline]
     fn eye_like(&self) -> Self {
         ndarray::Array2::eye(self.dim().0)
     }
@@ -172,10 +179,12 @@ impl ArgminEye for ndarray::Array2<f64> {
 
 #[cfg(feature = "ndarrayl")]
 impl ArgminEye for ndarray::Array2<f32> {
+    #[inline]
     fn eye(n: usize) -> Self {
         ndarray::Array2::eye(n)
     }
 
+    #[inline]
     fn eye_like(&self) -> Self {
         ndarray::Array2::eye(self.dim().0)
     }
@@ -196,6 +205,7 @@ impl ArgminEye for ndarray::Array2<f32> {
 
 // Hacky: This allows a dot product of the form a*b^T for Vec<Vec<f64>>... Rethink this!
 impl ArgminDot<Vec<f64>, Vec<Vec<f64>>> for Vec<f64> {
+    #[inline]
     fn dot(&self, other: &Vec<f64>) -> Vec<Vec<f64>> {
         other
             .iter()
@@ -206,6 +216,7 @@ impl ArgminDot<Vec<f64>, Vec<Vec<f64>>> for Vec<f64> {
 
 // Hacky: This allows a dot product of the form a*b^T for Vec<Vec<f32>>... Rethink this!
 impl ArgminDot<Vec<f32>, Vec<Vec<f32>>> for Vec<f32> {
+    #[inline]
     fn dot(&self, other: &Vec<f32>) -> Vec<Vec<f32>> {
         other
             .iter()
@@ -217,6 +228,7 @@ impl ArgminDot<Vec<f32>, Vec<Vec<f32>>> for Vec<f32> {
 // eewwwwww!!! there must be a better way...
 #[cfg(feature = "ndarrayl")]
 impl ArgminDot<ndarray::Array1<f64>, ndarray::Array2<f64>> for ndarray::Array1<f64> {
+    #[inline]
     fn dot(&self, other: &ndarray::Array1<f64>) -> ndarray::Array2<f64> {
         let mut out = ndarray::Array2::zeros((self.len(), other.len()));
         for i in 0..self.len() {
@@ -232,24 +244,28 @@ impl ArgminDot<ndarray::Array1<f64>, ndarray::Array2<f64>> for ndarray::Array1<f
 macro_rules! make_math {
     ($t:ty, $u:ty, $v:ty) => {
         impl<'a> ArgminDot<$t, $u> for $v {
+            #[inline]
             fn dot(&self, other: &$t) -> $u {
                 self.iter().zip(other.iter()).map(|(a, b)| a * b).sum()
             }
         }
 
         impl<'a> ArgminAdd<$t> for $v {
+            #[inline]
             fn add(&self, other: &$t) -> $v {
                 self.iter().zip(other.iter()).map(|(a, b)| a + b).collect()
             }
         }
 
         impl<'a> ArgminSub<$t> for $v {
+            #[inline]
             fn sub(&self, other: &$t) -> $v {
                 self.iter().zip(other.iter()).map(|(a, b)| a - b).collect()
             }
         }
 
         impl<'a> ArgminScaledAdd<$t, $u> for $v {
+            #[inline]
             fn scaled_add(&self, scale: $u, other: &$t) -> $v {
                 self.iter()
                     .zip(other.iter())
@@ -259,6 +275,7 @@ macro_rules! make_math {
         }
 
         impl<'a> ArgminScaledSub<$t, $u> for $v {
+            #[inline]
             fn scaled_sub(&self, scale: $u, other: &$t) -> $v {
                 self.iter()
                     .zip(other.iter())
@@ -273,6 +290,7 @@ macro_rules! make_math {
 macro_rules! make_math2 {
     ($u:ty, $v:ty) => {
         impl<'a> ArgminScale<$u> for $v {
+            #[inline]
             fn scale(&self, scale: $u) -> $v {
                 self.iter().map(|a| scale * a).collect()
             }
@@ -284,6 +302,7 @@ macro_rules! make_math2 {
 macro_rules! make_math3 {
     ($u:ty, $v:ty) => {
         impl<'a> ArgminNorm<$u> for $v {
+            #[inline]
             fn norm(&self) -> $u {
                 self.iter().map(|a| a.powi(2)).sum::<$u>().sqrt()
             }
@@ -296,84 +315,98 @@ macro_rules! make_math3 {
 macro_rules! make_math_ndarray {
     ($t:ty) => {
         impl<'a> ArgminDot<ndarray::Array1<$t>, $t> for ndarray::Array1<$t> {
+            #[inline]
             fn dot(&self, other: &ndarray::Array1<$t>) -> $t {
                 ndarray::Array1::dot(self, other)
             }
         }
 
         impl<'a> ArgminDot<ndarray::Array1<$t>, ndarray::Array1<$t>> for ndarray::Array2<$t> {
+            #[inline]
             fn dot(&self, other: &ndarray::Array1<$t>) -> ndarray::Array1<$t> {
                 ndarray::Array2::dot(self, other)
             }
         }
 
         impl<'a> ArgminDot<ndarray::Array2<$t>, ndarray::Array1<$t>> for ndarray::Array1<$t> {
+            #[inline]
             fn dot(&self, other: &ndarray::Array2<$t>) -> ndarray::Array1<$t> {
                 ndarray::Array1::dot(self, other)
             }
         }
 
         impl<'a> ArgminDot<ndarray::Array2<$t>, ndarray::Array2<$t>> for ndarray::Array2<$t> {
+            #[inline]
             fn dot(&self, other: &ndarray::Array2<$t>) -> ndarray::Array2<$t> {
                 ndarray::Array2::dot(self, other)
             }
         }
 
         impl<'a> ArgminAdd<ndarray::Array1<$t>> for ndarray::Array1<$t> {
+            #[inline]
             fn add(&self, other: &ndarray::Array1<$t>) -> ndarray::Array1<$t> {
                 self + other
             }
         }
 
         impl<'a> ArgminAdd<ndarray::Array2<$t>> for ndarray::Array2<$t> {
+            #[inline]
             fn add(&self, other: &ndarray::Array2<$t>) -> ndarray::Array2<$t> {
                 self + other
             }
         }
 
         impl<'a> ArgminSub<ndarray::Array1<$t>> for ndarray::Array1<$t> {
+            #[inline]
             fn sub(&self, other: &ndarray::Array1<$t>) -> ndarray::Array1<$t> {
                 self - other
             }
         }
 
         impl<'a> ArgminSub<ndarray::Array2<$t>> for ndarray::Array2<$t> {
+            #[inline]
             fn sub(&self, other: &ndarray::Array2<$t>) -> ndarray::Array2<$t> {
                 self - other
             }
         }
 
         impl<'a> ArgminScaledAdd<ndarray::Array1<$t>, $t> for ndarray::Array1<$t> {
+            #[inline]
             fn scaled_add(&self, scale: $t, other: &ndarray::Array1<$t>) -> ndarray::Array1<$t> {
                 self + &(scale * other)
             }
         }
 
         impl<'a> ArgminScaledAdd<ndarray::Array2<$t>, $t> for ndarray::Array2<$t> {
+            #[inline]
             fn scaled_add(&self, scale: $t, other: &ndarray::Array2<$t>) -> ndarray::Array2<$t> {
                 self + &(scale * other)
             }
         }
 
         impl<'a> ArgminScaledSub<ndarray::Array1<$t>, $t> for ndarray::Array1<$t> {
+            #[inline]
             fn scaled_sub(&self, scale: $t, other: &ndarray::Array1<$t>) -> ndarray::Array1<$t> {
                 self - &(scale * other)
             }
         }
 
         impl<'a> ArgminScaledSub<ndarray::Array2<$t>, $t> for ndarray::Array2<$t> {
+            #[inline]
             fn scaled_sub(&self, scale: $t, other: &ndarray::Array2<$t>) -> ndarray::Array2<$t> {
                 self - &(scale * other)
             }
         }
 
         impl<'a> ArgminScale<$t> for ndarray::Array1<$t> {
+            #[inline]
             fn scale(&self, scale: $t) -> ndarray::Array1<$t> {
                 scale * self
             }
         }
 
         impl<'a> ArgminScale<$t> for ndarray::Array2<$t> {
+            #[inline]
             fn scale(&self, scale: $t) -> ndarray::Array2<$t> {
                 scale * self
             }
@@ -385,6 +418,7 @@ macro_rules! make_math_ndarray {
 macro_rules! make_math_ndarray3 {
     ($t:ty) => {
         impl<'a> ArgminNorm<$t> for ndarray::Array1<$t> {
+            #[inline]
             fn norm(&self) -> $t {
                 self.iter().map(|a| (*a).powi(2)).sum::<$t>().sqrt()
             }
@@ -394,6 +428,7 @@ macro_rules! make_math_ndarray3 {
         where
             ndarray::Array2<$t>: Inverse,
         {
+            #[inline]
             fn ainv(&self) -> Result<ndarray::Array2<$t>, Error> {
                 // Stupid error types...
                 Ok(self.inv()?)
