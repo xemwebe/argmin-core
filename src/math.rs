@@ -215,12 +215,34 @@ impl ArgminTranspose for ndarray::Array2<f64> {
     }
 }
 
+#[cfg(feature = "ndarrayl")]
+impl ArgminTranspose for ndarray::Array2<f32> {
+    fn t(self) -> Self {
+        self.reversed_axes()
+    }
+}
+
 // could be more efficient!
 impl ArgminTranspose for Vec<Vec<f64>> {
     fn t(self) -> Self {
         let n1 = self.len();
         let n2 = self[0].len();
         let mut out: Vec<Vec<f64>> = vec![vec![0.0; n2]; n1];
+        for i in 0..n1 {
+            for j in 0..n2 {
+                out[j][i] = self[i][j];
+            }
+        }
+        out
+    }
+}
+
+// could be more efficient!
+impl ArgminTranspose for Vec<Vec<f32>> {
+    fn t(self) -> Self {
+        let n1 = self.len();
+        let n2 = self[0].len();
+        let mut out: Vec<Vec<f32>> = vec![vec![0.0; n2]; n1];
         for i in 0..n1 {
             for j in 0..n2 {
                 out[j][i] = self[i][j];
@@ -554,13 +576,13 @@ mod tests {
 
         let a = vec![1.0f32, 2.0, 3.0];
         let b = vec![4.0f32, 5.0, 6.0];
-        let product = a.dot(&b);
+        let product: f32 = a.dot(&b);
 
-        assert!((product - 32.0).abs() < std::f32::EPSILON);
+        assert!((product - 32.0f32).abs() < std::f32::EPSILON);
 
         let a = vec![1.0f64, 2.0, 3.0];
         let b = vec![4.0f64, 5.0, 6.0];
-        let product = a.dot(&b);
+        let product: f64 = a.dot(&b);
 
         assert!((product - 32.0).abs() < std::f64::EPSILON);
     }
@@ -633,13 +655,13 @@ mod tests {
 
         let a = vec![1.0f32, 2.0, 3.0];
         let b = vec![4.0f32, 5.0, 6.0];
-        let product = a.amul(&b);
+        let product: f32 = a.amul(&b);
 
         assert!((product - 32.0).abs() < std::f32::EPSILON);
 
         let a = vec![1.0f64, 2.0, 3.0];
         let b = vec![4.0f64, 5.0, 6.0];
-        let product = a.amul(&b);
+        let product: f64 = a.amul(&b);
 
         assert!((product - 32.0).abs() < std::f64::EPSILON);
     }
@@ -673,14 +695,81 @@ mod tests {
 
         let a = array![1.0f32, 2.0, 3.0];
         let b = array![4.0f32, 5.0, 6.0];
-        let product = a.amul(&b);
+        let product: f32 = a.amul(&b);
 
-        assert!((product - 32.0).abs() < std::f32::EPSILON);
+        assert!((product - 32.0f32).abs() < std::f32::EPSILON);
 
         let a = array![1.0f64, 2.0, 3.0];
         let b = array![4.0f64, 5.0, 6.0];
-        let product = a.amul(&b);
+        let product: f64 = a.amul(&b);
 
-        assert!((product - 32.0).abs() < std::f64::EPSILON);
+        assert!((product - 32.0f64).abs() < std::f64::EPSILON);
+    }
+
+    #[test]
+    fn test_transpose_vec() {
+        let mut mat = vec![vec![0.0; 2]; 2];
+        let mut t = 1.0f64;
+        for i in 0..2 {
+            for j in 0..2 {
+                mat[i][j] = t;
+                t += 1.0;
+            }
+        }
+        let mat2 = mat.clone().t();
+        for i in 0..2 {
+            for j in 0..2 {
+                assert!((mat[i][j] - mat2[j][i]).abs() < std::f64::EPSILON);
+            }
+        }
+
+        let mut mat = vec![vec![0.0; 2]; 2];
+        let mut t = 1.0f32;
+        for i in 0..2 {
+            for j in 0..2 {
+                mat[i][j] = t;
+                t += 1.0;
+            }
+        }
+        let mat2 = mat.clone().t();
+        for i in 0..2 {
+            for j in 0..2 {
+                assert!((mat[i][j] - mat2[j][i]).abs() < std::f32::EPSILON);
+            }
+        }
+    }
+
+    #[cfg(feature = "ndarrayl")]
+    #[test]
+    fn test_transpose_ndarray() {
+        let mut mat = ndarray::Array2::zeros((2, 2));
+        let mut t = 1.0f64;
+        for i in 0..2 {
+            for j in 0..2 {
+                mat[(i, j)] = t;
+                t += 1.0;
+            }
+        }
+        let mat2 = mat.clone().t();
+        for i in 0..2 {
+            for j in 0..2 {
+                assert!((mat[(i, j)] - mat2[(j, i)]).abs() < std::f64::EPSILON);
+            }
+        }
+
+        let mut mat = ndarray::Array2::zeros((2, 2));
+        let mut t = 1.0f32;
+        for i in 0..2 {
+            for j in 0..2 {
+                mat[(i, j)] = t;
+                t += 1.0;
+            }
+        }
+        let mat2 = mat.clone().t();
+        for i in 0..2 {
+            for j in 0..2 {
+                assert!((mat[(i, j)] - mat2[(j, i)]).abs() < std::f32::EPSILON);
+            }
+        }
     }
 }
