@@ -203,6 +203,33 @@ impl ArgminEye for ndarray::Array2<f32> {
 // }
 //
 
+// Suboptimal: self is moved. ndarray however offers array views...
+pub trait ArgminTranspose {
+    fn t(self) -> Self;
+}
+
+#[cfg(feature = "ndarrayl")]
+impl ArgminTranspose for ndarray::Array2<f64> {
+    fn t(self) -> Self {
+        self.reversed_axes()
+    }
+}
+
+// could be more efficient!
+impl ArgminTranspose for Vec<Vec<f64>> {
+    fn t(self) -> Self {
+        let n1 = self.len();
+        let n2 = self[0].len();
+        let mut out: Vec<Vec<f64>> = vec![vec![0.0; n2]; n1];
+        for i in 0..n1 {
+            for j in 0..n2 {
+                out[j][i] = self[i][j];
+            }
+        }
+        out
+    }
+}
+
 // Hacky: This allows a dot product of the form a*b^T for Vec<Vec<f64>>... Rethink this!
 impl ArgminDot<Vec<f64>, Vec<Vec<f64>>> for Vec<f64> {
     #[inline]
