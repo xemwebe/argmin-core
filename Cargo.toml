@@ -34,7 +34,7 @@ num = { version = "0.2", optional = true }
 
 [features]
 default = []
-ndarrayl = ["ndarray", "ndarray-linalg", "num"]
+ndarrayl = ["ndarray", "ndarray-linalg", "num", "finitediff/ndarray"]
 
 [dev-dependencies]
 ndarray-linalg = { version = "0.10.0", features = ["openblas"] }
