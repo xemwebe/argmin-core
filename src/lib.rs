@@ -14,8 +14,6 @@
 //! TODOs:
 //!   * Provide an example of how to implement a solver
 
-// #![feature(specialization)]
-#![feature(doc_spotlight)]
 // I really do not like the a..=b syntax
 #![allow(clippy::range_plus_one)]
 
@@ -64,7 +62,6 @@ pub mod finitediff {
 
 /// Defines the interface to a solver. Usually, there is no need to implement this manually, use
 /// the `argmin_derive` crate instead.
-#[doc(spotlight)]
 pub trait ArgminSolver: ArgminNextIter {
     /// apply cost function or operator to a parameter vector
     fn apply(
