@@ -23,16 +23,15 @@ macro_rules! make_dot_mat {
         impl ArgminDot<Vec<$t>, Vec<Vec<$t>>> for Vec<$t> {
             #[inline]
             fn dot(&self, other: &Vec<$t>) -> Vec<Vec<$t>> {
-                other
-                    .iter()
-                    .map(|b| self.iter().map(|a| a * b).collect())
+                self.iter()
+                    .map(|b| other.iter().map(|a| a * b).collect())
                     .collect()
             }
         }
     };
 }
 
-// scalar = <vec, vec>
+// scalar = <row_vec, col_vec>
 make_dot_vec!(f32);
 make_dot_vec!(f64);
 make_dot_vec!(i8);
@@ -46,7 +45,7 @@ make_dot_vec!(u64);
 make_dot_vec!(isize);
 make_dot_vec!(usize);
 
-// mat = <vec, vec^T>
+// mat = <col_vec, row_vec>
 make_dot_mat!(f32);
 make_dot_mat!(f64);
 make_dot_mat!(i8);
@@ -142,5 +141,143 @@ mod tests {
         let b = vec![4.0f64, 5.0, 6.0];
         let product: f64 = a.dot(&b);
         assert!((product - 32.0).abs() < std::f64::EPSILON);
+    }
+
+    #[test]
+    fn test_mat_vec_i8() {
+        let a = vec![1i8, 2, 3];
+        let b = vec![4i8, 5, 6];
+        let res = vec![vec![4, 5, 6], vec![8, 10, 12], vec![12, 15, 18]];
+        let product: Vec<Vec<i8>> = a.dot(&b);
+        for i in 0..3 {
+            for j in 0..3 {
+                assert_eq!(product[i][j], res[i][j]);
+            }
+        }
+    }
+
+    #[test]
+    fn test_mat_vec_u8() {
+        let a = vec![1u8, 2, 3];
+        let b = vec![4u8, 5, 6];
+        let res = vec![vec![4, 5, 6], vec![8, 10, 12], vec![12, 15, 18]];
+        let product: Vec<Vec<u8>> = a.dot(&b);
+        for i in 0..3 {
+            for j in 0..3 {
+                assert_eq!(product[i][j], res[i][j]);
+            }
+        }
+    }
+
+    #[test]
+    fn test_mat_vec_i16() {
+        let a = vec![1i16, 2, 3];
+        let b = vec![4i16, 5, 6];
+        let res = vec![vec![4, 5, 6], vec![8, 10, 12], vec![12, 15, 18]];
+        let product: Vec<Vec<i16>> = a.dot(&b);
+        for i in 0..3 {
+            for j in 0..3 {
+                assert_eq!(product[i][j], res[i][j]);
+            }
+        }
+    }
+
+    #[test]
+    fn test_mat_vec_u16() {
+        let a = vec![1u16, 2, 3];
+        let b = vec![4u16, 5, 6];
+        let res = vec![vec![4, 5, 6], vec![8, 10, 12], vec![12, 15, 18]];
+        let product: Vec<Vec<u16>> = a.dot(&b);
+        for i in 0..3 {
+            for j in 0..3 {
+                assert_eq!(product[i][j], res[i][j]);
+            }
+        }
+    }
+
+    #[test]
+    fn test_mat_vec_i32() {
+        let a = vec![1i32, 2, 3];
+        let b = vec![4i32, 5, 6];
+        let res = vec![vec![4, 5, 6], vec![8, 10, 12], vec![12, 15, 18]];
+        let product: Vec<Vec<i32>> = a.dot(&b);
+        for i in 0..3 {
+            for j in 0..3 {
+                assert_eq!(product[i][j], res[i][j]);
+            }
+        }
+    }
+
+    #[test]
+    fn test_mat_vec_u32() {
+        let a = vec![1u32, 2, 3];
+        let b = vec![4u32, 5, 6];
+        let res = vec![vec![4, 5, 6], vec![8, 10, 12], vec![12, 15, 18]];
+        let product: Vec<Vec<u32>> = a.dot(&b);
+        for i in 0..3 {
+            for j in 0..3 {
+                assert_eq!(product[i][j], res[i][j]);
+            }
+        }
+    }
+
+    #[test]
+    fn test_mat_vec_i64() {
+        let a = vec![1i64, 2, 3];
+        let b = vec![4i64, 5, 6];
+        let res = vec![vec![4, 5, 6], vec![8, 10, 12], vec![12, 15, 18]];
+        let product: Vec<Vec<i64>> = a.dot(&b);
+        for i in 0..3 {
+            for j in 0..3 {
+                assert_eq!(product[i][j], res[i][j]);
+            }
+        }
+    }
+
+    #[test]
+    fn test_mat_vec_u64() {
+        let a = vec![1u64, 2, 3];
+        let b = vec![4u64, 5, 6];
+        let res = vec![vec![4, 5, 6], vec![8, 10, 12], vec![12, 15, 18]];
+        let product: Vec<Vec<u64>> = a.dot(&b);
+        for i in 0..3 {
+            for j in 0..3 {
+                assert_eq!(product[i][j], res[i][j]);
+            }
+        }
+    }
+
+    #[test]
+    fn test_mat_vec_f32() {
+        let a = vec![1f32, 2.0, 3.0];
+        let b = vec![4f32, 5.0, 6.0];
+        let res = vec![
+            vec![4.0, 5.0, 6.0],
+            vec![8.0, 10.0, 12.0],
+            vec![12.0, 15.0, 18.0],
+        ];
+        let product: Vec<Vec<f32>> = a.dot(&b);
+        for i in 0..3 {
+            for j in 0..3 {
+                assert!((product[i][j] - res[i][j]) < std::f32::EPSILON);
+            }
+        }
+    }
+
+    #[test]
+    fn test_mat_vec_f64() {
+        let a = vec![1f64, 2.0, 3.0];
+        let b = vec![4f64, 5.0, 6.0];
+        let res = vec![
+            vec![4.0, 5.0, 6.0],
+            vec![8.0, 10.0, 12.0],
+            vec![12.0, 15.0, 18.0],
+        ];
+        let product: Vec<Vec<f64>> = a.dot(&b);
+        for i in 0..3 {
+            for j in 0..3 {
+                assert!((product[i][j] - res[i][j]) < std::f64::EPSILON);
+            }
+        }
     }
 }
