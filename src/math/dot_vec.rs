@@ -55,6 +55,7 @@ macro_rules! make_dot_mat {
     };
 }
 
+// scalar = <vec, vec>
 make_dot_vec!(f32);
 make_dot_vec!(f64);
 make_dot_vec!(i8);
@@ -67,6 +68,8 @@ make_dot_vec!(u32);
 make_dot_vec!(u64);
 make_dot_vec!(isize);
 make_dot_vec!(usize);
+
+// mat = <vec, vec^T>
 make_dot_mat!(f32);
 make_dot_mat!(f64);
 make_dot_mat!(i8);
