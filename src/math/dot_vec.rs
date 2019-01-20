@@ -6,29 +6,6 @@
 // copied, modified, or distributed except according to those terms.
 
 use crate::math::ArgminDot;
-// use crate::Error;
-
-// Hacky: This allows a dot product of the form a*b^T for Vec<Vec<f64>>... Rethink this!
-// impl ArgminDot<Vec<f64>, Vec<Vec<f64>>> for Vec<f64> {
-//     #[inline]
-//     fn dot(&self, other: &Vec<f64>) -> Vec<Vec<f64>> {
-//         other
-//             .iter()
-//             .map(|b| self.iter().map(|a| a * b).collect())
-//             .collect()
-//     }
-// }
-//
-// // Hacky: This allows a dot product of the form a*b^T for Vec<Vec<f32>>... Rethink this!
-// impl ArgminDot<Vec<f32>, Vec<Vec<f32>>> for Vec<f32> {
-//     #[inline]
-//     fn dot(&self, other: &Vec<f32>) -> Vec<Vec<f32>> {
-//         other
-//             .iter()
-//             .map(|b| self.iter().map(|a| a * b).collect())
-//             .collect()
-//     }
-// }
 
 macro_rules! make_dot_vec {
     ($t:ty) => {
