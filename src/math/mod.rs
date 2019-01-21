@@ -15,7 +15,11 @@
 //! implemented for basic `Vec`s, and will in the future also be implemented for types defined by
 //! `ndarray` and `nalgebra`.
 
+#[cfg(feature = "ndarrayl")]
+mod dot_ndarray;
 mod dot_vec;
+#[cfg(feature = "ndarrayl")]
+pub use crate::math::dot_ndarray::*;
 pub use crate::math::dot_vec::*;
 
 use crate::Error;
@@ -108,31 +112,11 @@ pub trait ArgminAdd<T> {
     fn add(&self, other: &T) -> Self;
 }
 
-// would be great if this worked
-// impl<T: std::ops::Add<Output = Self> + Clone> ArgminAdd<T> for T {
-//     fn add(&self, other: T) -> T {
-//         // is this smart?
-//         (*self).clone() + other
-//     }
-// }
-
 /// Subtract a `T` from `self`
 pub trait ArgminSub<T> {
     /// Subtract a `T` from `self`
     fn sub(&self, other: &T) -> Self;
 }
-
-// would be great if this worked
-// impl<T, U> ArgminSub<T> for U
-// where
-//     T: std::ops::Sub<Output = T> + Clone,
-//     U: std::ops::Sub<Output = T> + Clone,
-// {
-//     default fn sub(&self, other: T) -> Self {
-//         // is this smart?
-//         ((*self).clone()) - (other)
-//     }
-// }
 
 /// Add a `T` scaled by an `U` to `self`
 pub trait ArgminScaledAdd<T, U> {
@@ -257,19 +241,19 @@ impl ArgminTranspose for Vec<Vec<f32>> {
 }
 
 // eewwwwww!!! there must be a better way...
-#[cfg(feature = "ndarrayl")]
-impl ArgminDot<ndarray::Array1<f64>, ndarray::Array2<f64>> for ndarray::Array1<f64> {
-    #[inline]
-    fn dot(&self, other: &ndarray::Array1<f64>) -> ndarray::Array2<f64> {
-        let mut out = ndarray::Array2::zeros((self.len(), other.len()));
-        for i in 0..self.len() {
-            for j in 0..other.len() {
-                out[(i, j)] = self[i] * other[j];
-            }
-        }
-        out
-    }
-}
+// #[cfg(feature = "ndarrayl")]
+// impl ArgminDot<ndarray::Array1<f64>, ndarray::Array2<f64>> for ndarray::Array1<f64> {
+//     #[inline]
+//     fn dot(&self, other: &ndarray::Array1<f64>) -> ndarray::Array2<f64> {
+//         let mut out = ndarray::Array2::zeros((self.len(), other.len()));
+//         for i in 0..self.len() {
+//             for j in 0..other.len() {
+//                 out[(i, j)] = self[i] * other[j];
+//             }
+//         }
+//         out
+//     }
+// }
 
 /// Implement a subset of the mathematics traits
 macro_rules! make_math {
@@ -338,33 +322,33 @@ macro_rules! make_math3 {
 #[cfg(feature = "ndarrayl")]
 macro_rules! make_math_ndarray {
     ($t:ty) => {
-        impl<'a> ArgminDot<ndarray::Array1<$t>, $t> for ndarray::Array1<$t> {
-            #[inline]
-            fn dot(&self, other: &ndarray::Array1<$t>) -> $t {
-                ndarray::Array1::dot(self, other)
-            }
-        }
+        // impl<'a> ArgminDot<ndarray::Array1<$t>, $t> for ndarray::Array1<$t> {
+        //     #[inline]
+        //     fn dot(&self, other: &ndarray::Array1<$t>) -> $t {
+        //         ndarray::Array1::dot(self, other)
+        //     }
+        // }
 
-        impl<'a> ArgminDot<ndarray::Array1<$t>, ndarray::Array1<$t>> for ndarray::Array2<$t> {
-            #[inline]
-            fn dot(&self, other: &ndarray::Array1<$t>) -> ndarray::Array1<$t> {
-                ndarray::Array2::dot(self, other)
-            }
-        }
-
-        impl<'a> ArgminDot<ndarray::Array2<$t>, ndarray::Array1<$t>> for ndarray::Array1<$t> {
-            #[inline]
-            fn dot(&self, other: &ndarray::Array2<$t>) -> ndarray::Array1<$t> {
-                ndarray::Array1::dot(self, other)
-            }
-        }
-
-        impl<'a> ArgminDot<ndarray::Array2<$t>, ndarray::Array2<$t>> for ndarray::Array2<$t> {
-            #[inline]
-            fn dot(&self, other: &ndarray::Array2<$t>) -> ndarray::Array2<$t> {
-                ndarray::Array2::dot(self, other)
-            }
-        }
+        // impl<'a> ArgminDot<ndarray::Array1<$t>, ndarray::Array1<$t>> for ndarray::Array2<$t> {
+        //     #[inline]
+        //     fn dot(&self, other: &ndarray::Array1<$t>) -> ndarray::Array1<$t> {
+        //         ndarray::Array2::dot(self, other)
+        //     }
+        // }
+        //
+        // impl<'a> ArgminDot<ndarray::Array2<$t>, ndarray::Array1<$t>> for ndarray::Array1<$t> {
+        //     #[inline]
+        //     fn dot(&self, other: &ndarray::Array2<$t>) -> ndarray::Array1<$t> {
+        //         ndarray::Array1::dot(self, other)
+        //     }
+        // }
+        //
+        // impl<'a> ArgminDot<ndarray::Array2<$t>, ndarray::Array2<$t>> for ndarray::Array2<$t> {
+        //     #[inline]
+        //     fn dot(&self, other: &ndarray::Array2<$t>) -> ndarray::Array2<$t> {
+        //         ndarray::Array2::dot(self, other)
+        //     }
+        // }
 
         impl<'a> ArgminAdd<ndarray::Array1<$t>> for ndarray::Array1<$t> {
             #[inline]
@@ -602,45 +586,45 @@ mod tests {
         assert!((product - 32.0).abs() < std::f64::EPSILON);
     }
 
-    #[cfg(feature = "ndarrayl")]
-    #[test]
-    fn test_amul_ndarray() {
-        let a = array![1i32, 2, 3];
-        let b = array![4i32, 5, 6];
-        let product = a.amul(&b);
-
-        assert_eq!(product, 32);
-
-        let a = array![1u32, 2, 3];
-        let b = array![4u32, 5, 6];
-        let product = a.amul(&b);
-
-        assert_eq!(product, 32);
-
-        let a = array![1i64, 2, 3];
-        let b = array![4i64, 5, 6];
-        let product = a.amul(&b);
-
-        assert_eq!(product, 32);
-
-        let a = array![1u64, 2, 3];
-        let b = array![4u64, 5, 6];
-        let product = a.amul(&b);
-
-        assert_eq!(product, 32);
-
-        let a = array![1.0f32, 2.0, 3.0];
-        let b = array![4.0f32, 5.0, 6.0];
-        let product: f32 = a.amul(&b);
-
-        assert!((product - 32.0f32).abs() < std::f32::EPSILON);
-
-        let a = array![1.0f64, 2.0, 3.0];
-        let b = array![4.0f64, 5.0, 6.0];
-        let product: f64 = a.amul(&b);
-
-        assert!((product - 32.0f64).abs() < std::f64::EPSILON);
-    }
+    // #[cfg(feature = "ndarrayl")]
+    // #[test]
+    // fn test_amul_ndarray() {
+    //     let a = array![1i32, 2, 3];
+    //     let b = array![4i32, 5, 6];
+    //     let product = a.amul(&b);
+    //
+    //     assert_eq!(product, 32);
+    //
+    //     let a = array![1u32, 2, 3];
+    //     let b = array![4u32, 5, 6];
+    //     let product = a.amul(&b);
+    //
+    //     assert_eq!(product, 32);
+    //
+    //     let a = array![1i64, 2, 3];
+    //     let b = array![4i64, 5, 6];
+    //     let product = a.amul(&b);
+    //
+    //     assert_eq!(product, 32);
+    //
+    //     let a = array![1u64, 2, 3];
+    //     let b = array![4u64, 5, 6];
+    //     let product = a.amul(&b);
+    //
+    //     assert_eq!(product, 32);
+    //
+    //     let a = array![1.0f32, 2.0, 3.0];
+    //     let b = array![4.0f32, 5.0, 6.0];
+    //     let product: f32 = a.amul(&b);
+    //
+    //     assert!((product - 32.0f32).abs() < std::f32::EPSILON);
+    //
+    //     let a = array![1.0f64, 2.0, 3.0];
+    //     let b = array![4.0f64, 5.0, 6.0];
+    //     let product: f64 = a.amul(&b);
+    //
+    //     assert!((product - 32.0f64).abs() < std::f64::EPSILON);
+    // }
 
     #[test]
     fn test_transpose_vec() {
