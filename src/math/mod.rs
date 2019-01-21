@@ -38,6 +38,7 @@ pub trait ArgminDot<T, U> {
     fn dot(&self, other: &T) -> U;
 }
 
+// TODO: Remove, unnecesarry (ArgminDot does the same)
 pub trait ArgminMul<T, U> {
     fn amul(&self, other: &T) -> U;
 }
