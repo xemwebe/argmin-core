@@ -7,7 +7,7 @@
 
 use crate::math::ArgminDot;
 
-macro_rules! make_dot_vec {
+macro_rules! make_dot_scalar {
     ($t:ty) => {
         impl<'a> ArgminDot<Vec<$t>, $t> for Vec<$t> {
             #[inline]
@@ -15,11 +15,21 @@ macro_rules! make_dot_vec {
                 self.iter().zip(other.iter()).map(|(a, b)| a * b).sum()
             }
         }
-    };
-}
 
-macro_rules! make_dot_mat {
-    ($t:ty) => {
+        impl<'a> ArgminDot<$t, Vec<$t>> for Vec<$t> {
+            #[inline]
+            fn dot(&self, other: &$t) -> Vec<$t> {
+                self.iter().map(|a| a * other).collect()
+            }
+        }
+
+        impl<'a> ArgminDot<Vec<$t>, Vec<$t>> for $t {
+            #[inline]
+            fn dot(&self, other: &Vec<$t>) -> Vec<$t> {
+                other.iter().map(|a| a * self).collect()
+            }
+        }
+
         impl ArgminDot<Vec<$t>, Vec<Vec<$t>>> for Vec<$t> {
             #[inline]
             fn dot(&self, other: &Vec<$t>) -> Vec<Vec<$t>> {
@@ -31,33 +41,18 @@ macro_rules! make_dot_mat {
     };
 }
 
-// scalar = <row_vec, col_vec>
-make_dot_vec!(f32);
-make_dot_vec!(f64);
-make_dot_vec!(i8);
-make_dot_vec!(i16);
-make_dot_vec!(i32);
-make_dot_vec!(i64);
-make_dot_vec!(u8);
-make_dot_vec!(u16);
-make_dot_vec!(u32);
-make_dot_vec!(u64);
-make_dot_vec!(isize);
-make_dot_vec!(usize);
-
-// mat = <col_vec, row_vec>
-make_dot_mat!(f32);
-make_dot_mat!(f64);
-make_dot_mat!(i8);
-make_dot_mat!(i16);
-make_dot_mat!(i32);
-make_dot_mat!(i64);
-make_dot_mat!(u8);
-make_dot_mat!(u16);
-make_dot_mat!(u32);
-make_dot_mat!(u64);
-make_dot_mat!(isize);
-make_dot_mat!(usize);
+make_dot_scalar!(f32);
+make_dot_scalar!(f64);
+make_dot_scalar!(i8);
+make_dot_scalar!(i16);
+make_dot_scalar!(i32);
+make_dot_scalar!(i64);
+make_dot_scalar!(u8);
+make_dot_scalar!(u16);
+make_dot_scalar!(u32);
+make_dot_scalar!(u64);
+make_dot_scalar!(isize);
+make_dot_scalar!(usize);
 
 #[cfg(test)]
 mod tests {
