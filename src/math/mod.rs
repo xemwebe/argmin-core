@@ -42,11 +42,11 @@ pub trait ArgminMul<T, U> {
     fn amul(&self, other: &T) -> U;
 }
 
-impl ArgminMul<f64, Vec<f64>> for Vec<f64> {
-    fn amul(&self, f: &f64) -> Vec<f64> {
-        self.iter().map(|x| f * x).collect::<Vec<f64>>()
-    }
-}
+// impl ArgminMul<f64, Vec<f64>> for Vec<f64> {
+//     fn amul(&self, f: &f64) -> Vec<f64> {
+//         self.iter().map(|x| f * x).collect::<Vec<f64>>()
+//     }
+// }
 
 impl<F, T, U> ArgminMul<T, U> for F
 where
