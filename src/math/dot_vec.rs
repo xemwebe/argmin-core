@@ -7,7 +7,7 @@
 
 use crate::math::ArgminDot;
 
-macro_rules! make_dot_scalar {
+macro_rules! make_dot_vec {
     ($t:ty) => {
         impl<'a> ArgminDot<Vec<$t>, $t> for Vec<$t> {
             #[inline]
@@ -41,18 +41,18 @@ macro_rules! make_dot_scalar {
     };
 }
 
-make_dot_scalar!(f32);
-make_dot_scalar!(f64);
-make_dot_scalar!(i8);
-make_dot_scalar!(i16);
-make_dot_scalar!(i32);
-make_dot_scalar!(i64);
-make_dot_scalar!(u8);
-make_dot_scalar!(u16);
-make_dot_scalar!(u32);
-make_dot_scalar!(u64);
-make_dot_scalar!(isize);
-make_dot_scalar!(usize);
+make_dot_vec!(f32);
+make_dot_vec!(f64);
+make_dot_vec!(i8);
+make_dot_vec!(i16);
+make_dot_vec!(i32);
+make_dot_vec!(i64);
+make_dot_vec!(u8);
+make_dot_vec!(u16);
+make_dot_vec!(u32);
+make_dot_vec!(u64);
+make_dot_vec!(isize);
+make_dot_vec!(usize);
 
 #[cfg(test)]
 mod tests {
@@ -138,6 +138,225 @@ mod tests {
         assert!((product - 32.0).abs() < std::f64::EPSILON);
     }
 
+    #[test]
+    fn test_vec_scalar_i8() {
+        let a = vec![1i8, 2, 3];
+        let b = 2i8;
+        let product = a.dot(&b);
+        let res = vec![2i8, 4, 6];
+        for i in 0..3 {
+            assert_eq!(product[i], res[i]);
+        }
+    }
+
+    #[test]
+    fn test_vec_scalar_u8() {
+        let a = vec![1u8, 2, 3];
+        let b = 2u8;
+        let product = a.dot(&b);
+        let res = vec![2u8, 4, 6];
+        for i in 0..3 {
+            assert_eq!(product[i], res[i]);
+        }
+    }
+
+    #[test]
+    fn test_vec_scalar_i16() {
+        let a = vec![1i16, 2, 3];
+        let b = 2i16;
+        let product = a.dot(&b);
+        let res = vec![2i16, 4, 6];
+        for i in 0..3 {
+            assert_eq!(product[i], res[i]);
+        }
+    }
+
+    #[test]
+    fn test_vec_scalar_u16() {
+        let a = vec![1u16, 2, 3];
+        let b = 2u16;
+        let product = a.dot(&b);
+        let res = vec![2u16, 4, 6];
+        for i in 0..3 {
+            assert_eq!(product[i], res[i]);
+        }
+    }
+
+    #[test]
+    fn test_vec_scalar_i32() {
+        let a = vec![1i32, 2, 3];
+        let b = 2i32;
+        let product = a.dot(&b);
+        let res = vec![2i32, 4, 6];
+        for i in 0..3 {
+            assert_eq!(product[i], res[i]);
+        }
+    }
+
+    #[test]
+    fn test_vec_scalar_u32() {
+        let a = vec![1u32, 2, 3];
+        let b = 2u32;
+        let product = a.dot(&b);
+        let res = vec![2u32, 4, 6];
+        for i in 0..3 {
+            assert_eq!(product[i], res[i]);
+        }
+    }
+
+    #[test]
+    fn test_vec_scalar_i64() {
+        let a = vec![1i64, 2, 3];
+        let b = 2i64;
+        let product = a.dot(&b);
+        let res = vec![2i64, 4, 6];
+        for i in 0..3 {
+            assert_eq!(product[i], res[i]);
+        }
+    }
+
+    #[test]
+    fn test_vec_scalar_u64() {
+        let a = vec![1u64, 2, 3];
+        let b = 2u64;
+        let product = a.dot(&b);
+        let res = vec![2u64, 4, 6];
+        for i in 0..3 {
+            assert_eq!(product[i], res[i]);
+        }
+    }
+
+    #[test]
+    fn test_vec_scalar_f32() {
+        let a = vec![1f32, 2.0, 3.0];
+        let b = 2f32;
+        let product = a.dot(&b);
+        let res = vec![2f32, 4.0, 6.0];
+        for i in 0..3 {
+            assert_eq!(product[i], res[i]);
+        }
+    }
+
+    #[test]
+    fn test_vec_scalar_f64() {
+        let a = vec![1f64, 2.0, 3.0];
+        let b = 2f64;
+        let product = a.dot(&b);
+        let res = vec![2f64, 4.0, 6.0];
+        for i in 0..3 {
+            assert_eq!(product[i], res[i]);
+        }
+    }
+
+    #[test]
+    fn test_scalar_vec_i8() {
+        let a = vec![1i8, 2, 3];
+        let b = 2i8;
+        let product = b.dot(&a);
+        let res = vec![2i8, 4, 6];
+        for i in 0..3 {
+            assert_eq!(product[i], res[i]);
+        }
+    }
+
+    #[test]
+    fn test_scalar_vec_u8() {
+        let a = vec![1u8, 2, 3];
+        let b = 2u8;
+        let product = b.dot(&a);
+        let res = vec![2u8, 4, 6];
+        for i in 0..3 {
+            assert_eq!(product[i], res[i]);
+        }
+    }
+
+    #[test]
+    fn test_scalar_vec_i16() {
+        let a = vec![1i16, 2, 3];
+        let b = 2i16;
+        let product = b.dot(&a);
+        let res = vec![2i16, 4, 6];
+        for i in 0..3 {
+            assert_eq!(product[i], res[i]);
+        }
+    }
+
+    #[test]
+    fn test_scalar_vec_u16() {
+        let a = vec![1u16, 2, 3];
+        let b = 2u16;
+        let product = b.dot(&a);
+        let res = vec![2u16, 4, 6];
+        for i in 0..3 {
+            assert_eq!(product[i], res[i]);
+        }
+    }
+
+    #[test]
+    fn test_scalar_vec_i32() {
+        let a = vec![1i32, 2, 3];
+        let b = 2i32;
+        let product = b.dot(&a);
+        let res = vec![2i32, 4, 6];
+        for i in 0..3 {
+            assert_eq!(product[i], res[i]);
+        }
+    }
+
+    #[test]
+    fn test_scalar_vec_u32() {
+        let a = vec![1u32, 2, 3];
+        let b = 2u32;
+        let product = b.dot(&a);
+        let res = vec![2u32, 4, 6];
+        for i in 0..3 {
+            assert_eq!(product[i], res[i]);
+        }
+    }
+
+    #[test]
+    fn test_scalar_vec_i64() {
+        let a = vec![1i64, 2, 3];
+        let b = 2i64;
+        let product = b.dot(&a);
+        let res = vec![2i64, 4, 6];
+        for i in 0..3 {
+            assert_eq!(product[i], res[i]);
+        }
+    }
+
+    #[test]
+    fn test_scalar_vec_u64() {
+        let a = vec![1u64, 2, 3];
+        let b = 2u64;
+        let product = b.dot(&a);
+        let res = vec![2u64, 4, 6];
+        for i in 0..3 {
+            assert_eq!(product[i], res[i]);
+        }
+    }
+
+    #[test]
+    fn test_scalar_vec_f32() {
+        let a = vec![1f32, 2.0, 3.0];
+        let b = 2f32;
+        let product = b.dot(&a);
+        let res = vec![2f32, 4.0, 6.0];
+        for i in 0..3 {
+            assert_eq!(product[i], res[i]);
+        }
+    }
+
+    #[test]
+    fn test_scalar_vec_f64() {
+        let a = vec![1f64, 2.0, 3.0];
+        let b = 2f64;
+        let product = b.dot(&a);
+        let res = vec![2f64, 4.0, 6.0];
+        for i in 0..3 {
+            assert_eq!(product[i], res[i]);
+        }
+    }
     #[test]
     fn test_mat_vec_i8() {
         let a = vec![1i8, 2, 3];
