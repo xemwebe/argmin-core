@@ -42,26 +42,6 @@ pub trait ArgminDot<T, U> {
     fn dot(&self, other: &T) -> U;
 }
 
-// TODO: Remove, unnecesarry (ArgminDot does the same)
-pub trait ArgminMul<T, U> {
-    fn amul(&self, other: &T) -> U;
-}
-
-// impl ArgminMul<f64, Vec<f64>> for Vec<f64> {
-//     fn amul(&self, f: &f64) -> Vec<f64> {
-//         self.iter().map(|x| f * x).collect::<Vec<f64>>()
-//     }
-// }
-
-impl<F, T, U> ArgminMul<T, U> for F
-where
-    F: ArgminDot<T, U>,
-{
-    fn amul(&self, f: &T) -> U {
-        self.dot(f)
-    }
-}
-
 /// Dot/scalar product of `T` and `self` weighted by W (p^TWv)
 pub trait ArgminWeightedDot<T, U, V> {
     /// Dot/scalar product of `T` and `self`
@@ -488,85 +468,6 @@ mod tests {
         let product = a.dot(&b);
 
         assert!((product - 32.0).abs() < std::f64::EPSILON);
-    }
-
-    #[test]
-    fn test_amul_vec() {
-        let a = vec![1i32, 2, 3];
-        let b = vec![4i32, 5, 6];
-        let product: i32 = a.amul(&b);
-
-        assert_eq!(product, 32);
-
-        let a = vec![1u32, 2, 3];
-        let b = vec![4u32, 5, 6];
-        let product: u32 = a.amul(&b);
-
-        assert_eq!(product, 32);
-
-        let a = vec![1i64, 2, 3];
-        let b = vec![4i64, 5, 6];
-        let product: i64 = a.amul(&b);
-
-        assert_eq!(product, 32);
-
-        let a = vec![1u64, 2, 3];
-        let b = vec![4u64, 5, 6];
-        let product: u64 = a.amul(&b);
-
-        assert_eq!(product, 32);
-
-        let a = vec![1.0f32, 2.0, 3.0];
-        let b = vec![4.0f32, 5.0, 6.0];
-        let product: f32 = a.amul(&b);
-
-        assert!((product - 32.0).abs() < std::f32::EPSILON);
-
-        let a = vec![1.0f64, 2.0, 3.0];
-        let b = vec![4.0f64, 5.0, 6.0];
-        let product: f64 = a.amul(&b);
-
-        assert!((product - 32.0).abs() < std::f64::EPSILON);
-    }
-
-    #[cfg(feature = "ndarrayl")]
-    #[test]
-    fn test_amul_ndarray() {
-        let a = array![1i32, 2, 3];
-        let b = array![4i32, 5, 6];
-        let product: i32 = a.amul(&b);
-
-        assert_eq!(product, 32);
-
-        let a = array![1u32, 2, 3];
-        let b = array![4u32, 5, 6];
-        let product: u32 = a.amul(&b);
-
-        assert_eq!(product, 32);
-
-        let a = array![1i64, 2, 3];
-        let b = array![4i64, 5, 6];
-        let product: i64 = a.amul(&b);
-
-        assert_eq!(product, 32);
-
-        let a = array![1u64, 2, 3];
-        let b = array![4u64, 5, 6];
-        let product: u64 = a.amul(&b);
-
-        assert_eq!(product, 32);
-
-        let a = array![1.0f32, 2.0, 3.0];
-        let b = array![4.0f32, 5.0, 6.0];
-        let product: f32 = a.amul(&b);
-
-        assert!((product - 32.0f32).abs() < std::f32::EPSILON);
-
-        let a = array![1.0f64, 2.0, 3.0];
-        let b = array![4.0f64, 5.0, 6.0];
-        let product: f64 = a.amul(&b);
-
-        assert!((product - 32.0f64).abs() < std::f64::EPSILON);
     }
 
     #[test]
