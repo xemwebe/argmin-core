@@ -641,4 +641,142 @@ mod tests {
             assert!((product[i] - res[i]) < std::f64::EPSILON);
         }
     }
+
+    #[test]
+    fn test_mat_mat_i8() {
+        let a = array![[1i8, 2, 3], [4, 5, 6], [3, 2, 1]];
+        let b = array![[3i8, 2, 1], [6, 5, 4], [2, 4, 3]];
+        let res = array![[21, 24, 18], [54, 57, 42], [23, 20, 14]];
+        let product: Array2<i8> = <Array2<i8> as ArgminDot<Array2<i8>, Array2<i8>>>::dot(&a, &b);
+        for i in 0..3 {
+            for j in 0..3 {
+                assert_eq!(product[(i, j)], res[(i, j)]);
+            }
+        }
+    }
+
+    #[test]
+    fn test_mat_mat_u8() {
+        let a = array![[1u8, 2, 3], [4, 5, 6], [3, 2, 1]];
+        let b = array![[3u8, 2, 1], [6, 5, 4], [2, 4, 3]];
+        let res = array![[21, 24, 18], [54, 57, 42], [23, 20, 14]];
+        let product: Array2<u8> = <Array2<u8> as ArgminDot<Array2<u8>, Array2<u8>>>::dot(&a, &b);
+        for i in 0..3 {
+            for j in 0..3 {
+                assert_eq!(product[(i, j)], res[(i, j)]);
+            }
+        }
+    }
+
+    #[test]
+    fn test_mat_mat_i16() {
+        let a = array![[1i16, 2, 3], [4, 5, 6], [3, 2, 1]];
+        let b = array![[3i16, 2, 1], [6, 5, 4], [2, 4, 3]];
+        let res = array![[21, 24, 18], [54, 57, 42], [23, 20, 14]];
+        let product: Array2<i16> =
+            <Array2<i16> as ArgminDot<Array2<i16>, Array2<i16>>>::dot(&a, &b);
+        for i in 0..3 {
+            for j in 0..3 {
+                assert_eq!(product[(i, j)], res[(i, j)]);
+            }
+        }
+    }
+
+    #[test]
+    fn test_mat_mat_u16() {
+        let a = array![[1u16, 2, 3], [4, 5, 6], [3, 2, 1]];
+        let b = array![[3u16, 2, 1], [6, 5, 4], [2, 4, 3]];
+        let res = array![[21, 24, 18], [54, 57, 42], [23, 20, 14]];
+        let product: Array2<u16> =
+            <Array2<u16> as ArgminDot<Array2<u16>, Array2<u16>>>::dot(&a, &b);
+        for i in 0..3 {
+            for j in 0..3 {
+                assert_eq!(product[(i, j)], res[(i, j)]);
+            }
+        }
+    }
+
+    #[test]
+    fn test_mat_mat_i32() {
+        let a = array![[1i32, 2, 3], [4, 5, 6], [3, 2, 1]];
+        let b = array![[3i32, 2, 1], [6, 5, 4], [2, 4, 3]];
+        let res = array![[21, 24, 18], [54, 57, 42], [23, 20, 14]];
+        let product: Array2<i32> =
+            <Array2<i32> as ArgminDot<Array2<i32>, Array2<i32>>>::dot(&a, &b);
+        for i in 0..3 {
+            for j in 0..3 {
+                assert_eq!(product[(i, j)], res[(i, j)]);
+            }
+        }
+    }
+
+    #[test]
+    fn test_mat_mat_u32() {
+        let a = array![[1u32, 2, 3], [4, 5, 6], [3, 2, 1]];
+        let b = array![[3u32, 2, 1], [6, 5, 4], [2, 4, 3]];
+        let res = array![[21, 24, 18], [54, 57, 42], [23, 20, 14]];
+        let product: Array2<u32> =
+            <Array2<u32> as ArgminDot<Array2<u32>, Array2<u32>>>::dot(&a, &b);
+        for i in 0..3 {
+            for j in 0..3 {
+                assert_eq!(product[(i, j)], res[(i, j)]);
+            }
+        }
+    }
+
+    #[test]
+    fn test_mat_mat_i64() {
+        let a = array![[1i64, 2, 3], [4, 5, 6], [3, 2, 1]];
+        let b = array![[3i64, 2, 1], [6, 5, 4], [2, 4, 3]];
+        let res = array![[21, 24, 18], [54, 57, 42], [23, 20, 14]];
+        let product: Array2<i64> =
+            <Array2<i64> as ArgminDot<Array2<i64>, Array2<i64>>>::dot(&a, &b);
+        for i in 0..3 {
+            for j in 0..3 {
+                assert_eq!(product[(i, j)], res[(i, j)]);
+            }
+        }
+    }
+
+    #[test]
+    fn test_mat_mat_u64() {
+        let a = array![[1u64, 2, 3], [4, 5, 6], [3, 2, 1]];
+        let b = array![[3u64, 2, 1], [6, 5, 4], [2, 4, 3]];
+        let res = array![[21, 24, 18], [54, 57, 42], [23, 20, 14]];
+        let product: Array2<u64> =
+            <Array2<u64> as ArgminDot<Array2<u64>, Array2<u64>>>::dot(&a, &b);
+        for i in 0..3 {
+            for j in 0..3 {
+                assert_eq!(product[(i, j)], res[(i, j)]);
+            }
+        }
+    }
+
+    #[test]
+    fn test_mat_mat_f32() {
+        let a = array![[1f32, 2.0, 3.0], [4.0, 5.0, 6.0], [3.0, 2.0, 1.0]];
+        let b = array![[3f32, 2.0, 1.0], [6.0, 5.0, 4.0], [2.0, 4.0, 3.0]];
+        let res = array![[21.0, 24.0, 18.0], [54.0, 57.0, 42.0], [23.0, 20.0, 14.0]];
+        let product: Array2<f32> =
+            <Array2<f32> as ArgminDot<Array2<f32>, Array2<f32>>>::dot(&a, &b);
+        for i in 0..3 {
+            for j in 0..3 {
+                assert!((product[(i, j)] - res[(i, j)]).abs() < std::f32::EPSILON);
+            }
+        }
+    }
+
+    #[test]
+    fn test_mat_mat_f64() {
+        let a = array![[1f64, 2.0, 3.0], [4.0, 5.0, 6.0], [3.0, 2.0, 1.0]];
+        let b = array![[3f64, 2.0, 1.0], [6.0, 5.0, 4.0], [2.0, 4.0, 3.0]];
+        let res = array![[21.0, 24.0, 18.0], [54.0, 57.0, 42.0], [23.0, 20.0, 14.0]];
+        let product: Array2<f64> =
+            <Array2<f64> as ArgminDot<Array2<f64>, Array2<f64>>>::dot(&a, &b);
+        for i in 0..3 {
+            for j in 0..3 {
+                assert!((product[(i, j)] - res[(i, j)]).abs() < std::f64::EPSILON);
+            }
+        }
+    }
 }
