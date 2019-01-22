@@ -43,6 +43,20 @@ macro_rules! make_dot_ndarray {
                 out
             }
         }
+
+        impl ArgminDot<Array1<$t>, Array1<$t>> for Array2<$t> {
+            #[inline]
+            fn dot(&self, other: &Array1<$t>) -> Array1<$t> {
+                ndarray::Array2::dot(self, other)
+            }
+        }
+
+        impl ArgminDot<Array2<$t>, Array2<$t>> for Array2<$t> {
+            #[inline]
+            fn dot(&self, other: &Array2<$t>) -> Array2<$t> {
+                ndarray::Array2::dot(self, other)
+            }
+        }
     };
 }
 
