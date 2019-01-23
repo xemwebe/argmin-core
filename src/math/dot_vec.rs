@@ -6,6 +6,7 @@
 // copied, modified, or distributed except according to those terms.
 
 use crate::math::ArgminDot;
+use crate::math::ArgminTranspose;
 
 macro_rules! make_dot_vec {
     ($t:ty) => {
@@ -46,12 +47,30 @@ macro_rules! make_dot_vec {
             }
         }
 
-        // impl ArgminDot<Array2<$t>, Array2<$t>> for Array2<$t> {
-        //     #[inline]
-        //     fn dot(&self, other: &Array2<$t>) -> Array2<$t> {
-        //         ndarray::Array2::dot(self, other)
-        //     }
-        // }
+        impl ArgminDot<Vec<Vec<$t>>, Vec<Vec<$t>>> for Vec<Vec<$t>> {
+            #[inline]
+            fn dot(&self, other: &Vec<Vec<$t>>) -> Vec<Vec<$t>> {
+                let sr = self.len();
+                let sc = self[0].len();
+                let or = self.len();
+                let oc = self[0].len();
+                assert_eq!(sc, or);
+                let other_t = other.clone().t();
+                let mut v = Vec::with_capacity(oc);
+                unsafe {
+                    v.set_len(oc);
+                }
+                let mut out = vec![v; sr];
+                for i in 0..sr {
+                    assert_eq!(self[i].len(), sc);
+                    assert_eq!(other[i].len(), oc);
+                    for j in 0..oc {
+                        out[i][j] = self[i].dot(&other_t[j]);
+                    }
+                }
+                out
+            }
+        }
     };
 }
 
@@ -626,4 +645,18 @@ mod tests {
             assert!((product[i] - res[i]).abs() < std::f64::EPSILON);
         }
     }
+
+    #[test]
+    fn test_mat_mat_i8() {
+        let a = vec![vec![1i8, 2, 3], vec![4, 5, 6], vec![3, 2, 1]];
+        let b = vec![vec![3i8, 2, 1], vec![6, 5, 4], vec![2, 4, 3]];
+        let res = vec![vec![21, 24, 18], vec![54, 57, 42], vec![23, 20, 14]];
+        let product = a.dot(&b);
+        for i in 0..3 {
+            for j in 0..3 {
+                assert_eq!(product[i][j], res[i][j]);
+            }
+        }
+    }
+
 }
