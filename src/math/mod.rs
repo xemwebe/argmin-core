@@ -577,8 +577,6 @@ make_math_ndarray3!(f64);
 mod tests {
 
     use super::*;
-    #[cfg(feature = "ndarrayl")]
-    use ndarray::array;
 
     #[test]
     fn test_transpose_vec() {
