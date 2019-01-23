@@ -177,6 +177,156 @@ impl ArgminTranspose for ndarray::Array2<f32> {
 }
 
 // could be more efficient!
+impl ArgminTranspose for Vec<Vec<i8>> {
+    fn t(self) -> Self {
+        let n1 = self.len();
+        let n2 = self[0].len();
+        let mut out: Vec<Vec<i8>> = vec![vec![0; n2]; n1];
+        for i in 0..n1 {
+            for j in 0..n2 {
+                out[j][i] = self[i][j];
+            }
+        }
+        out
+    }
+}
+
+// could be more efficient!
+impl ArgminTranspose for Vec<Vec<u8>> {
+    fn t(self) -> Self {
+        let n1 = self.len();
+        let n2 = self[0].len();
+        let mut out: Vec<Vec<u8>> = vec![vec![0; n2]; n1];
+        for i in 0..n1 {
+            for j in 0..n2 {
+                out[j][i] = self[i][j];
+            }
+        }
+        out
+    }
+}
+
+// could be more efficient!
+impl ArgminTranspose for Vec<Vec<i16>> {
+    fn t(self) -> Self {
+        let n1 = self.len();
+        let n2 = self[0].len();
+        let mut out: Vec<Vec<i16>> = vec![vec![0; n2]; n1];
+        for i in 0..n1 {
+            for j in 0..n2 {
+                out[j][i] = self[i][j];
+            }
+        }
+        out
+    }
+}
+
+// could be more efficient!
+impl ArgminTranspose for Vec<Vec<u16>> {
+    fn t(self) -> Self {
+        let n1 = self.len();
+        let n2 = self[0].len();
+        let mut out: Vec<Vec<u16>> = vec![vec![0; n2]; n1];
+        for i in 0..n1 {
+            for j in 0..n2 {
+                out[j][i] = self[i][j];
+            }
+        }
+        out
+    }
+}
+
+// could be more efficient!
+impl ArgminTranspose for Vec<Vec<i32>> {
+    fn t(self) -> Self {
+        let n1 = self.len();
+        let n2 = self[0].len();
+        let mut out: Vec<Vec<i32>> = vec![vec![0; n2]; n1];
+        for i in 0..n1 {
+            for j in 0..n2 {
+                out[j][i] = self[i][j];
+            }
+        }
+        out
+    }
+}
+
+// could be more efficient!
+impl ArgminTranspose for Vec<Vec<u32>> {
+    fn t(self) -> Self {
+        let n1 = self.len();
+        let n2 = self[0].len();
+        let mut out: Vec<Vec<u32>> = vec![vec![0; n2]; n1];
+        for i in 0..n1 {
+            for j in 0..n2 {
+                out[j][i] = self[i][j];
+            }
+        }
+        out
+    }
+}
+
+// could be more efficient!
+impl ArgminTranspose for Vec<Vec<i64>> {
+    fn t(self) -> Self {
+        let n1 = self.len();
+        let n2 = self[0].len();
+        let mut out: Vec<Vec<i64>> = vec![vec![0; n2]; n1];
+        for i in 0..n1 {
+            for j in 0..n2 {
+                out[j][i] = self[i][j];
+            }
+        }
+        out
+    }
+}
+
+// could be more efficient!
+impl ArgminTranspose for Vec<Vec<u64>> {
+    fn t(self) -> Self {
+        let n1 = self.len();
+        let n2 = self[0].len();
+        let mut out: Vec<Vec<u64>> = vec![vec![0; n2]; n1];
+        for i in 0..n1 {
+            for j in 0..n2 {
+                out[j][i] = self[i][j];
+            }
+        }
+        out
+    }
+}
+
+// could be more efficient!
+impl ArgminTranspose for Vec<Vec<isize>> {
+    fn t(self) -> Self {
+        let n1 = self.len();
+        let n2 = self[0].len();
+        let mut out: Vec<Vec<isize>> = vec![vec![0; n2]; n1];
+        for i in 0..n1 {
+            for j in 0..n2 {
+                out[j][i] = self[i][j];
+            }
+        }
+        out
+    }
+}
+
+// could be more efficient!
+impl ArgminTranspose for Vec<Vec<usize>> {
+    fn t(self) -> Self {
+        let n1 = self.len();
+        let n2 = self[0].len();
+        let mut out: Vec<Vec<usize>> = vec![vec![0; n2]; n1];
+        for i in 0..n1 {
+            for j in 0..n2 {
+                out[j][i] = self[i][j];
+            }
+        }
+        out
+    }
+}
+
+// could be more efficient!
 impl ArgminTranspose for Vec<Vec<f64>> {
     fn t(self) -> Self {
         let n1 = self.len();
@@ -536,4 +686,5 @@ mod tests {
             }
         }
     }
+
 }
