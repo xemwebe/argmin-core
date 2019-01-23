@@ -38,6 +38,20 @@ macro_rules! make_dot_vec {
                     .collect()
             }
         }
+
+        impl ArgminDot<Vec<$t>, Vec<$t>> for Vec<Vec<$t>> {
+            #[inline]
+            fn dot(&self, other: &Vec<$t>) -> Vec<$t> {
+                (0..self.len()).map(|i| self[i].dot(other)).collect()
+            }
+        }
+
+        // impl ArgminDot<Array2<$t>, Array2<$t>> for Array2<$t> {
+        //     #[inline]
+        //     fn dot(&self, other: &Array2<$t>) -> Array2<$t> {
+        //         ndarray::Array2::dot(self, other)
+        //     }
+        // }
     };
 }
 
@@ -492,6 +506,28 @@ mod tests {
             for j in 0..3 {
                 assert!((product[i][j] - res[i][j]) < std::f64::EPSILON);
             }
+        }
+    }
+
+    #[test]
+    fn test_mat_vec_2_i8() {
+        let a = vec![vec![1i8, 2, 3], vec![4, 5, 6], vec![7, 8, 9]];
+        let b = vec![1i8, 2, 3];
+        let res = vec![14, 32, 50];
+        let product = a.dot(&b);
+        for i in 0..3 {
+            assert_eq!(product[i], res[i]);
+        }
+    }
+
+    #[test]
+    fn test_mat_vec_2_u8() {
+        let a = vec![vec![1u8, 2, 3], vec![4, 5, 6], vec![7, 8, 9]];
+        let b = vec![1u8, 2, 3];
+        let res = vec![14, 32, 50];
+        let product = a.dot(&b);
+        for i in 0..3 {
+            assert_eq!(product[i], res[i]);
         }
     }
 }
