@@ -51,10 +51,15 @@ macro_rules! make_dot_vec {
             #[inline]
             fn dot(&self, other: &Vec<Vec<$t>>) -> Vec<Vec<$t>> {
                 let sr = self.len();
+                assert!(sr > 0);
                 let sc = self[0].len();
+                assert!(sc > 0);
                 let or = self.len();
+                assert!(or > 0);
                 let oc = self[0].len();
                 assert_eq!(sc, or);
+                assert!(oc > 0);
+                // Would be more efficient if this wasn't necessary!
                 let other_t = other.clone().t();
                 let mut v = Vec::with_capacity(oc);
                 unsafe {
