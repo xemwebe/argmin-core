@@ -77,850 +77,126 @@ make_dot_ndarray!(usize);
 mod tests {
     use super::*;
     use ndarray::array;
+    use paste::item;
 
-    #[test]
-    fn test_vec_vec_isize() {
-        let a = array![1isize, 2, 3];
-        let b = array![4isize, 5, 6];
-        let product: isize = <Array1<isize> as ArgminDot<Array1<isize>, isize>>::dot(&a, &b);
-        assert_eq!(product, 32);
-    }
-
-    #[test]
-    fn test_vec_vec_usize() {
-        let a = array![1usize, 2, 3];
-        let b = array![4usize, 5, 6];
-        let product: usize = <Array1<usize> as ArgminDot<Array1<usize>, usize>>::dot(&a, &b);
-        assert_eq!(product, 32);
-    }
-
-    #[test]
-    fn test_vec_vec_i8() {
-        let a = array![1i8, 2, 3];
-        let b = array![4i8, 5, 6];
-        let product: i8 = <Array1<i8> as ArgminDot<Array1<i8>, i8>>::dot(&a, &b);
-        assert_eq!(product, 32);
-    }
-
-    #[test]
-    fn test_vec_vec_u8() {
-        let a = array![1u8, 2, 3];
-        let b = array![4u8, 5, 6];
-        let product: u8 = <Array1<u8> as ArgminDot<Array1<u8>, u8>>::dot(&a, &b);
-        assert_eq!(product, 32);
-    }
-
-    #[test]
-    fn test_vec_vec_i16() {
-        let a = array![1i16, 2, 3];
-        let b = array![4i16, 5, 6];
-        let product: i16 = <Array1<i16> as ArgminDot<Array1<i16>, i16>>::dot(&a, &b);
-        assert_eq!(product, 32);
-    }
-
-    #[test]
-    fn test_vec_vec_u16() {
-        let a = array![1u16, 2, 3];
-        let b = array![4u16, 5, 6];
-        let product: u16 = <Array1<u16> as ArgminDot<Array1<u16>, u16>>::dot(&a, &b);
-        assert_eq!(product, 32);
-    }
-
-    #[test]
-    fn test_vec_vec_i32() {
-        let a = array![1i32, 2, 3];
-        let b = array![4i32, 5, 6];
-        let product: i32 = <Array1<i32> as ArgminDot<Array1<i32>, i32>>::dot(&a, &b);
-        assert_eq!(product, 32);
-    }
-
-    #[test]
-    fn test_vec_vec_u32() {
-        let a = array![1u32, 2, 3];
-        let b = array![4u32, 5, 6];
-        let product: u32 = <Array1<u32> as ArgminDot<Array1<u32>, u32>>::dot(&a, &b);
-        assert_eq!(product, 32);
-    }
-
-    #[test]
-    fn test_vec_vec_i64() {
-        let a = array![1i64, 2, 3];
-        let b = array![4i64, 5, 6];
-        let product: i64 = <Array1<i64> as ArgminDot<Array1<i64>, i64>>::dot(&a, &b);
-        assert_eq!(product, 32);
-    }
-
-    #[test]
-    fn test_vec_vec_u64() {
-        let a = array![1u64, 2, 3];
-        let b = array![4u64, 5, 6];
-        let product: u64 = <Array1<u64> as ArgminDot<Array1<u64>, u64>>::dot(&a, &b);
-        assert_eq!(product, 32);
-    }
-
-    #[test]
-    fn test_vec_vec_f32() {
-        let a = array![1.0f32, 2.0, 3.0];
-        let b = array![4.0f32, 5.0, 6.0];
-        let product: f32 = <Array1<f32> as ArgminDot<Array1<f32>, f32>>::dot(&a, &b);
-        assert!((product - 32.0f32).abs() < std::f32::EPSILON);
-    }
-
-    #[test]
-    fn test_vec_vec_f64() {
-        let a = array![1.0f64, 2.0, 3.0];
-        let b = array![4.0f64, 5.0, 6.0];
-        let product: f64 = <Array1<f64> as ArgminDot<Array1<f64>, f64>>::dot(&a, &b);
-        assert!((product - 32.0).abs() < std::f64::EPSILON);
-    }
-
-    #[test]
-    fn test_vec_scalar_isize() {
-        let a = array![1isize, 2, 3];
-        let b = 2isize;
-        let product: Array1<isize> =
-            <Array1<isize> as ArgminDot<isize, Array1<isize>>>::dot(&a, &b);
-        let res = array![2isize, 4, 6];
-        for i in 0..3 {
-            assert_eq!(product[i], res[i]);
-        }
-    }
-
-    #[test]
-    fn test_vec_scalar_usize() {
-        let a = array![1usize, 2, 3];
-        let b = 2usize;
-        let product: Array1<usize> =
-            <Array1<usize> as ArgminDot<usize, Array1<usize>>>::dot(&a, &b);
-        let res = array![2usize, 4, 6];
-        for i in 0..3 {
-            assert_eq!(product[i], res[i]);
-        }
-    }
-
-    #[test]
-    fn test_vec_scalar_i8() {
-        let a = array![1i8, 2, 3];
-        let b = 2i8;
-        let product: Array1<i8> = <Array1<i8> as ArgminDot<i8, Array1<i8>>>::dot(&a, &b);
-        let res = array![2i8, 4, 6];
-        for i in 0..3 {
-            assert_eq!(product[i], res[i]);
-        }
-    }
-
-    #[test]
-    fn test_vec_scalar_u8() {
-        let a = array![1u8, 2, 3];
-        let b = 2u8;
-        let product: Array1<u8> = <Array1<u8> as ArgminDot<u8, Array1<u8>>>::dot(&a, &b);
-        let res = array![2u8, 4, 6];
-        for i in 0..3 {
-            assert_eq!(product[i], res[i]);
-        }
-    }
-
-    #[test]
-    fn test_vec_scalar_i16() {
-        let a = array![1i16, 2, 3];
-        let b = 2i16;
-        let product: Array1<i16> = <Array1<i16> as ArgminDot<i16, Array1<i16>>>::dot(&a, &b);
-        let res = array![2i16, 4, 6];
-        for i in 0..3 {
-            assert_eq!(product[i], res[i]);
-        }
-    }
-
-    #[test]
-    fn test_vec_scalar_u16() {
-        let a = array![1u16, 2, 3];
-        let b = 2u16;
-        let product: Array1<u16> = <Array1<u16> as ArgminDot<u16, Array1<u16>>>::dot(&a, &b);
-        let res = array![2u16, 4, 6];
-        for i in 0..3 {
-            assert_eq!(product[i], res[i]);
-        }
-    }
-
-    #[test]
-    fn test_vec_scalar_i32() {
-        let a = array![1i32, 2, 3];
-        let b = 2i32;
-        let product: Array1<i32> = <Array1<i32> as ArgminDot<i32, Array1<i32>>>::dot(&a, &b);
-        let res = array![2i32, 4, 6];
-        for i in 0..3 {
-            assert_eq!(product[i], res[i]);
-        }
-    }
-
-    #[test]
-    fn test_vec_scalar_u32() {
-        let a = array![1u32, 2, 3];
-        let b = 2u32;
-        let product: Array1<u32> = <Array1<u32> as ArgminDot<u32, Array1<u32>>>::dot(&a, &b);
-        let res = array![2u32, 4, 6];
-        for i in 0..3 {
-            assert_eq!(product[i], res[i]);
-        }
-    }
-
-    #[test]
-    fn test_vec_scalar_i64() {
-        let a = array![1i64, 2, 3];
-        let b = 2i64;
-        let product: Array1<i64> = <Array1<i64> as ArgminDot<i64, Array1<i64>>>::dot(&a, &b);
-        let res = array![2i64, 4, 6];
-        for i in 0..3 {
-            assert_eq!(product[i], res[i]);
-        }
-    }
-
-    #[test]
-    fn test_vec_scalar_u64() {
-        let a = array![1u64, 2, 3];
-        let b = 2u64;
-        let product: Array1<u64> = <Array1<u64> as ArgminDot<u64, Array1<u64>>>::dot(&a, &b);
-        let res = array![2u64, 4, 6];
-        for i in 0..3 {
-            assert_eq!(product[i], res[i]);
-        }
-    }
-
-    #[test]
-    fn test_vec_scalar_f32() {
-        let a = array![1f32, 2.0, 3.0];
-        let b = 2f32;
-        let product: Array1<f32> = <Array1<f32> as ArgminDot<f32, Array1<f32>>>::dot(&a, &b);
-        let res = array![2f32, 4.0, 6.0];
-        for i in 0..3 {
-            assert_eq!(product[i], res[i]);
-        }
-    }
-
-    #[test]
-    fn test_vec_scalar_f64() {
-        let a = array![1f64, 2.0, 3.0];
-        let b = 2f64;
-        let product: Array1<f64> = <Array1<f64> as ArgminDot<f64, Array1<f64>>>::dot(&a, &b);
-        let res = array![2f64, 4.0, 6.0];
-        for i in 0..3 {
-            assert_eq!(product[i], res[i]);
-        }
-    }
-
-    #[test]
-    fn test_scalar_vec_isize() {
-        let a = array![1isize, 2, 3];
-        let b = 2isize;
-        let product: Array1<isize> =
-            <isize as ArgminDot<Array1<isize>, Array1<isize>>>::dot(&b, &a);
-        let res = array![2isize, 4, 6];
-        for i in 0..3 {
-            assert_eq!(product[i], res[i]);
-        }
-    }
-
-    #[test]
-    fn test_scalar_vec_usize() {
-        let a = array![1usize, 2, 3];
-        let b = 2usize;
-        let product: Array1<usize> =
-            <usize as ArgminDot<Array1<usize>, Array1<usize>>>::dot(&b, &a);
-        let res = array![2usize, 4, 6];
-        for i in 0..3 {
-            assert_eq!(product[i], res[i]);
-        }
-    }
-
-    #[test]
-    fn test_scalar_vec_i8() {
-        let a = array![1i8, 2, 3];
-        let b = 2i8;
-        let product: Array1<i8> = <i8 as ArgminDot<Array1<i8>, Array1<i8>>>::dot(&b, &a);
-        let res = array![2i8, 4, 6];
-        for i in 0..3 {
-            assert_eq!(product[i], res[i]);
-        }
-    }
-
-    #[test]
-    fn test_scalar_vec_u8() {
-        let a = array![1u8, 2, 3];
-        let b = 2u8;
-        let product: Array1<u8> = <u8 as ArgminDot<Array1<u8>, Array1<u8>>>::dot(&b, &a);
-        let res = array![2u8, 4, 6];
-        for i in 0..3 {
-            assert_eq!(product[i], res[i]);
-        }
-    }
-
-    #[test]
-    fn test_scalar_vec_i16() {
-        let a = array![1i16, 2, 3];
-        let b = 2i16;
-        let product: Array1<i16> = <i16 as ArgminDot<Array1<i16>, Array1<i16>>>::dot(&b, &a);
-        let res = array![2i16, 4, 6];
-        for i in 0..3 {
-            assert_eq!(product[i], res[i]);
-        }
-    }
-
-    #[test]
-    fn test_scalar_vec_u16() {
-        let a = array![1u16, 2, 3];
-        let b = 2u16;
-        let product: Array1<u16> = <u16 as ArgminDot<Array1<u16>, Array1<u16>>>::dot(&b, &a);
-        let res = array![2u16, 4, 6];
-        for i in 0..3 {
-            assert_eq!(product[i], res[i]);
-        }
-    }
-
-    #[test]
-    fn test_scalar_vec_i32() {
-        let a = array![1i32, 2, 3];
-        let b = 2i32;
-        let product: Array1<i32> = <i32 as ArgminDot<Array1<i32>, Array1<i32>>>::dot(&b, &a);
-        let res = array![2i32, 4, 6];
-        for i in 0..3 {
-            assert_eq!(product[i], res[i]);
-        }
-    }
-
-    #[test]
-    fn test_scalar_vec_u32() {
-        let a = array![1u32, 2, 3];
-        let b = 2u32;
-        let product: Array1<u32> = <u32 as ArgminDot<Array1<u32>, Array1<u32>>>::dot(&b, &a);
-        let res = array![2u32, 4, 6];
-        for i in 0..3 {
-            assert_eq!(product[i], res[i]);
-        }
-    }
-
-    #[test]
-    fn test_scalar_vec_i64() {
-        let a = array![1i64, 2, 3];
-        let b = 2i64;
-        let product: Array1<i64> = <i64 as ArgminDot<Array1<i64>, Array1<i64>>>::dot(&b, &a);
-        let res = array![2i64, 4, 6];
-        for i in 0..3 {
-            assert_eq!(product[i], res[i]);
-        }
-    }
-
-    #[test]
-    fn test_scalar_vec_u64() {
-        let a = array![1u64, 2, 3];
-        let b = 2u64;
-        let product: Array1<u64> = <u64 as ArgminDot<Array1<u64>, Array1<u64>>>::dot(&b, &a);
-        let res = array![2u64, 4, 6];
-        for i in 0..3 {
-            assert_eq!(product[i], res[i]);
-        }
-    }
-
-    #[test]
-    fn test_scalar_vec_f32() {
-        let a = array![1f32, 2.0, 3.0];
-        let b = 2f32;
-        let product: Array1<f32> = <f32 as ArgminDot<Array1<f32>, Array1<f32>>>::dot(&b, &a);
-        let res = array![2f32, 4.0, 6.0];
-        for i in 0..3 {
-            assert_eq!(product[i], res[i]);
-        }
-    }
-
-    #[test]
-    fn test_scalar_vec_f64() {
-        let a = array![1f64, 2.0, 3.0];
-        let b = 2f64;
-        let product: Array1<f64> = <f64 as ArgminDot<Array1<f64>, Array1<f64>>>::dot(&b, &a);
-        let res = array![2f64, 4.0, 6.0];
-        for i in 0..3 {
-            assert_eq!(product[i], res[i]);
-        }
-    }
-
-    #[test]
-    fn test_mat_vec_isize() {
-        let a = array![1isize, 2, 3];
-        let b = array![4isize, 5, 6];
-        let res = vec![vec![4, 5, 6], vec![8, 10, 12], vec![12, 15, 18]];
-        let product: Array2<isize> =
-            <Array1<isize> as ArgminDot<Array1<isize>, Array2<isize>>>::dot(&a, &b);
-        for i in 0..3 {
-            for j in 0..3 {
-                assert_eq!(product[(i, j)], res[i][j]);
+    macro_rules! make_test {
+        ($t:ty) => {
+            item! {
+                #[test]
+                fn [<test_vec_vec_ $t>]() {
+                    let a = array![1 as $t, 2 as $t, 3 as $t];
+                    let b = array![4 as $t, 5 as $t, 6 as $t];
+                    let res: $t = <Array1<$t> as ArgminDot<Array1<$t>, $t>>::dot(&a, &b);
+                    assert!((((res - 32 as $t) as f64).abs()) < std::f64::EPSILON);
+                }
             }
-        }
-    }
 
-    #[test]
-    fn test_mat_vec_usize() {
-        let a = array![1usize, 2, 3];
-        let b = array![4usize, 5, 6];
-        let res = vec![vec![4, 5, 6], vec![8, 10, 12], vec![12, 15, 18]];
-        let product: Array2<usize> =
-            <Array1<usize> as ArgminDot<Array1<usize>, Array2<usize>>>::dot(&a, &b);
-        for i in 0..3 {
-            for j in 0..3 {
-                assert_eq!(product[(i, j)], res[i][j]);
+            item! {
+                #[test]
+                fn [<test_vec_scalar_ $t>]() {
+                    let a = array![1 as $t, 2 as $t, 3 as $t];
+                    let b = 2 as $t;
+                    let product: Array1<$t> =
+                        <Array1<$t> as ArgminDot<$t, Array1<$t>>>::dot(&a, &b);
+                    let res = array![2 as $t, 4 as $t, 6 as $t];
+                    for i in 0..3 {
+                        assert!((((res[i] - product[i]) as f64).abs()) < std::f64::EPSILON);
+                    }
+                }
             }
-        }
-    }
 
-    #[test]
-    fn test_mat_vec_i8() {
-        let a = array![1i8, 2, 3];
-        let b = array![4i8, 5, 6];
-        let res = vec![vec![4, 5, 6], vec![8, 10, 12], vec![12, 15, 18]];
-        let product: Array2<i8> = <Array1<i8> as ArgminDot<Array1<i8>, Array2<i8>>>::dot(&a, &b);
-        for i in 0..3 {
-            for j in 0..3 {
-                assert_eq!(product[(i, j)], res[i][j]);
+            item! {
+                #[test]
+                fn [<test_scalar_vec_ $t>]() {
+                    let a = array![1 as $t, 2 as $t, 3 as $t];
+                    let b = 2 as $t;
+                    let product: Array1<$t> =
+                        <$t as ArgminDot<Array1<$t>, Array1<$t>>>::dot(&b, &a);
+                    let res = array![2 as $t, 4 as $t, 6 as $t];
+                    for i in 0..3 {
+                        assert!((((res[i] - product[i]) as f64).abs()) < std::f64::EPSILON);
+                    }
+                }
             }
-        }
-    }
 
-    #[test]
-    fn test_mat_vec_u8() {
-        let a = array![1u8, 2, 3];
-        let b = array![4u8, 5, 6];
-        let res = vec![vec![4, 5, 6], vec![8, 10, 12], vec![12, 15, 18]];
-        let product: Array2<u8> = <Array1<u8> as ArgminDot<Array1<u8>, Array2<u8>>>::dot(&a, &b);
-        for i in 0..3 {
-            for j in 0..3 {
-                assert_eq!(product[(i, j)], res[i][j]);
+            item! {
+                #[test]
+                fn [<test_mat_vec_ $t>]() {
+                    let a = array![1 as $t, 2 as $t, 3 as $t];
+                    let b = array![4 as $t, 5 as $t, 6 as $t];
+                    let res = array![
+                        [4 as $t, 5 as $t, 6 as $t],
+                        [8 as $t, 10 as $t, 12 as $t],
+                        [12 as $t, 15 as $t, 18 as $t]
+                    ];
+                    let product: Array2<$t> =
+                        <Array1<$t> as ArgminDot<Array1<$t>, Array2<$t>>>::dot(&a, &b);
+                    for i in 0..3 {
+                        for j in 0..3 {
+                            assert!((((res[(i, j)] - product[(i, j)]) as f64).abs()) < std::f64::EPSILON);
+                        }
+                    }
+                }
             }
-        }
-    }
 
-    #[test]
-    fn test_mat_vec_i16() {
-        let a = array![1i16, 2, 3];
-        let b = array![4i16, 5, 6];
-        let res = vec![vec![4, 5, 6], vec![8, 10, 12], vec![12, 15, 18]];
-        let product: Array2<i16> =
-            <Array1<i16> as ArgminDot<Array1<i16>, Array2<i16>>>::dot(&a, &b);
-        for i in 0..3 {
-            for j in 0..3 {
-                assert_eq!(product[(i, j)], res[i][j]);
+            item! {
+                #[test]
+                fn [<test_mat_vec_2_ $t>]() {
+                    let a = array![
+                        [1 as $t, 2 as $t, 3 as $t],
+                        [4 as $t, 5 as $t, 6 as $t],
+                        [7 as $t, 8 as $t, 9 as $t]
+                    ];
+                    let b = array![1 as $t, 2 as $t, 3 as $t];
+                    let res = array![14 as $t, 32 as $t, 50 as $t];
+                    let product: Array1<$t> =
+                        <Array2<$t> as ArgminDot<Array1<$t>, Array1<$t>>>::dot(&a, &b);
+                    for i in 0..3 {
+                        assert!((((res[i] - product[i]) as f64).abs()) < std::f64::EPSILON);
+                    }
+                }
             }
-        }
-    }
 
-    #[test]
-    fn test_mat_vec_u16() {
-        let a = array![1u16, 2, 3];
-        let b = array![4u16, 5, 6];
-        let res = vec![vec![4, 5, 6], vec![8, 10, 12], vec![12, 15, 18]];
-        let product: Array2<u16> =
-            <Array1<u16> as ArgminDot<Array1<u16>, Array2<u16>>>::dot(&a, &b);
-        for i in 0..3 {
-            for j in 0..3 {
-                assert_eq!(product[(i, j)], res[i][j]);
+            item! {
+                #[test]
+                fn [<test_mat_mat_ $t>]() {
+                    let a = array![
+                        [1 as $t, 2 as $t, 3 as $t],
+                        [4 as $t, 5 as $t, 6 as $t],
+                        [3 as $t, 2 as $t, 1 as $t]
+                    ];
+                    let b = array![
+                        [3 as $t, 2 as $t, 1 as $t],
+                        [6 as $t, 5 as $t, 4 as $t],
+                        [2 as $t, 4 as $t, 3 as $t]
+                    ];
+                    let res = array![
+                        [21 as $t, 24 as $t, 18 as $t],
+                        [54 as $t, 57 as $t, 42 as $t],
+                        [23 as $t, 20 as $t, 14 as $t]
+                    ];
+                    let product: Array2<$t> =
+                        <Array2<$t> as ArgminDot<Array2<$t>, Array2<$t>>>::dot(&a, &b);
+                    for i in 0..3 {
+                        for j in 0..3 {
+                            assert!((((res[(i, j)] - product[(i, j)]) as f64).abs()) < std::f64::EPSILON);
+                        }
+                    }
+                }
             }
-        }
+        };
     }
 
-    #[test]
-    fn test_mat_vec_i32() {
-        let a = array![1i32, 2, 3];
-        let b = array![4i32, 5, 6];
-        let res = vec![vec![4, 5, 6], vec![8, 10, 12], vec![12, 15, 18]];
-        let product: Array2<i32> =
-            <Array1<i32> as ArgminDot<Array1<i32>, Array2<i32>>>::dot(&a, &b);
-        for i in 0..3 {
-            for j in 0..3 {
-                assert_eq!(product[(i, j)], res[i][j]);
-            }
-        }
-    }
-
-    #[test]
-    fn test_mat_vec_u32() {
-        let a = array![1u32, 2, 3];
-        let b = array![4u32, 5, 6];
-        let res = vec![vec![4, 5, 6], vec![8, 10, 12], vec![12, 15, 18]];
-        let product: Array2<u32> =
-            <Array1<u32> as ArgminDot<Array1<u32>, Array2<u32>>>::dot(&a, &b);
-        for i in 0..3 {
-            for j in 0..3 {
-                assert_eq!(product[(i, j)], res[i][j]);
-            }
-        }
-    }
-
-    #[test]
-    fn test_mat_vec_i64() {
-        let a = array![1i64, 2, 3];
-        let b = array![4i64, 5, 6];
-        let res = vec![vec![4, 5, 6], vec![8, 10, 12], vec![12, 15, 18]];
-        let product: Array2<i64> =
-            <Array1<i64> as ArgminDot<Array1<i64>, Array2<i64>>>::dot(&a, &b);
-        for i in 0..3 {
-            for j in 0..3 {
-                assert_eq!(product[(i, j)], res[i][j]);
-            }
-        }
-    }
-
-    #[test]
-    fn test_mat_vec_u64() {
-        let a = array![1u64, 2, 3];
-        let b = array![4u64, 5, 6];
-        let res = vec![vec![4, 5, 6], vec![8, 10, 12], vec![12, 15, 18]];
-        let product: Array2<u64> =
-            <Array1<u64> as ArgminDot<Array1<u64>, Array2<u64>>>::dot(&a, &b);
-        for i in 0..3 {
-            for j in 0..3 {
-                assert_eq!(product[(i, j)], res[i][j]);
-            }
-        }
-    }
-
-    #[test]
-    fn test_mat_vec_f32() {
-        let a = array![1f32, 2.0, 3.0];
-        let b = array![4f32, 5.0, 6.0];
-        let res = vec![
-            vec![4.0, 5.0, 6.0],
-            vec![8.0, 10.0, 12.0],
-            vec![12.0, 15.0, 18.0],
-        ];
-        let product: Array2<f32> =
-            <Array1<f32> as ArgminDot<Array1<f32>, Array2<f32>>>::dot(&a, &b);
-        for i in 0..3 {
-            for j in 0..3 {
-                assert!((product[(i, j)] - res[i][j]) < std::f32::EPSILON);
-            }
-        }
-    }
-
-    #[test]
-    fn test_mat_vec_f64() {
-        let a = array![1f64, 2.0, 3.0];
-        let b = array![4f64, 5.0, 6.0];
-        let res = vec![
-            vec![4.0, 5.0, 6.0],
-            vec![8.0, 10.0, 12.0],
-            vec![12.0, 15.0, 18.0],
-        ];
-        let product: Array2<f64> =
-            <Array1<f64> as ArgminDot<Array1<f64>, Array2<f64>>>::dot(&a, &b);
-        for i in 0..3 {
-            for j in 0..3 {
-                assert!((product[(i, j)] - res[i][j]) < std::f64::EPSILON);
-            }
-        }
-    }
-
-    #[test]
-    fn test_mat_vec_2_isize() {
-        let a = array![[1isize, 2, 3], [4, 5, 6], [7, 8, 9]];
-        let b = array![1isize, 2, 3];
-        let res = vec![14, 32, 50];
-        let product: Array1<isize> =
-            <Array2<isize> as ArgminDot<Array1<isize>, Array1<isize>>>::dot(&a, &b);
-        for i in 0..3 {
-            assert_eq!(product[i], res[i]);
-        }
-    }
-
-    #[test]
-    fn test_mat_vec_2_usize() {
-        let a = array![[1usize, 2, 3], [4, 5, 6], [7, 8, 9]];
-        let b = array![1usize, 2, 3];
-        let res = vec![14, 32, 50];
-        let product: Array1<usize> =
-            <Array2<usize> as ArgminDot<Array1<usize>, Array1<usize>>>::dot(&a, &b);
-        for i in 0..3 {
-            assert_eq!(product[i], res[i]);
-        }
-    }
-
-    #[test]
-    fn test_mat_vec_2_i8() {
-        let a = array![[1i8, 2, 3], [4, 5, 6], [7, 8, 9]];
-        let b = array![1i8, 2, 3];
-        let res = vec![14, 32, 50];
-        let product: Array1<i8> = <Array2<i8> as ArgminDot<Array1<i8>, Array1<i8>>>::dot(&a, &b);
-        for i in 0..3 {
-            assert_eq!(product[i], res[i]);
-        }
-    }
-
-    #[test]
-    fn test_mat_vec_2_u8() {
-        let a = array![[1u8, 2, 3], [4, 5, 6], [7, 8, 9]];
-        let b = array![1u8, 2, 3];
-        let res = vec![14, 32, 50];
-        let product: Array1<u8> = <Array2<u8> as ArgminDot<Array1<u8>, Array1<u8>>>::dot(&a, &b);
-        for i in 0..3 {
-            assert_eq!(product[i], res[i]);
-        }
-    }
-
-    #[test]
-    fn test_mat_vec_2_i16() {
-        let a = array![[1i16, 2, 3], [4, 5, 6], [7, 8, 9]];
-        let b = array![1i16, 2, 3];
-        let res = vec![14, 32, 50];
-        let product: Array1<i16> =
-            <Array2<i16> as ArgminDot<Array1<i16>, Array1<i16>>>::dot(&a, &b);
-        for i in 0..3 {
-            assert_eq!(product[i], res[i]);
-        }
-    }
-
-    #[test]
-    fn test_mat_vec_2_u16() {
-        let a = array![[1u16, 2, 3], [4, 5, 6], [7, 8, 9]];
-        let b = array![1u16, 2, 3];
-        let res = vec![14, 32, 50];
-        let product: Array1<u16> =
-            <Array2<u16> as ArgminDot<Array1<u16>, Array1<u16>>>::dot(&a, &b);
-        for i in 0..3 {
-            assert_eq!(product[i], res[i]);
-        }
-    }
-
-    #[test]
-    fn test_mat_vec_2_i32() {
-        let a = array![[1i32, 2, 3], [4, 5, 6], [7, 8, 9]];
-        let b = array![1i32, 2, 3];
-        let res = vec![14, 32, 50];
-        let product: Array1<i32> =
-            <Array2<i32> as ArgminDot<Array1<i32>, Array1<i32>>>::dot(&a, &b);
-        for i in 0..3 {
-            assert_eq!(product[i], res[i]);
-        }
-    }
-
-    #[test]
-    fn test_mat_vec_2_u32() {
-        let a = array![[1u32, 2, 3], [4, 5, 6], [7, 8, 9]];
-        let b = array![1u32, 2, 3];
-        let res = vec![14, 32, 50];
-        let product: Array1<u32> =
-            <Array2<u32> as ArgminDot<Array1<u32>, Array1<u32>>>::dot(&a, &b);
-        for i in 0..3 {
-            assert_eq!(product[i], res[i]);
-        }
-    }
-
-    #[test]
-    fn test_mat_vec_2_i64() {
-        let a = array![[1i64, 2, 3], [4, 5, 6], [7, 8, 9]];
-        let b = array![1i64, 2, 3];
-        let res = vec![14, 32, 50];
-        let product: Array1<i64> =
-            <Array2<i64> as ArgminDot<Array1<i64>, Array1<i64>>>::dot(&a, &b);
-        for i in 0..3 {
-            assert_eq!(product[i], res[i]);
-        }
-    }
-
-    #[test]
-    fn test_mat_vec_2_u64() {
-        let a = array![[1u64, 2, 3], [4, 5, 6], [7, 8, 9]];
-        let b = array![1u64, 2, 3];
-        let res = vec![14, 32, 50];
-        let product: Array1<u64> =
-            <Array2<u64> as ArgminDot<Array1<u64>, Array1<u64>>>::dot(&a, &b);
-        for i in 0..3 {
-            assert_eq!(product[i], res[i]);
-        }
-    }
-
-    #[test]
-    fn test_mat_vec_2_f32() {
-        let a = array![[1f32, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]];
-        let b = array![1f32, 2.0, 3.0];
-        let res = vec![14.0, 32.0, 50.0];
-        let product: Array1<f32> =
-            <Array2<f32> as ArgminDot<Array1<f32>, Array1<f32>>>::dot(&a, &b);
-        for i in 0..3 {
-            assert!((product[i] - res[i]) < std::f32::EPSILON);
-        }
-    }
-
-    #[test]
-    fn test_mat_vec_2_f64() {
-        let a = array![[1f64, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]];
-        let b = array![1f64, 2.0, 3.0];
-        let res = vec![14.0, 32.0, 50.0];
-        let product: Array1<f64> =
-            <Array2<f64> as ArgminDot<Array1<f64>, Array1<f64>>>::dot(&a, &b);
-        for i in 0..3 {
-            assert!((product[i] - res[i]) < std::f64::EPSILON);
-        }
-    }
-
-    #[test]
-    fn test_mat_mat_isize() {
-        let a = array![[1isize, 2, 3], [4, 5, 6], [3, 2, 1]];
-        let b = array![[3isize, 2, 1], [6, 5, 4], [2, 4, 3]];
-        let res = array![[21, 24, 18], [54, 57, 42], [23, 20, 14]];
-        let product: Array2<isize> =
-            <Array2<isize> as ArgminDot<Array2<isize>, Array2<isize>>>::dot(&a, &b);
-        for i in 0..3 {
-            for j in 0..3 {
-                assert_eq!(product[(i, j)], res[(i, j)]);
-            }
-        }
-    }
-
-    #[test]
-    fn test_mat_mat_usize() {
-        let a = array![[1usize, 2, 3], [4, 5, 6], [3, 2, 1]];
-        let b = array![[3usize, 2, 1], [6, 5, 4], [2, 4, 3]];
-        let res = array![[21, 24, 18], [54, 57, 42], [23, 20, 14]];
-        let product: Array2<usize> =
-            <Array2<usize> as ArgminDot<Array2<usize>, Array2<usize>>>::dot(&a, &b);
-        for i in 0..3 {
-            for j in 0..3 {
-                assert_eq!(product[(i, j)], res[(i, j)]);
-            }
-        }
-    }
-
-    #[test]
-    fn test_mat_mat_i8() {
-        let a = array![[1i8, 2, 3], [4, 5, 6], [3, 2, 1]];
-        let b = array![[3i8, 2, 1], [6, 5, 4], [2, 4, 3]];
-        let res = array![[21, 24, 18], [54, 57, 42], [23, 20, 14]];
-        let product: Array2<i8> = <Array2<i8> as ArgminDot<Array2<i8>, Array2<i8>>>::dot(&a, &b);
-        for i in 0..3 {
-            for j in 0..3 {
-                assert_eq!(product[(i, j)], res[(i, j)]);
-            }
-        }
-    }
-
-    #[test]
-    fn test_mat_mat_u8() {
-        let a = array![[1u8, 2, 3], [4, 5, 6], [3, 2, 1]];
-        let b = array![[3u8, 2, 1], [6, 5, 4], [2, 4, 3]];
-        let res = array![[21, 24, 18], [54, 57, 42], [23, 20, 14]];
-        let product: Array2<u8> = <Array2<u8> as ArgminDot<Array2<u8>, Array2<u8>>>::dot(&a, &b);
-        for i in 0..3 {
-            for j in 0..3 {
-                assert_eq!(product[(i, j)], res[(i, j)]);
-            }
-        }
-    }
-
-    #[test]
-    fn test_mat_mat_i16() {
-        let a = array![[1i16, 2, 3], [4, 5, 6], [3, 2, 1]];
-        let b = array![[3i16, 2, 1], [6, 5, 4], [2, 4, 3]];
-        let res = array![[21, 24, 18], [54, 57, 42], [23, 20, 14]];
-        let product: Array2<i16> =
-            <Array2<i16> as ArgminDot<Array2<i16>, Array2<i16>>>::dot(&a, &b);
-        for i in 0..3 {
-            for j in 0..3 {
-                assert_eq!(product[(i, j)], res[(i, j)]);
-            }
-        }
-    }
-
-    #[test]
-    fn test_mat_mat_u16() {
-        let a = array![[1u16, 2, 3], [4, 5, 6], [3, 2, 1]];
-        let b = array![[3u16, 2, 1], [6, 5, 4], [2, 4, 3]];
-        let res = array![[21, 24, 18], [54, 57, 42], [23, 20, 14]];
-        let product: Array2<u16> =
-            <Array2<u16> as ArgminDot<Array2<u16>, Array2<u16>>>::dot(&a, &b);
-        for i in 0..3 {
-            for j in 0..3 {
-                assert_eq!(product[(i, j)], res[(i, j)]);
-            }
-        }
-    }
-
-    #[test]
-    fn test_mat_mat_i32() {
-        let a = array![[1i32, 2, 3], [4, 5, 6], [3, 2, 1]];
-        let b = array![[3i32, 2, 1], [6, 5, 4], [2, 4, 3]];
-        let res = array![[21, 24, 18], [54, 57, 42], [23, 20, 14]];
-        let product: Array2<i32> =
-            <Array2<i32> as ArgminDot<Array2<i32>, Array2<i32>>>::dot(&a, &b);
-        for i in 0..3 {
-            for j in 0..3 {
-                assert_eq!(product[(i, j)], res[(i, j)]);
-            }
-        }
-    }
-
-    #[test]
-    fn test_mat_mat_u32() {
-        let a = array![[1u32, 2, 3], [4, 5, 6], [3, 2, 1]];
-        let b = array![[3u32, 2, 1], [6, 5, 4], [2, 4, 3]];
-        let res = array![[21, 24, 18], [54, 57, 42], [23, 20, 14]];
-        let product: Array2<u32> =
-            <Array2<u32> as ArgminDot<Array2<u32>, Array2<u32>>>::dot(&a, &b);
-        for i in 0..3 {
-            for j in 0..3 {
-                assert_eq!(product[(i, j)], res[(i, j)]);
-            }
-        }
-    }
-
-    #[test]
-    fn test_mat_mat_i64() {
-        let a = array![[1i64, 2, 3], [4, 5, 6], [3, 2, 1]];
-        let b = array![[3i64, 2, 1], [6, 5, 4], [2, 4, 3]];
-        let res = array![[21, 24, 18], [54, 57, 42], [23, 20, 14]];
-        let product: Array2<i64> =
-            <Array2<i64> as ArgminDot<Array2<i64>, Array2<i64>>>::dot(&a, &b);
-        for i in 0..3 {
-            for j in 0..3 {
-                assert_eq!(product[(i, j)], res[(i, j)]);
-            }
-        }
-    }
-
-    #[test]
-    fn test_mat_mat_u64() {
-        let a = array![[1u64, 2, 3], [4, 5, 6], [3, 2, 1]];
-        let b = array![[3u64, 2, 1], [6, 5, 4], [2, 4, 3]];
-        let res = array![[21, 24, 18], [54, 57, 42], [23, 20, 14]];
-        let product: Array2<u64> =
-            <Array2<u64> as ArgminDot<Array2<u64>, Array2<u64>>>::dot(&a, &b);
-        for i in 0..3 {
-            for j in 0..3 {
-                assert_eq!(product[(i, j)], res[(i, j)]);
-            }
-        }
-    }
-
-    #[test]
-    fn test_mat_mat_f32() {
-        let a = array![[1f32, 2.0, 3.0], [4.0, 5.0, 6.0], [3.0, 2.0, 1.0]];
-        let b = array![[3f32, 2.0, 1.0], [6.0, 5.0, 4.0], [2.0, 4.0, 3.0]];
-        let res = array![[21.0, 24.0, 18.0], [54.0, 57.0, 42.0], [23.0, 20.0, 14.0]];
-        let product: Array2<f32> =
-            <Array2<f32> as ArgminDot<Array2<f32>, Array2<f32>>>::dot(&a, &b);
-        for i in 0..3 {
-            for j in 0..3 {
-                assert!((product[(i, j)] - res[(i, j)]).abs() < std::f32::EPSILON);
-            }
-        }
-    }
-
-    #[test]
-    fn test_mat_mat_f64() {
-        let a = array![[1f64, 2.0, 3.0], [4.0, 5.0, 6.0], [3.0, 2.0, 1.0]];
-        let b = array![[3f64, 2.0, 1.0], [6.0, 5.0, 4.0], [2.0, 4.0, 3.0]];
-        let res = array![[21.0, 24.0, 18.0], [54.0, 57.0, 42.0], [23.0, 20.0, 14.0]];
-        let product: Array2<f64> =
-            <Array2<f64> as ArgminDot<Array2<f64>, Array2<f64>>>::dot(&a, &b);
-        for i in 0..3 {
-            for j in 0..3 {
-                assert!((product[(i, j)] - res[(i, j)]).abs() < std::f64::EPSILON);
-            }
-        }
-    }
+    make_test!(isize);
+    make_test!(usize);
+    make_test!(i8);
+    make_test!(u8);
+    make_test!(i16);
+    make_test!(u16);
+    make_test!(i32);
+    make_test!(u32);
+    make_test!(i64);
+    make_test!(u64);
+    make_test!(f32);
+    make_test!(f64);
 }
