@@ -56,3 +56,43 @@ mod tests_vec {
     make_test!(f32);
     make_test!(f64);
 }
+
+#[cfg(feature = "ndarrayl")]
+#[cfg(test)]
+mod tests_ndarray {
+    use super::*;
+    use ndarray::array;
+    use paste::item;
+
+    macro_rules! make_test {
+        ($t:ty) => {
+            item! {
+                #[test]
+                fn [<test_ $t>]() {
+                    let a = array![2 as $t, 1 as $t, 2 as $t];
+                    let b = array![1 as $t, 2 as $t, 1 as $t];
+                    let w = array![
+                        [8 as $t, 1 as $t, 6 as $t],
+                        [3 as $t, 5 as $t, 7 as $t],
+                        [4 as $t, 9 as $t, 2 as $t],
+                    ];
+                    let res: $t = a.weighted_dot(&w, &b);
+                    assert!((((res - 100 as $t) as f64).abs()) < std::f64::EPSILON);
+                }
+            }
+        };
+    }
+
+    make_test!(isize);
+    make_test!(usize);
+    make_test!(i8);
+    make_test!(u8);
+    make_test!(i16);
+    make_test!(u16);
+    make_test!(i32);
+    make_test!(u32);
+    make_test!(i64);
+    make_test!(u64);
+    make_test!(f32);
+    make_test!(f64);
+}
