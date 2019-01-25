@@ -8,18 +8,6 @@
 use crate::math::ArgminDot;
 use crate::math::ArgminWeightedDot;
 
-// /// Dot/scalar product of `T` and `self` weighted by W (p^TWv)
-// pub trait ArgminWeightedDot<T, U, V> {
-//     /// Dot/scalar product of `T` and `self`
-//     fn weighted_dot(&self, w: &V, vec: &T) -> U;
-// }
-
-// /// Dot/scalar product of `T` and `self`
-// pub trait ArgminDot<T, U> {
-//     /// Dot/scalar product of `T` and `self`
-//     fn dot(&self, other: &T) -> U;
-// }
-
 impl<T, U, V> ArgminWeightedDot<T, U, V> for T
 where
     Self: ArgminDot<T, U>,
@@ -29,4 +17,42 @@ where
     fn weighted_dot(&self, w: &V, v: &T) -> U {
         self.dot(&w.dot(v))
     }
+}
+
+#[cfg(test)]
+mod tests_vec {
+    use super::*;
+    use paste::item;
+
+    macro_rules! make_test {
+        ($t:ty) => {
+            item! {
+                #[test]
+                fn [<test_ $t>]() {
+                    let a = vec![2 as $t, 1 as $t, 2 as $t];
+                    let b = vec![1 as $t, 2 as $t, 1 as $t];
+                    let w = vec![
+                        vec![8 as $t, 1 as $t, 6 as $t],
+                        vec![3 as $t, 5 as $t, 7 as $t],
+                        vec![4 as $t, 9 as $t, 2 as $t],
+                    ];
+                    let res: $t = a.weighted_dot(&w, &b);
+                    assert!((((res - 100 as $t) as f64).abs()) < std::f64::EPSILON);
+                }
+            }
+        };
+    }
+
+    make_test!(isize);
+    make_test!(usize);
+    make_test!(i8);
+    make_test!(u8);
+    make_test!(i16);
+    make_test!(u16);
+    make_test!(i32);
+    make_test!(u32);
+    make_test!(i64);
+    make_test!(u64);
+    make_test!(f32);
+    make_test!(f64);
 }

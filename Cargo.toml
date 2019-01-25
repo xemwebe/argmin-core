@@ -38,6 +38,7 @@ ndarrayl = ["ndarray", "ndarray-linalg", "num", "finitediff/ndarray"]
 
 [dev-dependencies]
 ndarray-linalg = { version = "0.10.0", features = ["openblas"] }
+paste = "0.1.4"
 
 [badges]
 travis-ci = { repository = "argmin-rs/argmin-core", branch = "master" }
