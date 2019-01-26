@@ -99,7 +99,7 @@ mod tests_primitives {
                 #[test]
                 fn [<test_zero_ $t>]() {
                     let a = <$t as ArgminZero>::zero();
-                    assert!(((0 as $t - a) as f64) < std::f64::EPSILON);
+                    assert!(((0 as $t - a) as f64).abs() < std::f64::EPSILON);
                 }
             }
 
@@ -107,7 +107,7 @@ mod tests_primitives {
                 #[test]
                 fn [<test_zero_like_ $t>]() {
                     let a = (42 as $t).zero_like();
-                    assert!(((0 as $t - a) as f64) < std::f64::EPSILON);
+                    assert!(((0 as $t - a) as f64).abs() < std::f64::EPSILON);
                 }
             }
         };
@@ -157,7 +157,7 @@ mod tests_vec {
                 fn [<test_zero_like_2_ $t>]() {
                     let a = (vec![42 as $t; 4]).zero_like();
                     for i in 0..4 {
-                        assert!(((0 as $t - a[i]) as f64) < std::f64::EPSILON);
+                        assert!(((0 as $t - a[i]) as f64).abs() < std::f64::EPSILON);
                     }
                 }
             }
@@ -186,7 +186,7 @@ mod tests_vec {
                     let a = (vec![vec![42 as $t; 2]; 2]).zero_like();
                     for i in 0..2 {
                         for j in 0..2 {
-                            assert!(((0 as $t - a[i][j]) as f64) < std::f64::EPSILON);
+                            assert!(((0 as $t - a[i][j]) as f64).abs() < std::f64::EPSILON);
                         }
                     }
                 }
@@ -240,7 +240,7 @@ mod tests_ndarray {
                 fn [<test_zero_like_2_ $t>]() {
                     let a = (array![42 as $t, 42 as $t, 42 as $t, 42 as $t]).zero_like();
                     for i in 0..4 {
-                        assert!(((0 as $t - a[i]) as f64) < std::f64::EPSILON);
+                        assert!(((0 as $t - a[i]) as f64).abs() < std::f64::EPSILON);
                     }
                 }
             }
@@ -269,7 +269,7 @@ mod tests_ndarray {
                     let a = (array![[42 as $t, 42 as $t], [42 as $t, 42 as $t]]).zero_like();
                     for i in 0..2 {
                         for j in 0..2 {
-                            assert!(((0 as $t - a[(i, j)]) as f64) < std::f64::EPSILON);
+                            assert!(((0 as $t - a[(i, j)]) as f64).abs() < std::f64::EPSILON);
                         }
                     }
                 }
