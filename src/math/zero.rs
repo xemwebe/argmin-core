@@ -177,3 +177,57 @@ mod tests_vec {
     make_test!(f32);
     make_test!(f64);
 }
+
+#[cfg(feature = "ndarrayl")]
+#[cfg(test)]
+mod tests_ndarray {
+    use super::*;
+    use ndarray::array;
+    use ndarray::Array1;
+    use paste::item;
+
+    macro_rules! make_test {
+        ($t:ty) => {
+            item! {
+                #[test]
+                fn [<test_zero_ $t>]() {
+                    let a = <Array1<$t> as ArgminZero>::zero();
+                    let b: Array1<$t> = array![];
+                    assert_eq!(a, b);
+                }
+            }
+
+            item! {
+                #[test]
+                fn [<test_zero_like_ $t>]() {
+                    let t: Array1<$t> = array![];
+                    let a = t.zero_like();
+                    assert_eq!(t, a);
+                }
+            }
+
+            item! {
+                #[test]
+                fn [<test_zero_like_2_ $t>]() {
+                    let a = (array![42 as $t, 42 as $t, 42 as $t, 42 as $t]).zero_like();
+                    for i in 0..4 {
+                        assert!(((0 as $t - a[i]) as f64) < std::f64::EPSILON);
+                    }
+                }
+            }
+        };
+    }
+
+    make_test!(isize);
+    make_test!(usize);
+    make_test!(i8);
+    make_test!(u8);
+    make_test!(i16);
+    make_test!(u16);
+    make_test!(i32);
+    make_test!(u32);
+    make_test!(i64);
+    make_test!(u64);
+    make_test!(f32);
+    make_test!(f64);
+}
