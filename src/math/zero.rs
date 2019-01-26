@@ -182,8 +182,7 @@ mod tests_vec {
 #[cfg(test)]
 mod tests_ndarray {
     use super::*;
-    use ndarray::array;
-    use ndarray::Array1;
+    use ndarray::{array, Array1, Array2};
     use paste::item;
 
     macro_rules! make_test {
@@ -212,6 +211,36 @@ mod tests_ndarray {
                     let a = (array![42 as $t, 42 as $t, 42 as $t, 42 as $t]).zero_like();
                     for i in 0..4 {
                         assert!(((0 as $t - a[i]) as f64) < std::f64::EPSILON);
+                    }
+                }
+            }
+
+            item! {
+                #[test]
+                fn [<test_2d_zero_ $t>]() {
+                    let a = <Array2<$t> as ArgminZero>::zero();
+                    let b: Array2<$t> = Array2::zeros((0, 0));
+                    assert_eq!(a, b);
+                }
+            }
+
+            item! {
+                #[test]
+                fn [<test_2d_zero_like_ $t>]() {
+                    let t: Array2<$t> = Array2::zeros((0, 0));
+                    let a = t.zero_like();
+                    assert_eq!(t, a);
+                }
+            }
+
+            item! {
+                #[test]
+                fn [<test_2d_zero_like_2_ $t>]() {
+                    let a = (array![[42 as $t, 42 as $t], [42 as $t, 42 as $t]]).zero_like();
+                    for i in 0..2 {
+                        for j in 0..2 {
+                            assert!(((0 as $t - a[(i, j)]) as f64) < std::f64::EPSILON);
+                        }
                     }
                 }
             }
