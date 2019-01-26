@@ -146,6 +146,15 @@ mod tests_vec {
             item! {
                 #[test]
                 fn [<test_zero_like_ $t>]() {
+                    let t: Vec<$t> = vec![];
+                    let a = t.zero_like();
+                    assert_eq!(t, a);
+                }
+            }
+
+            item! {
+                #[test]
+                fn [<test_zero_like_2_ $t>]() {
                     let a = (vec![42 as $t; 4]).zero_like();
                     for i in 0..4 {
                         assert!(((0 as $t - a[i]) as f64) < std::f64::EPSILON);
