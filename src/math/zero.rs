@@ -161,6 +161,36 @@ mod tests_vec {
                     }
                 }
             }
+
+            item! {
+                #[test]
+                fn [<test_2d_zero_ $t>]() {
+                    let a = <Vec<Vec<$t>> as ArgminZero>::zero();
+                    let b: Vec<Vec<$t>> = vec![];
+                    assert_eq!(a, b);
+                }
+            }
+
+            item! {
+                #[test]
+                fn [<test_2d_zero_like_ $t>]() {
+                    let t: Vec<Vec<$t>> = vec![];
+                    let a = t.zero_like();
+                    assert_eq!(t, a);
+                }
+            }
+
+            item! {
+                #[test]
+                fn [<test_2d_zero_like_2_ $t>]() {
+                    let a = (vec![vec![42 as $t; 2]; 2]).zero_like();
+                    for i in 0..2 {
+                        for j in 0..2 {
+                            assert!(((0 as $t - a[i][j]) as f64) < std::f64::EPSILON);
+                        }
+                    }
+                }
+            }
         };
     }
 
