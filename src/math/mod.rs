@@ -19,10 +19,12 @@
 mod dot_ndarray;
 mod dot_vec;
 mod weighteddot;
+mod zero;
 #[cfg(feature = "ndarrayl")]
 pub use crate::math::dot_ndarray::*;
 pub use crate::math::dot_vec::*;
 pub use crate::math::weighteddot::*;
+pub use crate::math::zero::*;
 
 use crate::Error;
 #[cfg(feature = "ndarrayl")]
@@ -52,23 +54,10 @@ pub trait ArgminWeightedDot<T, U, V> {
 
 /// Return param vector of all zeros (for now, this is a hack. It should be done better)
 pub trait ArgminZero {
-    /// Return param vector of all zeros
-    fn zero(&self) -> Self;
-}
-
-impl ArgminZero for Vec<f64> {
-    #[inline]
-    fn zero(&self) -> Vec<f64> {
-        self.iter().map(|_| 0.0).collect::<Self>()
-    }
-}
-
-#[cfg(feature = "ndarrayl")]
-impl ArgminZero for ndarray::Array1<f64> {
-    #[inline]
-    fn zero(&self) -> ndarray::Array1<f64> {
-        ndarray::Array1::zeros(self.len())
-    }
+    /// Return zero(s)
+    fn zero_like(&self) -> Self;
+    /// Return zero(s)
+    fn zero() -> Self;
 }
 
 /// Add a `T` to `self`
