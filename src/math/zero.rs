@@ -89,7 +89,7 @@ where
 }
 
 #[cfg(test)]
-mod tests {
+mod tests_primitives {
     use super::*;
     use paste::item;
 
@@ -108,6 +108,48 @@ mod tests {
                 fn [<test_zero_like_ $t>]() {
                     let a = (42 as $t).zero_like();
                     assert!(((0 as $t - a) as f64) < std::f64::EPSILON);
+                }
+            }
+        };
+    }
+
+    make_test!(isize);
+    make_test!(usize);
+    make_test!(i8);
+    make_test!(u8);
+    make_test!(i16);
+    make_test!(u16);
+    make_test!(i32);
+    make_test!(u32);
+    make_test!(i64);
+    make_test!(u64);
+    make_test!(f32);
+    make_test!(f64);
+}
+
+#[cfg(test)]
+mod tests_vec {
+    use super::*;
+    use paste::item;
+
+    macro_rules! make_test {
+        ($t:ty) => {
+            item! {
+                #[test]
+                fn [<test_zero_ $t>]() {
+                    let a = <Vec<$t> as ArgminZero>::zero();
+                    let b: Vec<$t> = vec![];
+                    assert_eq!(a, b);
+                }
+            }
+
+            item! {
+                #[test]
+                fn [<test_zero_like_ $t>]() {
+                    let a = (vec![42 as $t; 4]).zero_like();
+                    for i in 0..4 {
+                        assert!(((0 as $t - a[i]) as f64) < std::f64::EPSILON);
+                    }
                 }
             }
         };
