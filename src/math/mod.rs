@@ -21,10 +21,16 @@ mod dot_vec;
 mod weighteddot;
 mod zero;
 #[cfg(feature = "ndarrayl")]
+mod zero_ndarray;
+mod zero_vec;
+#[cfg(feature = "ndarrayl")]
 pub use crate::math::dot_ndarray::*;
 pub use crate::math::dot_vec::*;
 pub use crate::math::weighteddot::*;
 pub use crate::math::zero::*;
+#[cfg(feature = "ndarrayl")]
+pub use crate::math::zero_ndarray::*;
+pub use crate::math::zero_vec::*;
 
 use crate::Error;
 #[cfg(feature = "ndarrayl")]
