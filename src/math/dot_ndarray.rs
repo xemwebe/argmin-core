@@ -20,14 +20,14 @@ macro_rules! make_dot_ndarray {
         impl ArgminDot<$t, Array1<$t>> for Array1<$t> {
             #[inline]
             fn dot(&self, other: &$t) -> Array1<$t> {
-                self.iter().map(|a| a * other).collect()
+                *other * self
             }
         }
 
         impl<'a> ArgminDot<Array1<$t>, Array1<$t>> for $t {
             #[inline]
             fn dot(&self, other: &Array1<$t>) -> Array1<$t> {
-                other.iter().map(|a| a * self).collect()
+                other * *self
             }
         }
 
