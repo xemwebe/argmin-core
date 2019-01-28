@@ -57,6 +57,20 @@ macro_rules! make_dot_ndarray {
                 ndarray::Array2::dot(self, other)
             }
         }
+
+        impl ArgminDot<$t, Array2<$t>> for Array2<$t> {
+            #[inline]
+            fn dot(&self, other: &$t) -> Array2<$t> {
+                *other * self
+            }
+        }
+
+        impl<'a> ArgminDot<Array2<$t>, Array2<$t>> for $t {
+            #[inline]
+            fn dot(&self, other: &Array2<$t>) -> Array2<$t> {
+                other * *self
+            }
+        }
     };
 }
 
@@ -70,8 +84,6 @@ make_dot_ndarray!(u8);
 make_dot_ndarray!(u16);
 make_dot_ndarray!(u32);
 make_dot_ndarray!(u64);
-make_dot_ndarray!(isize);
-make_dot_ndarray!(usize);
 
 #[cfg(test)]
 mod tests {
@@ -187,8 +199,6 @@ mod tests {
         };
     }
 
-    make_test!(isize);
-    make_test!(usize);
     make_test!(i8);
     make_test!(u8);
     make_test!(i16);
