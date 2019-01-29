@@ -18,6 +18,8 @@
 #[cfg(feature = "ndarrayl")]
 mod dot_ndarray;
 mod dot_vec;
+#[cfg(feature = "ndarrayl")]
+mod eye_ndarray;
 mod eye_vec;
 mod scale;
 mod weighteddot;
@@ -28,6 +30,8 @@ mod zero_vec;
 #[cfg(feature = "ndarrayl")]
 pub use crate::math::dot_ndarray::*;
 pub use crate::math::dot_vec::*;
+#[cfg(feature = "ndarrayl")]
+pub use crate::math::eye_ndarray::*;
 pub use crate::math::eye_vec::*;
 pub use crate::math::scale::*;
 pub use crate::math::weighteddot::*;
@@ -116,32 +120,6 @@ pub trait ArgminNorm<U> {
 /// Compute the inverse (`T`) of `self`
 pub trait ArgminInv<T> {
     fn ainv(&self) -> Result<T, Error>;
-}
-
-#[cfg(feature = "ndarrayl")]
-impl ArgminEye for ndarray::Array2<f64> {
-    #[inline]
-    fn eye(n: usize) -> Self {
-        ndarray::Array2::eye(n)
-    }
-
-    #[inline]
-    fn eye_like(&self) -> Self {
-        ndarray::Array2::eye(self.dim().0)
-    }
-}
-
-#[cfg(feature = "ndarrayl")]
-impl ArgminEye for ndarray::Array2<f32> {
-    #[inline]
-    fn eye(n: usize) -> Self {
-        ndarray::Array2::eye(n)
-    }
-
-    #[inline]
-    fn eye_like(&self) -> Self {
-        ndarray::Array2::eye(self.dim().0)
-    }
 }
 
 // Suboptimal: self is moved. ndarray however offers array views...
