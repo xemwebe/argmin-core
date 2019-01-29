@@ -281,6 +281,42 @@ mod tests {
 
             item! {
                 #[test]
+                #[should_panic]
+                fn [<test_mat_mat_panic_5_ $t>]() {
+                    let a = vec![
+                        vec![1 as $t, 2 as $t, 3 as $t],
+                        vec![4 as $t, 5 as $t, 6 as $t],
+                        vec![3 as $t, 2 as $t, 1 as $t]
+                    ];
+                    let b = vec![
+                        vec![3 as $t, 2 as $t, 1 as $t],
+                        vec![6 as $t, 5 as $t, 4 as $t],
+                        vec![2 as $t, 3 as $t]
+                    ];
+                    a.dot(&b);
+                }
+            }
+
+            item! {
+                #[test]
+                #[should_panic]
+                fn [<test_mat_mat_panic_6_ $t>]() {
+                    let a = vec![
+                        vec![1 as $t, 2 as $t, 3 as $t],
+                        vec![4 as $t, 5 as $t],
+                        vec![3 as $t, 2 as $t, 1 as $t]
+                    ];
+                    let b = vec![
+                        vec![3 as $t, 2 as $t, 1 as $t],
+                        vec![6 as $t, 5 as $t, 4 as $t],
+                        vec![2 as $t, 4 as $t, 3 as $t]
+                    ];
+                    a.dot(&b);
+                }
+            }
+
+            item! {
+                #[test]
                 fn [<test_mat_primitive_ $t>]() {
                     let a = vec![
                         vec![1 as $t, 2 as $t, 3 as $t],
