@@ -196,6 +196,52 @@ mod tests {
                     }
                 }
             }
+
+            item! {
+                #[test]
+                fn [<test_mat_primitive_ $t>]() {
+                    let a = array![
+                        [1 as $t, 2 as $t, 3 as $t],
+                        [4 as $t, 5 as $t, 6 as $t],
+                        [3 as $t, 2 as $t, 1 as $t]
+                    ];
+                    let res = array![
+                        [2 as $t, 4 as $t, 6 as $t],
+                        [8 as $t, 10 as $t, 12 as $t],
+                        [6 as $t, 4 as $t, 2 as $t]
+                    ];
+                    let product: Array2<$t> =
+                        <Array2<$t> as ArgminDot<$t, Array2<$t>>>::dot(&a, &(2 as $t));
+                    for i in 0..3 {
+                        for j in 0..3 {
+                            assert!((((res[(i, j)] - product[(i, j)]) as f64).abs()) < std::f64::EPSILON);
+                        }
+                    }
+                }
+            }
+
+            item! {
+                #[test]
+                fn [<test_primitive_mat_ $t>]() {
+                    let a = array![
+                        [1 as $t, 2 as $t, 3 as $t],
+                        [4 as $t, 5 as $t, 6 as $t],
+                        [3 as $t, 2 as $t, 1 as $t]
+                    ];
+                    let res = array![
+                        [2 as $t, 4 as $t, 6 as $t],
+                        [8 as $t, 10 as $t, 12 as $t],
+                        [6 as $t, 4 as $t, 2 as $t]
+                    ];
+                    let product: Array2<$t> =
+                        <$t as ArgminDot<Array2<$t>, Array2<$t>>>::dot(&(2 as $t), &a);
+                    for i in 0..3 {
+                        for j in 0..3 {
+                            assert!((((res[(i, j)] - product[(i, j)]) as f64).abs()) < std::f64::EPSILON);
+                        }
+                    }
+                }
+            }
         };
     }
 
