@@ -76,6 +76,24 @@ macro_rules! make_dot_vec {
                 out
             }
         }
+
+        impl<'a> ArgminDot<$t, Vec<Vec<$t>>> for Vec<Vec<$t>> {
+            #[inline]
+            fn dot(&self, other: &$t) -> Vec<Vec<$t>> {
+                (0..self.len())
+                    .map(|i| self[i].iter().map(|a| a * other).collect())
+                    .collect()
+            }
+        }
+
+        impl<'a> ArgminDot<Vec<Vec<$t>>, Vec<Vec<$t>>> for $t {
+            #[inline]
+            fn dot(&self, other: &Vec<Vec<$t>>) -> Vec<Vec<$t>> {
+                (0..other.len())
+                    .map(|i| other[i].iter().map(|a| a * self).collect())
+                    .collect()
+            }
+        }
     };
 }
 
