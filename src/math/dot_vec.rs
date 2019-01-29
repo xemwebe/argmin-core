@@ -50,17 +50,17 @@ macro_rules! make_dot_vec {
         impl ArgminDot<Vec<Vec<$t>>, Vec<Vec<$t>>> for Vec<Vec<$t>> {
             #[inline]
             fn dot(&self, other: &Vec<Vec<$t>>) -> Vec<Vec<$t>> {
+                // Would be more efficient if this wasn't necessary!
+                let other = other.clone().t();
                 let sr = self.len();
                 assert!(sr > 0);
                 let sc = self[0].len();
                 assert!(sc > 0);
-                let or = self.len();
+                let or = other.len();
                 assert!(or > 0);
-                let oc = self[0].len();
+                let oc = other[0].len();
                 assert_eq!(sc, or);
                 assert!(oc > 0);
-                // Would be more efficient if this wasn't necessary!
-                let other_t = other.clone().t();
                 let mut v = Vec::with_capacity(oc);
                 unsafe {
                     v.set_len(oc);
@@ -68,9 +68,9 @@ macro_rules! make_dot_vec {
                 let mut out = vec![v; sr];
                 for i in 0..sr {
                     assert_eq!(self[i].len(), sc);
-                    assert_eq!(other[i].len(), oc);
+                    // assert_eq!(other[i].len(), oc);
                     for j in 0..oc {
-                        out[i][j] = self[i].dot(&other_t[j]);
+                        out[i][j] = self[i].dot(&other[j]);
                     }
                 }
                 out
@@ -213,6 +213,69 @@ mod tests {
                             assert!((((res[i][j] - product[i][j]) as f64).abs()) < std::f64::EPSILON);
                         }
                     }
+                }
+            }
+
+            item! {
+                #[test]
+                #[should_panic]
+                fn [<test_mat_mat_panic_1_ $t>]() {
+                    let a = vec![];
+                    let b = vec![
+                        vec![3 as $t, 2 as $t, 1 as $t],
+                        vec![6 as $t, 5 as $t, 4 as $t],
+                        vec![2 as $t, 4 as $t, 3 as $t]
+                    ];
+                    a.dot(&b);
+                }
+            }
+
+            item! {
+                #[test]
+                #[should_panic]
+                fn [<test_mat_mat_panic_2_ $t>]() {
+                    let a: Vec<Vec<$t>> = vec![];
+                    let b = vec![
+                        vec![3 as $t, 2 as $t, 1 as $t],
+                        vec![6 as $t, 5 as $t, 4 as $t],
+                        vec![2 as $t, 4 as $t, 3 as $t]
+                    ];
+                    b.dot(&a);
+                }
+            }
+
+            item! {
+                #[test]
+                #[should_panic]
+                fn [<test_mat_mat_panic_3_ $t>]() {
+                    let a = vec![
+                        vec![1 as $t, 2 as $t],
+                        vec![4 as $t, 5 as $t],
+                        vec![3 as $t, 2 as $t]
+                    ];
+                    let b = vec![
+                        vec![3 as $t, 2 as $t, 1 as $t],
+                        vec![6 as $t, 5 as $t, 4 as $t],
+                        vec![2 as $t, 4 as $t, 3 as $t]
+                    ];
+                    a.dot(&b);
+                }
+            }
+
+            item! {
+                #[test]
+                #[should_panic]
+                fn [<test_mat_mat_panic_4_ $t>]() {
+                    let a = vec![
+                        vec![1 as $t, 2 as $t, 3 as $t],
+                        vec![4 as $t, 5 as $t, 6 as $t],
+                        vec![3 as $t, 2 as $t, 1 as $t]
+                    ];
+                    let b = vec![
+                        vec![3 as $t, 2 as $t, 1 as $t],
+                        vec![6 as $t, 5 as $t, 4 as $t],
+                    ];
+                    a.dot(&b);
                 }
             }
 
