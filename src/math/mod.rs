@@ -74,6 +74,8 @@ pub trait ArgminScale<U> {
     fn scale(&self, factor: U) -> Self;
 }
 
+// ---------- REFACTORING MARKER -----------
+
 /// Add a `T` to `self`
 pub trait ArgminAdd<T> {
     /// Add a `T` to `self`
