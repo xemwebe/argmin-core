@@ -25,8 +25,8 @@ macro_rules! make_eye {
     };
 }
 
-make_eye!(f32);
-make_eye!(f64);
+make_eye!(isize);
+make_eye!(usize);
 make_eye!(i8);
 make_eye!(i16);
 make_eye!(i32);
@@ -35,8 +35,8 @@ make_eye!(u8);
 make_eye!(u16);
 make_eye!(u32);
 make_eye!(u64);
-make_eye!(isize);
-make_eye!(usize);
+make_eye!(f32);
+make_eye!(f64);
 
 #[cfg(test)]
 mod tests {
@@ -82,6 +82,19 @@ mod tests {
                             assert!((((res[(i, j)] - e[(i, j)]) as f64).abs()) < std::f64::EPSILON);
                         }
                     }
+                }
+            }
+
+            item! {
+                #[test]
+                #[should_panic]
+                #[allow(unused)]
+                fn [<test_eye_like_panic_ $t>]() {
+                    let a = array![
+                        [0 as $t, 2 as $t, 6 as $t],
+                        [3 as $t, 2 as $t, 7 as $t],
+                    ];
+                    let e: Array2<$t> = a.eye_like();
                 }
             }
         };
