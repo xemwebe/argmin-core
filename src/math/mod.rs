@@ -18,6 +18,7 @@
 #[cfg(feature = "ndarrayl")]
 mod dot_ndarray;
 mod dot_vec;
+mod eye_vec;
 mod scale;
 mod weighteddot;
 mod zero;
@@ -27,6 +28,7 @@ mod zero_vec;
 #[cfg(feature = "ndarrayl")]
 pub use crate::math::dot_ndarray::*;
 pub use crate::math::dot_vec::*;
+pub use crate::math::eye_vec::*;
 pub use crate::math::scale::*;
 pub use crate::math::weighteddot::*;
 pub use crate::math::zero::*;
@@ -74,6 +76,11 @@ pub trait ArgminScale<U> {
     fn scale(&self, factor: U) -> Self;
 }
 
+pub trait ArgminEye {
+    fn eye(n: usize) -> Self;
+    fn eye_like(&self) -> Self;
+}
+
 // ---------- REFACTORING MARKER -----------
 
 /// Add a `T` to `self`
@@ -109,11 +116,6 @@ pub trait ArgminNorm<U> {
 /// Compute the inverse (`T`) of `self`
 pub trait ArgminInv<T> {
     fn ainv(&self) -> Result<T, Error>;
-}
-
-pub trait ArgminEye {
-    fn eye(n: usize) -> Self;
-    fn eye_like(&self) -> Self;
 }
 
 #[cfg(feature = "ndarrayl")]
