@@ -18,6 +18,7 @@
 #[cfg(feature = "ndarrayl")]
 mod dot_ndarray;
 mod dot_vec;
+mod scale;
 mod weighteddot;
 mod zero;
 #[cfg(feature = "ndarrayl")]
@@ -26,6 +27,7 @@ mod zero_vec;
 #[cfg(feature = "ndarrayl")]
 pub use crate::math::dot_ndarray::*;
 pub use crate::math::dot_vec::*;
+pub use crate::math::scale::*;
 pub use crate::math::weighteddot::*;
 pub use crate::math::zero::*;
 #[cfg(feature = "ndarrayl")]
@@ -70,15 +72,6 @@ pub trait ArgminZero {
 pub trait ArgminScale<U> {
     /// Scale `self` by a `U`
     fn scale(&self, factor: U) -> Self;
-}
-
-impl<T, U> ArgminScale<U> for T
-where
-    T: ArgminDot<U, T>,
-{
-    fn scale(&self, factor: U) -> T {
-        self.dot(&factor)
-    }
 }
 
 /// Add a `T` to `self`
