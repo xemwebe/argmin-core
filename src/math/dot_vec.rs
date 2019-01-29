@@ -237,6 +237,28 @@ mod tests {
                     }
                 }
             }
+
+            item! {
+                #[test]
+                fn [<test_primitive_mat_ $t>]() {
+                    let a = vec![
+                        vec![1 as $t, 2 as $t, 3 as $t],
+                        vec![4 as $t, 5 as $t, 6 as $t],
+                        vec![3 as $t, 2 as $t, 1 as $t]
+                    ];
+                    let res = vec![
+                        vec![2 as $t, 4 as $t, 6 as $t],
+                        vec![8 as $t, 10 as $t, 12 as $t],
+                        vec![6 as $t, 4 as $t, 2 as $t]
+                    ];
+                    let product = (2 as $t).dot(&a);
+                    for i in 0..3 {
+                        for j in 0..3 {
+                            assert!((((res[i][j] - product[i][j]) as f64).abs()) < std::f64::EPSILON);
+                        }
+                    }
+                }
+            }
         };
     }
 
