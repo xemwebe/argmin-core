@@ -340,13 +340,6 @@ impl ArgminTranspose for Vec<Vec<f32>> {
 /// Implement a subset of the mathematics traits
 macro_rules! make_math {
     ($t:ty, $u:ty, $v:ty) => {
-        // impl<'a> ArgminSub<$t> for $v {
-        //     #[inline]
-        //     fn sub(&self, other: &$t) -> $v {
-        //         self.iter().zip(other.iter()).map(|(a, b)| a - b).collect()
-        //     }
-        // }
-        //
         impl<'a> ArgminScaledAdd<$t, $u> for $v {
             #[inline]
             fn scaled_add(&self, scale: $u, other: &$t) -> $v {
@@ -385,20 +378,6 @@ macro_rules! make_math3 {
 #[cfg(feature = "ndarrayl")]
 macro_rules! make_math_ndarray {
     ($t:ty) => {
-        // impl<'a> ArgminSub<ndarray::Array1<$t>> for ndarray::Array1<$t> {
-        //     #[inline]
-        //     fn sub(&self, other: &ndarray::Array1<$t>) -> ndarray::Array1<$t> {
-        //         self - other
-        //     }
-        // }
-        //
-        // impl<'a> ArgminSub<ndarray::Array2<$t>> for ndarray::Array2<$t> {
-        //     #[inline]
-        //     fn sub(&self, other: &ndarray::Array2<$t>) -> ndarray::Array2<$t> {
-        //         self - other
-        //     }
-        // }
-        //
         impl<'a> ArgminScaledAdd<ndarray::Array1<$t>, $t> for ndarray::Array1<$t> {
             #[inline]
             fn scaled_add(&self, scale: $t, other: &ndarray::Array1<$t>) -> ndarray::Array1<$t> {
