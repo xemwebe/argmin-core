@@ -18,8 +18,8 @@ macro_rules! make_add {
     };
 }
 
-make_add!(f32);
-make_add!(f64);
+make_add!(isize);
+make_add!(usize);
 make_add!(i8);
 make_add!(i16);
 make_add!(i32);
@@ -28,44 +28,38 @@ make_add!(u8);
 make_add!(u16);
 make_add!(u32);
 make_add!(u64);
-make_add!(isize);
-make_add!(usize);
+make_add!(f32);
+make_add!(f64);
 
-// #[cfg(test)]
-// mod tests {
-//     use super::*;
-//     use paste::item;
-//
-//     macro_rules! make_test {
-//         ($t:ty) => {
-//             item! {
-//                 #[test]
-//                 fn [<test_zero_ $t>]() {
-//                     let a = <$t as ArgminZero>::zero();
-//                     assert!(((0 as $t - a) as f64).abs() < std::f64::EPSILON);
-//                 }
-//             }
-//
-//             item! {
-//                 #[test]
-//                 fn [<test_zero_like_ $t>]() {
-//                     let a = (42 as $t).zero_like();
-//                     assert!(((0 as $t - a) as f64).abs() < std::f64::EPSILON);
-//                 }
-//             }
-//         };
-//     }
-//
-//     make_test!(isize);
-//     make_test!(usize);
-//     make_test!(i8);
-//     make_test!(u8);
-//     make_test!(i16);
-//     make_test!(u16);
-//     make_test!(i32);
-//     make_test!(u32);
-//     make_test!(i64);
-//     make_test!(u64);
-//     make_test!(f32);
-//     make_test!(f64);
-// }
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use paste::item;
+
+    macro_rules! make_test {
+        ($t:ty) => {
+            item! {
+                #[test]
+                fn [<test_add_ $t>]() {
+                    let a = 8 as $t;
+                    let b = 34 as $t;
+                    let res = <$t as ArgminAdd<$t, $t>>::add(&a, &b);
+                    assert!(((42 as $t - res) as f64).abs() < std::f64::EPSILON);
+                }
+            }
+        };
+    }
+
+    make_test!(isize);
+    make_test!(usize);
+    make_test!(i8);
+    make_test!(u8);
+    make_test!(i16);
+    make_test!(u16);
+    make_test!(i32);
+    make_test!(u32);
+    make_test!(i64);
+    make_test!(u64);
+    make_test!(f32);
+    make_test!(f64);
+}
