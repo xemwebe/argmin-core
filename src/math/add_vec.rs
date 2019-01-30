@@ -111,6 +111,16 @@ mod tests {
                     }
                 }
             }
+
+            item! {
+                #[test]
+                #[should_panic]
+                fn [<test_add_vec_vec_panic_ $t>]() {
+                    let a = vec![1 as $t, 4 as $t];
+                    let b = vec![41 as $t, 38 as $t, 34 as $t];
+                    <Vec<$t> as ArgminAdd<Vec<$t>, Vec<$t>>>::add(&a, &b);
+                }
+            }
         };
     }
 
