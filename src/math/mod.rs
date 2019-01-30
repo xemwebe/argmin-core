@@ -26,6 +26,7 @@ mod dot_vec;
 mod eye_ndarray;
 mod eye_vec;
 mod scale;
+mod sub;
 mod weighteddot;
 mod zero;
 #[cfg(feature = "ndarrayl")]
@@ -42,6 +43,7 @@ pub use crate::math::dot_vec::*;
 pub use crate::math::eye_ndarray::*;
 pub use crate::math::eye_vec::*;
 pub use crate::math::scale::*;
+pub use crate::math::sub::*;
 pub use crate::math::weighteddot::*;
 pub use crate::math::zero::*;
 #[cfg(feature = "ndarrayl")]
@@ -99,13 +101,13 @@ pub trait ArgminAdd<T, U> {
     fn add(&self, other: &T) -> U;
 }
 
-// ---------- REFACTORING MARKER -----------
-
 /// Subtract a `T` from `self`
-pub trait ArgminSub<T> {
+pub trait ArgminSub<T, U> {
     /// Subtract a `T` from `self`
-    fn sub(&self, other: &T) -> Self;
+    fn sub(&self, other: &T) -> U;
 }
+
+// ---------- REFACTORING MARKER -----------
 
 /// Add a `T` scaled by an `U` to `self`
 pub trait ArgminScaledAdd<T, U> {
@@ -332,13 +334,13 @@ impl ArgminTranspose for Vec<Vec<f32>> {
 /// Implement a subset of the mathematics traits
 macro_rules! make_math {
     ($t:ty, $u:ty, $v:ty) => {
-        impl<'a> ArgminSub<$t> for $v {
-            #[inline]
-            fn sub(&self, other: &$t) -> $v {
-                self.iter().zip(other.iter()).map(|(a, b)| a - b).collect()
-            }
-        }
-
+        // impl<'a> ArgminSub<$t> for $v {
+        //     #[inline]
+        //     fn sub(&self, other: &$t) -> $v {
+        //         self.iter().zip(other.iter()).map(|(a, b)| a - b).collect()
+        //     }
+        // }
+        //
         impl<'a> ArgminScaledAdd<$t, $u> for $v {
             #[inline]
             fn scaled_add(&self, scale: $u, other: &$t) -> $v {
@@ -377,20 +379,20 @@ macro_rules! make_math3 {
 #[cfg(feature = "ndarrayl")]
 macro_rules! make_math_ndarray {
     ($t:ty) => {
-        impl<'a> ArgminSub<ndarray::Array1<$t>> for ndarray::Array1<$t> {
-            #[inline]
-            fn sub(&self, other: &ndarray::Array1<$t>) -> ndarray::Array1<$t> {
-                self - other
-            }
-        }
-
-        impl<'a> ArgminSub<ndarray::Array2<$t>> for ndarray::Array2<$t> {
-            #[inline]
-            fn sub(&self, other: &ndarray::Array2<$t>) -> ndarray::Array2<$t> {
-                self - other
-            }
-        }
-
+        // impl<'a> ArgminSub<ndarray::Array1<$t>> for ndarray::Array1<$t> {
+        //     #[inline]
+        //     fn sub(&self, other: &ndarray::Array1<$t>) -> ndarray::Array1<$t> {
+        //         self - other
+        //     }
+        // }
+        //
+        // impl<'a> ArgminSub<ndarray::Array2<$t>> for ndarray::Array2<$t> {
+        //     #[inline]
+        //     fn sub(&self, other: &ndarray::Array2<$t>) -> ndarray::Array2<$t> {
+        //         self - other
+        //     }
+        // }
+        //
         impl<'a> ArgminScaledAdd<ndarray::Array1<$t>, $t> for ndarray::Array1<$t> {
             #[inline]
             fn scaled_add(&self, scale: $t, other: &ndarray::Array1<$t>) -> ndarray::Array1<$t> {
