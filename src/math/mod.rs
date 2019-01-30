@@ -15,6 +15,7 @@
 //! implemented for basic `Vec`s, and will in the future also be implemented for types defined by
 //! `ndarray` and `nalgebra`.
 
+mod add;
 #[cfg(feature = "ndarrayl")]
 mod dot_ndarray;
 mod dot_vec;
@@ -27,6 +28,7 @@ mod zero;
 #[cfg(feature = "ndarrayl")]
 mod zero_ndarray;
 mod zero_vec;
+pub use crate::math::add::*;
 #[cfg(feature = "ndarrayl")]
 pub use crate::math::dot_ndarray::*;
 pub use crate::math::dot_vec::*;
@@ -85,13 +87,13 @@ pub trait ArgminEye {
     fn eye_like(&self) -> Self;
 }
 
-// ---------- REFACTORING MARKER -----------
-
 /// Add a `T` to `self`
-pub trait ArgminAdd<T> {
+pub trait ArgminAdd<T, U> {
     /// Add a `T` to `self`
-    fn add(&self, other: &T) -> Self;
+    fn add(&self, other: &T) -> U;
 }
+
+// ---------- REFACTORING MARKER -----------
 
 /// Subtract a `T` from `self`
 pub trait ArgminSub<T> {
@@ -324,12 +326,12 @@ impl ArgminTranspose for Vec<Vec<f32>> {
 /// Implement a subset of the mathematics traits
 macro_rules! make_math {
     ($t:ty, $u:ty, $v:ty) => {
-        impl<'a> ArgminAdd<$t> for $v {
-            #[inline]
-            fn add(&self, other: &$t) -> $v {
-                self.iter().zip(other.iter()).map(|(a, b)| a + b).collect()
-            }
-        }
+        // impl<'a> ArgminAdd<$t> for $v {
+        //     #[inline]
+        //     fn add(&self, other: &$t) -> $v {
+        //         self.iter().zip(other.iter()).map(|(a, b)| a + b).collect()
+        //     }
+        // }
 
         impl<'a> ArgminSub<$t> for $v {
             #[inline]
@@ -376,14 +378,14 @@ macro_rules! make_math3 {
 #[cfg(feature = "ndarrayl")]
 macro_rules! make_math_ndarray {
     ($t:ty) => {
-        impl<'a> ArgminAdd<ndarray::Array1<$t>> for ndarray::Array1<$t> {
+        impl<'a> ArgminAdd<ndarray::Array1<$t>, ndarray::Array1<$t>> for ndarray::Array1<$t> {
             #[inline]
             fn add(&self, other: &ndarray::Array1<$t>) -> ndarray::Array1<$t> {
                 self + other
             }
         }
 
-        impl<'a> ArgminAdd<ndarray::Array2<$t>> for ndarray::Array2<$t> {
+        impl<'a> ArgminAdd<ndarray::Array2<$t>, ndarray::Array2<$t>> for ndarray::Array2<$t> {
             #[inline]
             fn add(&self, other: &ndarray::Array2<$t>) -> ndarray::Array2<$t> {
                 self + other
