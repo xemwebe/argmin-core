@@ -15,6 +15,7 @@
 //! implemented for basic `Vec`s, and will in the future also be implemented for types defined by
 //! `ndarray` and `nalgebra`.
 
+mod add;
 mod add_vec;
 #[cfg(feature = "ndarrayl")]
 mod dot_ndarray;
@@ -28,6 +29,7 @@ mod zero;
 #[cfg(feature = "ndarrayl")]
 mod zero_ndarray;
 mod zero_vec;
+pub use crate::math::add::*;
 pub use crate::math::add_vec::*;
 #[cfg(feature = "ndarrayl")]
 pub use crate::math::dot_ndarray::*;

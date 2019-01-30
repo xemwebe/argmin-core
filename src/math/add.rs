@@ -9,24 +9,10 @@ use crate::math::ArgminAdd;
 
 macro_rules! make_add {
     ($t:ty) => {
-        impl ArgminAdd<$t, Vec<$t>> for Vec<$t> {
+        impl ArgminAdd<$t, $t> for $t {
             #[inline]
-            fn add(&self, other: &$t) -> Vec<$t> {
-                self.iter().map(|a| a + other).collect()
-            }
-        }
-
-        impl ArgminAdd<Vec<$t>, Vec<$t>> for $t {
-            #[inline]
-            fn add(&self, other: &Vec<$t>) -> Vec<$t> {
-                other.iter().map(|a| a + self).collect()
-            }
-        }
-
-        impl ArgminAdd<Vec<$t>, Vec<$t>> for Vec<$t> {
-            #[inline]
-            fn add(&self, other: &Vec<$t>) -> Vec<$t> {
-                self.iter().zip(other.iter()).map(|(a, b)| a + b).collect()
+            fn add(&self, other: &$t) -> $t {
+                self + other
             }
         }
     };
