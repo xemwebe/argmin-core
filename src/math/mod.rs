@@ -27,6 +27,7 @@ mod eye_ndarray;
 mod eye_vec;
 mod scale;
 mod sub;
+mod sub_vec;
 mod weighteddot;
 mod zero;
 #[cfg(feature = "ndarrayl")]
@@ -44,6 +45,7 @@ pub use crate::math::eye_ndarray::*;
 pub use crate::math::eye_vec::*;
 pub use crate::math::scale::*;
 pub use crate::math::sub::*;
+pub use crate::math::sub_vec::*;
 pub use crate::math::weighteddot::*;
 pub use crate::math::zero::*;
 #[cfg(feature = "ndarrayl")]
