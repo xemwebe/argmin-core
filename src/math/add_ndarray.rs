@@ -98,26 +98,26 @@ mod tests {
                 }
             }
 
-            // item! {
-            //     #[test]
-            //     #[should_panic]
-            //     fn [<test_add_vec_vec_panic_ $t>]() {
-            //         let a = vec![1 as $t, 4 as $t];
-            //         let b = vec![41 as $t, 38 as $t, 34 as $t];
-            //         <Vec<$t> as ArgminAdd<Vec<$t>, Vec<$t>>>::add(&a, &b);
-            //     }
-            // }
-            //
-            // item! {
-            //     #[test]
-            //     #[should_panic]
-            //     fn [<test_add_vec_vec_panic_2_ $t>]() {
-            //         let a = vec![];
-            //         let b = vec![41 as $t, 38 as $t, 34 as $t];
-            //         <Vec<$t> as ArgminAdd<Vec<$t>, Vec<$t>>>::add(&a, &b);
-            //     }
-            // }
-            //
+            item! {
+                #[test]
+                #[should_panic]
+                fn [<test_add_vec_vec_panic_ $t>]() {
+                    let a = array![1 as $t, 4 as $t];
+                    let b = array![41 as $t, 38 as $t, 34 as $t];
+                    <Array1<$t> as ArgminAdd<Array1<$t>, Array1<$t>>>::add(&a, &b);
+                }
+            }
+
+            item! {
+                #[test]
+                #[should_panic]
+                fn [<test_add_vec_vec_panic_2_ $t>]() {
+                    let a = array![];
+                    let b = array![41 as $t, 38 as $t, 34 as $t];
+                    <Array1<$t> as ArgminAdd<Array1<$t>, Array1<$t>>>::add(&a, &b);
+                }
+            }
+
             // item! {
             //     #[test]
             //     #[should_panic]
