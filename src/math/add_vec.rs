@@ -26,7 +26,28 @@ macro_rules! make_add {
         impl ArgminAdd<Vec<$t>, Vec<$t>> for Vec<$t> {
             #[inline]
             fn add(&self, other: &Vec<$t>) -> Vec<$t> {
+                assert_eq!(self.len(), other.len());
                 self.iter().zip(other.iter()).map(|(a, b)| a + b).collect()
+            }
+        }
+
+        impl ArgminAdd<Vec<Vec<$t>>, Vec<Vec<$t>>> for Vec<Vec<$t>> {
+            #[inline]
+            fn add(&self, other: &Vec<Vec<$t>>) -> Vec<Vec<$t>> {
+                let sr = self.len();
+                let or = other.len();
+                assert!(sr > 0);
+                // implicitly, or > 0
+                assert_eq!(sr, or);
+                let sc = self[0].len();
+                self.iter()
+                    .zip(other.iter())
+                    .map(|(a, b)| {
+                        assert_eq!(a.len(), sc);
+                        assert_eq!(b.len(), sc);
+                        <Vec<$t> as ArgminAdd<Vec<$t>, Vec<$t>>>::add(&a, &b)
+                    })
+                    .collect()
             }
         }
     };
