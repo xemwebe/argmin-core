@@ -377,20 +377,6 @@ macro_rules! make_math3 {
 #[cfg(feature = "ndarrayl")]
 macro_rules! make_math_ndarray {
     ($t:ty) => {
-        // impl<'a> ArgminAdd<ndarray::Array1<$t>, ndarray::Array1<$t>> for ndarray::Array1<$t> {
-        //     #[inline]
-        //     fn add(&self, other: &ndarray::Array1<$t>) -> ndarray::Array1<$t> {
-        //         self + other
-        //     }
-        // }
-        //
-        // impl<'a> ArgminAdd<ndarray::Array2<$t>, ndarray::Array2<$t>> for ndarray::Array2<$t> {
-        //     #[inline]
-        //     fn add(&self, other: &ndarray::Array2<$t>) -> ndarray::Array2<$t> {
-        //         self + other
-        //     }
-        // }
-
         impl<'a> ArgminSub<ndarray::Array1<$t>> for ndarray::Array1<$t> {
             #[inline]
             fn sub(&self, other: &ndarray::Array1<$t>) -> ndarray::Array1<$t> {
