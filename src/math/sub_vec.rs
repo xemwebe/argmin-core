@@ -120,8 +120,8 @@ mod tests {
                 #[test]
                 #[should_panic]
                 fn [<test_sub_vec_vec_panic_ $t>]() {
-                    let a = vec![1 as $t, 4 as $t];
-                    let b = vec![41 as $t, 38 as $t, 34 as $t];
+                    let a = vec![41 as $t, 38 as $t, 34 as $t];
+                    let b = vec![1 as $t, 4 as $t];
                     <Vec<$t> as ArgminSub<Vec<$t>, Vec<$t>>>::sub(&a, &b);
                 }
             }
@@ -170,49 +170,49 @@ mod tests {
                 }
             }
 
-            // item! {
-            //     #[test]
-            //     #[should_panic]
-            //     fn [<test_sub_mat_mat_panic_1_ $t>]() {
-            //         let a = vec![
-            //             vec![1 as $t, 4 as $t, 8 as $t],
-            //             vec![2 as $t, 9 as $t]
-            //         ];
-            //         let b = vec![
-            //             vec![41 as $t, 38 as $t, 34 as $t],
-            //             vec![40 as $t, 37 as $t, 33 as $t]
-            //         ];
-            //         <Vec<Vec<$t>> as ArgminSub<Vec<Vec<$t>>, Vec<Vec<$t>>>>::sub(&a, &b);
-            //     }
-            // }
-            //
-            // item! {
-            //     #[test]
-            //     #[should_panic]
-            //     fn [<test_sub_mat_mat_panic_2_ $t>]() {
-            //         let a = vec![
-            //             vec![1 as $t, 4 as $t, 8 as $t],
-            //             vec![2 as $t, 5 as $t, 9 as $t]
-            //         ];
-            //         let b = vec![
-            //             vec![41 as $t, 38 as $t, 34 as $t],
-            //         ];
-            //         <Vec<Vec<$t>> as ArgminSub<Vec<Vec<$t>>, Vec<Vec<$t>>>>::sub(&a, &b);
-            //     }
-            // }
-            //
-            // item! {
-            //     #[test]
-            //     #[should_panic]
-            //     fn [<test_sub_mat_mat_panic_3_ $t>]() {
-            //         let a = vec![
-            //             vec![1 as $t, 4 as $t, 8 as $t],
-            //             vec![2 as $t, 5 as $t, 9 as $t]
-            //         ];
-            //         let b = vec![];
-            //         <Vec<Vec<$t>> as ArgminSub<Vec<Vec<$t>>, Vec<Vec<$t>>>>::sub(&a, &b);
-            //     }
-            // }
+            item! {
+                #[test]
+                #[should_panic]
+                fn [<test_sub_mat_mat_panic_1_ $t>]() {
+                    let a = vec![
+                        vec![41 as $t, 38 as $t, 34 as $t],
+                        vec![40 as $t, 37 as $t, 33 as $t]
+                    ];
+                    let b = vec![
+                        vec![1 as $t, 4 as $t, 8 as $t],
+                        vec![2 as $t, 9 as $t]
+                    ];
+                    <Vec<Vec<$t>> as ArgminSub<Vec<Vec<$t>>, Vec<Vec<$t>>>>::sub(&a, &b);
+                }
+            }
+
+            item! {
+                #[test]
+                #[should_panic]
+                fn [<test_sub_mat_mat_panic_2_ $t>]() {
+                    let a = vec![
+                        vec![41 as $t, 38 as $t, 34 as $t],
+                    ];
+                    let b = vec![
+                        vec![1 as $t, 4 as $t, 8 as $t],
+                        vec![2 as $t, 5 as $t, 9 as $t]
+                    ];
+                    <Vec<Vec<$t>> as ArgminSub<Vec<Vec<$t>>, Vec<Vec<$t>>>>::sub(&a, &b);
+                }
+            }
+
+            item! {
+                #[test]
+                #[should_panic]
+                fn [<test_sub_mat_mat_panic_3_ $t>]() {
+                    let a = vec![
+                        vec![1 as $t, 4 as $t, 8 as $t],
+                        vec![2 as $t, 5 as $t, 9 as $t]
+                    ];
+                    let b = vec![];
+                    <Vec<Vec<$t>> as ArgminSub<Vec<Vec<$t>>, Vec<Vec<$t>>>>::sub(&a, &b);
+                }
+            }
         };
     }
 
