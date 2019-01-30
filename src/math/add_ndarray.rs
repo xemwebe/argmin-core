@@ -118,83 +118,67 @@ mod tests {
                 }
             }
 
-            // item! {
-            //     #[test]
-            //     #[should_panic]
-            //     fn [<test_add_vec_vec_panic_3_ $t>]() {
-            //         let a = vec![41 as $t, 38 as $t, 34 as $t];
-            //         let b = vec![];
-            //         <Vec<$t> as ArgminAdd<Vec<$t>, Vec<$t>>>::add(&a, &b);
-            //     }
-            // }
-            //
-            // item! {
-            //     #[test]
-            //     fn [<test_add_mat_mat_ $t>]() {
-            //         let a = vec![
-            //             vec![1 as $t, 4 as $t, 8 as $t],
-            //             vec![2 as $t, 5 as $t, 9 as $t]
-            //         ];
-            //         let b = vec![
-            //             vec![41 as $t, 38 as $t, 34 as $t],
-            //             vec![40 as $t, 37 as $t, 33 as $t]
-            //         ];
-            //         let target = vec![
-            //             vec![42 as $t, 42 as $t, 42 as $t],
-            //             vec![42 as $t, 42 as $t, 42 as $t]
-            //         ];
-            //         let res = <Vec<Vec<$t>> as ArgminAdd<Vec<Vec<$t>>, Vec<Vec<$t>>>>::add(&a, &b);
-            //         for i in 0..3 {
-            //             for j in 0..2 {
-            //             assert!(((target[j][i] - res[j][i]) as f64).abs() < std::f64::EPSILON);
-            //             }
-            //         }
-            //     }
-            // }
-            //
-            // item! {
-            //     #[test]
-            //     #[should_panic]
-            //     fn [<test_add_mat_mat_panic_1_ $t>]() {
-            //         let a = vec![
-            //             vec![1 as $t, 4 as $t, 8 as $t],
-            //             vec![2 as $t, 9 as $t]
-            //         ];
-            //         let b = vec![
-            //             vec![41 as $t, 38 as $t, 34 as $t],
-            //             vec![40 as $t, 37 as $t, 33 as $t]
-            //         ];
-            //         <Vec<Vec<$t>> as ArgminAdd<Vec<Vec<$t>>, Vec<Vec<$t>>>>::add(&a, &b);
-            //     }
-            // }
-            //
-            // item! {
-            //     #[test]
-            //     #[should_panic]
-            //     fn [<test_add_mat_mat_panic_2_ $t>]() {
-            //         let a = vec![
-            //             vec![1 as $t, 4 as $t, 8 as $t],
-            //             vec![2 as $t, 5 as $t, 9 as $t]
-            //         ];
-            //         let b = vec![
-            //             vec![41 as $t, 38 as $t, 34 as $t],
-            //         ];
-            //         <Vec<Vec<$t>> as ArgminAdd<Vec<Vec<$t>>, Vec<Vec<$t>>>>::add(&a, &b);
-            //     }
-            // }
-            //
-            // item! {
-            //     #[test]
-            //     #[should_panic]
-            //     fn [<test_add_mat_mat_panic_3_ $t>]() {
-            //         let a = vec![
-            //             vec![1 as $t, 4 as $t, 8 as $t],
-            //             vec![2 as $t, 5 as $t, 9 as $t]
-            //         ];
-            //         let b = vec![];
-            //         <Vec<Vec<$t>> as ArgminAdd<Vec<Vec<$t>>, Vec<Vec<$t>>>>::add(&a, &b);
-            //     }
-            // }
+            item! {
+                #[test]
+                #[should_panic]
+                fn [<test_add_vec_vec_panic_3_ $t>]() {
+                    let a = array![41 as $t, 38 as $t, 34 as $t];
+                    let b = array![];
+                    <Array1<$t> as ArgminAdd<Array1<$t>, Array1<$t>>>::add(&a, &b);
+                }
+            }
+
+            item! {
+                #[test]
+                fn [<test_add_mat_mat_ $t>]() {
+                    let a = array![
+                        [1 as $t, 4 as $t, 8 as $t],
+                        [2 as $t, 5 as $t, 9 as $t]
+                    ];
+                    let b = array![
+                        [41 as $t, 38 as $t, 34 as $t],
+                        [40 as $t, 37 as $t, 33 as $t]
+                    ];
+                    let target = array![
+                        [42 as $t, 42 as $t, 42 as $t],
+                        [42 as $t, 42 as $t, 42 as $t]
+                    ];
+                    let res = <Array2<$t> as ArgminAdd<Array2<$t>, Array2<$t>>>::add(&a, &b);
+                    for i in 0..3 {
+                        for j in 0..2 {
+                        assert!(((target[(j, i)] - res[(j, i)]) as f64).abs() < std::f64::EPSILON);
+                        }
+                    }
+                }
+            }
+
+            item! {
+                #[test]
+                #[should_panic]
+                fn [<test_add_mat_mat_panic_2_ $t>]() {
+                    let a = array![
+                        [1 as $t, 4 as $t, 8 as $t],
+                        [2 as $t, 5 as $t, 9 as $t]
+                    ];
+                    let b = array![
+                        [41 as $t, 38 as $t],
+                    ];
+                    <Array2<$t> as ArgminAdd<Array2<$t>, Array2<$t>>>::add(&a, &b);
+                }
+            }
+
+            item! {
+                #[test]
+                #[should_panic]
+                fn [<test_add_mat_mat_panic_3_ $t>]() {
+                    let a = array![
+                        [1 as $t, 4 as $t, 8 as $t],
+                        [2 as $t, 5 as $t, 9 as $t]
+                    ];
+                    let b = array![[]];
+                    <Array2<$t> as ArgminAdd<Array2<$t>, Array2<$t>>>::add(&a, &b);
+                }
+            }
         };
     }
 
