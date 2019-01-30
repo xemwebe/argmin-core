@@ -16,6 +16,8 @@
 //! `ndarray` and `nalgebra`.
 
 mod add;
+#[cfg(feature = "ndarrayl")]
+mod add_ndarray;
 mod add_vec;
 #[cfg(feature = "ndarrayl")]
 mod dot_ndarray;
@@ -30,6 +32,8 @@ mod zero;
 mod zero_ndarray;
 mod zero_vec;
 pub use crate::math::add::*;
+#[cfg(feature = "ndarrayl")]
+pub use crate::math::add_ndarray::*;
 pub use crate::math::add_vec::*;
 #[cfg(feature = "ndarrayl")]
 pub use crate::math::dot_ndarray::*;
@@ -328,13 +332,6 @@ impl ArgminTranspose for Vec<Vec<f32>> {
 /// Implement a subset of the mathematics traits
 macro_rules! make_math {
     ($t:ty, $u:ty, $v:ty) => {
-        // impl<'a> ArgminAdd<$t> for $v {
-        //     #[inline]
-        //     fn add(&self, other: &$t) -> $v {
-        //         self.iter().zip(other.iter()).map(|(a, b)| a + b).collect()
-        //     }
-        // }
-
         impl<'a> ArgminSub<$t> for $v {
             #[inline]
             fn sub(&self, other: &$t) -> $v {
@@ -380,19 +377,19 @@ macro_rules! make_math3 {
 #[cfg(feature = "ndarrayl")]
 macro_rules! make_math_ndarray {
     ($t:ty) => {
-        impl<'a> ArgminAdd<ndarray::Array1<$t>, ndarray::Array1<$t>> for ndarray::Array1<$t> {
-            #[inline]
-            fn add(&self, other: &ndarray::Array1<$t>) -> ndarray::Array1<$t> {
-                self + other
-            }
-        }
-
-        impl<'a> ArgminAdd<ndarray::Array2<$t>, ndarray::Array2<$t>> for ndarray::Array2<$t> {
-            #[inline]
-            fn add(&self, other: &ndarray::Array2<$t>) -> ndarray::Array2<$t> {
-                self + other
-            }
-        }
+        // impl<'a> ArgminAdd<ndarray::Array1<$t>, ndarray::Array1<$t>> for ndarray::Array1<$t> {
+        //     #[inline]
+        //     fn add(&self, other: &ndarray::Array1<$t>) -> ndarray::Array1<$t> {
+        //         self + other
+        //     }
+        // }
+        //
+        // impl<'a> ArgminAdd<ndarray::Array2<$t>, ndarray::Array2<$t>> for ndarray::Array2<$t> {
+        //     #[inline]
+        //     fn add(&self, other: &ndarray::Array2<$t>) -> ndarray::Array2<$t> {
+        //         self + other
+        //     }
+        // }
 
         impl<'a> ArgminSub<ndarray::Array1<$t>> for ndarray::Array1<$t> {
             #[inline]
