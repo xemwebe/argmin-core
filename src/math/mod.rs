@@ -20,6 +20,8 @@ mod add;
 mod add_ndarray;
 mod add_vec;
 mod div;
+#[cfg(feature = "ndarrayl")]
+mod div_ndarray;
 mod div_vec;
 #[cfg(feature = "ndarrayl")]
 mod dot_ndarray;
@@ -45,6 +47,8 @@ pub use crate::math::add::*;
 #[cfg(feature = "ndarrayl")]
 pub use crate::math::add_ndarray::*;
 pub use crate::math::add_vec::*;
+#[cfg(feature = "ndarrayl")]
+pub use crate::math::div_ndarray::*;
 #[cfg(feature = "ndarrayl")]
 pub use crate::math::dot_ndarray::*;
 pub use crate::math::dot_vec::*;
