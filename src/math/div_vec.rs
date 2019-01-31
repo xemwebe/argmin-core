@@ -90,19 +90,19 @@ mod tests {
                 }
             }
 
-            // item! {
-            //     #[test]
-            //     fn [<test_div_scalar_vec_ $t>]() {
-            //         let a = vec![1 as $t, 4 as $t, 8 as $t];
-            //         let b = 2 as $t;
-            //         let target = vec![2 as $t, 8 as $t, 16 as $t];
-            //         let res = <$t as ArgminDiv<Vec<$t>, Vec<$t>>>::div(&b, &a);
-            //         for i in 0..3 {
-            //             assert!(((target[i] - res[i]) as f64).abs() < std::f64::EPSILON);
-            //         }
-            //     }
-            // }
-            //
+            item! {
+                #[test]
+                fn [<test_div_scalar_vec_ $t>]() {
+                    let a = vec![2 as $t, 4 as $t, 8 as $t];
+                    let b = 64 as $t;
+                    let target = vec![32 as $t, 16 as $t, 8 as $t];
+                    let res = <$t as ArgminDiv<Vec<$t>, Vec<$t>>>::div(&b, &a);
+                    for i in 0..3 {
+                        assert!(((target[i] - res[i]) as f64).abs() < std::f64::EPSILON);
+                    }
+                }
+            }
+
             // item! {
             //     #[test]
             //     fn [<test_div_vec_vec_ $t>]() {
