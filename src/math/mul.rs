@@ -21,12 +21,12 @@ macro_rules! make_mul {
 make_mul!(isize);
 make_mul!(usize);
 make_mul!(i8);
-make_mul!(i16);
-make_mul!(i32);
-make_mul!(i64);
 make_mul!(u8);
+make_mul!(i16);
 make_mul!(u16);
+make_mul!(i32);
 make_mul!(u32);
+make_mul!(i64);
 make_mul!(u64);
 make_mul!(f32);
 make_mul!(f64);

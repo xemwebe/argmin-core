@@ -41,12 +41,12 @@ macro_rules! make_mul {
 }
 
 make_mul!(i8);
-make_mul!(i16);
-make_mul!(i32);
-make_mul!(i64);
 make_mul!(u8);
+make_mul!(i16);
 make_mul!(u16);
+make_mul!(i32);
 make_mul!(u32);
+make_mul!(i64);
 make_mul!(u64);
 make_mul!(f32);
 make_mul!(f64);
@@ -128,57 +128,57 @@ mod tests {
                 }
             }
 
-            //         item! {
-            //             #[test]
-            //             fn [<test_mul_mat_mat_ $t>]() {
-            //                 let a = array![
-            //                     [1 as $t, 4 as $t, 8 as $t],
-            //                     [2 as $t, 5 as $t, 9 as $t]
-            //                 ];
-            //                 let b = array![
-            //                     [41 as $t, 38 as $t, 34 as $t],
-            //                     [40 as $t, 37 as $t, 33 as $t]
-            //                 ];
-            //                 let target = array![
-            //                     [42 as $t, 42 as $t, 42 as $t],
-            //                     [42 as $t, 42 as $t, 42 as $t]
-            //                 ];
-            //                 let res = <Array2<$t> as ArgminMul<Array2<$t>, Array2<$t>>>::mul(&a, &b);
-            //                 for i in 0..3 {
-            //                     for j in 0..2 {
-            //                     assert!(((target[(j, i)] - res[(j, i)]) as f64).abs() < std::f64::EPSILON);
-            //                     }
-            //                 }
-            //             }
-            //         }
-            //
-            //         item! {
-            //             #[test]
-            //             #[should_panic]
-            //             fn [<test_mul_mat_mat_panic_2_ $t>]() {
-            //                 let a = array![
-            //                     [1 as $t, 4 as $t, 8 as $t],
-            //                     [2 as $t, 5 as $t, 9 as $t]
-            //                 ];
-            //                 let b = array![
-            //                     [41 as $t, 38 as $t],
-            //                 ];
-            //                 <Array2<$t> as ArgminMul<Array2<$t>, Array2<$t>>>::mul(&a, &b);
-            //             }
-            //         }
-            //
-            //         item! {
-            //             #[test]
-            //             #[should_panic]
-            //             fn [<test_mul_mat_mat_panic_3_ $t>]() {
-            //                 let a = array![
-            //                     [1 as $t, 4 as $t, 8 as $t],
-            //                     [2 as $t, 5 as $t, 9 as $t]
-            //                 ];
-            //                 let b = array![[]];
-            //                 <Array2<$t> as ArgminMul<Array2<$t>, Array2<$t>>>::mul(&a, &b);
-            //             }
-            //         }
+            item! {
+                #[test]
+                fn [<test_mul_mat_mat_ $t>]() {
+                    let a = array![
+                        [1 as $t, 4 as $t, 8 as $t],
+                        [2 as $t, 5 as $t, 9 as $t]
+                    ];
+                    let b = array![
+                        [2 as $t, 3 as $t, 4 as $t],
+                        [3 as $t, 4 as $t, 5 as $t]
+                    ];
+                    let target = array![
+                        [2 as $t, 12 as $t, 32 as $t],
+                        [6 as $t, 20 as $t, 45 as $t]
+                    ];
+                    let res = <Array2<$t> as ArgminMul<Array2<$t>, Array2<$t>>>::mul(&a, &b);
+                    for i in 0..3 {
+                        for j in 0..2 {
+                        assert!(((target[(j, i)] - res[(j, i)]) as f64).abs() < std::f64::EPSILON);
+                        }
+                    }
+                }
+            }
+
+            item! {
+                #[test]
+                #[should_panic]
+                fn [<test_mul_mat_mat_panic_2_ $t>]() {
+                    let a = array![
+                        [1 as $t, 4 as $t, 8 as $t],
+                        [2 as $t, 5 as $t, 9 as $t]
+                    ];
+                    let b = array![
+                        [41 as $t, 38 as $t],
+                    ];
+                    <Array2<$t> as ArgminMul<Array2<$t>, Array2<$t>>>::mul(&a, &b);
+                }
+            }
+
+            item! {
+                #[test]
+                #[should_panic]
+                fn [<test_mul_mat_mat_panic_3_ $t>]() {
+                    let a = array![
+                        [1 as $t, 4 as $t, 8 as $t],
+                        [2 as $t, 5 as $t, 9 as $t]
+                    ];
+                    let b = array![[]];
+                    <Array2<$t> as ArgminMul<Array2<$t>, Array2<$t>>>::mul(&a, &b);
+                }
+            }
         };
     }
 
