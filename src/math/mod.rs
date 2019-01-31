@@ -19,6 +19,7 @@ mod add;
 #[cfg(feature = "ndarrayl")]
 mod add_ndarray;
 mod add_vec;
+mod div;
 #[cfg(feature = "ndarrayl")]
 mod dot_ndarray;
 mod dot_vec;
@@ -121,10 +122,16 @@ pub trait ArgminSub<T, U> {
     fn sub(&self, other: &T) -> U;
 }
 
-/// Subtract a `T` from `self`
+/// (Pointwise) Multiply a `T` with `self`
 pub trait ArgminMul<T, U> {
-    /// Subtract a `T` from `self`
+    /// (Pointwise) Multiply a `T` with `self`
     fn mul(&self, other: &T) -> U;
+}
+
+/// (Pointwise) Divide a `T` by `self`
+pub trait ArgminDiv<T, U> {
+    /// (Pointwise) Divide a `T` by `self`
+    fn div(&self, other: &T) -> U;
 }
 
 // ---------- REFACTORING MARKER -----------
