@@ -20,6 +20,7 @@ mod add;
 mod add_ndarray;
 mod add_vec;
 mod div;
+mod div_vec;
 #[cfg(feature = "ndarrayl")]
 mod dot_ndarray;
 mod dot_vec;
