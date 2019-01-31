@@ -103,49 +103,49 @@ mod tests {
                 }
             }
 
-            // item! {
-            //     #[test]
-            //     fn [<test_div_vec_vec_ $t>]() {
-            //         let a = vec![1 as $t, 4 as $t, 8 as $t];
-            //         let b = vec![2 as $t, 3 as $t, 4 as $t];
-            //         let target = vec![2 as $t, 12 as $t, 32 as $t];
-            //         let res = <Vec<$t> as ArgminDiv<Vec<$t>, Vec<$t>>>::div(&a, &b);
-            //         for i in 0..3 {
-            //             assert!(((target[i] - res[i]) as f64).abs() < std::f64::EPSILON);
-            //         }
-            //     }
-            // }
-            //
-            // item! {
-            //     #[test]
-            //     #[should_panic]
-            //     fn [<test_div_vec_vec_panic_ $t>]() {
-            //         let a = vec![1 as $t, 4 as $t];
-            //         let b = vec![41 as $t, 38 as $t, 34 as $t];
-            //         <Vec<$t> as ArgminDiv<Vec<$t>, Vec<$t>>>::div(&a, &b);
-            //     }
-            // }
-            //
-            // item! {
-            //     #[test]
-            //     #[should_panic]
-            //     fn [<test_div_vec_vec_panic_2_ $t>]() {
-            //         let a = vec![];
-            //         let b = vec![41 as $t, 38 as $t, 34 as $t];
-            //         <Vec<$t> as ArgminDiv<Vec<$t>, Vec<$t>>>::div(&a, &b);
-            //     }
-            // }
-            //
-            // item! {
-            //     #[test]
-            //     #[should_panic]
-            //     fn [<test_div_vec_vec_panic_3_ $t>]() {
-            //         let a = vec![41 as $t, 38 as $t, 34 as $t];
-            //         let b = vec![];
-            //         <Vec<$t> as ArgminDiv<Vec<$t>, Vec<$t>>>::div(&a, &b);
-            //     }
-            // }
-            //
+            item! {
+                #[test]
+                fn [<test_div_vec_vec_ $t>]() {
+                    let a = vec![4 as $t, 9 as $t, 8 as $t];
+                    let b = vec![2 as $t, 3 as $t, 4 as $t];
+                    let target = vec![2 as $t, 3 as $t, 2 as $t];
+                    let res = <Vec<$t> as ArgminDiv<Vec<$t>, Vec<$t>>>::div(&a, &b);
+                    for i in 0..3 {
+                        assert!(((target[i] - res[i]) as f64).abs() < std::f64::EPSILON);
+                    }
+                }
+            }
+
+            item! {
+                #[test]
+                #[should_panic]
+                fn [<test_div_vec_vec_panic_ $t>]() {
+                    let a = vec![1 as $t, 4 as $t];
+                    let b = vec![41 as $t, 38 as $t, 34 as $t];
+                    <Vec<$t> as ArgminDiv<Vec<$t>, Vec<$t>>>::div(&a, &b);
+                }
+            }
+
+            item! {
+                #[test]
+                #[should_panic]
+                fn [<test_div_vec_vec_panic_2_ $t>]() {
+                    let a = vec![];
+                    let b = vec![41 as $t, 38 as $t, 34 as $t];
+                    <Vec<$t> as ArgminDiv<Vec<$t>, Vec<$t>>>::div(&a, &b);
+                }
+            }
+
+            item! {
+                #[test]
+                #[should_panic]
+                fn [<test_div_vec_vec_panic_3_ $t>]() {
+                    let a = vec![41 as $t, 38 as $t, 34 as $t];
+                    let b = vec![];
+                    <Vec<$t> as ArgminDiv<Vec<$t>, Vec<$t>>>::div(&a, &b);
+                }
+            }
+
             // item! {
             //     #[test]
             //     fn [<test_div_mat_mat_ $t>]() {
