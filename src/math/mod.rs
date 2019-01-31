@@ -26,6 +26,8 @@ mod dot_vec;
 mod eye_ndarray;
 mod eye_vec;
 mod mul;
+#[cfg(feature = "ndarrayl")]
+mod mul_ndarray;
 mod mul_vec;
 mod scale;
 mod sub;
@@ -48,6 +50,8 @@ pub use crate::math::dot_vec::*;
 pub use crate::math::eye_ndarray::*;
 pub use crate::math::eye_vec::*;
 pub use crate::math::mul::*;
+#[cfg(feature = "ndarrayl")]
+pub use crate::math::mul_ndarray::*;
 pub use crate::math::mul_vec::*;
 pub use crate::math::scale::*;
 pub use crate::math::sub::*;
