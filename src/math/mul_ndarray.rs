@@ -72,62 +72,62 @@ mod tests {
                 }
             }
 
-            //         item! {
-            //             #[test]
-            //             fn [<test_mul_scalar_vec_ $t>]() {
-            //                 let a = array![1 as $t, 4 as $t, 8 as $t];
-            //                 let b = 34 as $t;
-            //                 let target = array![35 as $t, 38 as $t, 42 as $t];
-            //                 let res = <$t as ArgminMul<Array1<$t>, Array1<$t>>>::mul(&b, &a);
-            //                 for i in 0..3 {
-            //                     assert!(((target[i] - res[i]) as f64).abs() < std::f64::EPSILON);
-            //                 }
-            //             }
-            //         }
-            //
-            //         item! {
-            //             #[test]
-            //             fn [<test_mul_vec_vec_ $t>]() {
-            //                 let a = array![1 as $t, 4 as $t, 8 as $t];
-            //                 let b = array![41 as $t, 38 as $t, 34 as $t];
-            //                 let target = array![42 as $t, 42 as $t, 42 as $t];
-            //                 let res = <Array1<$t> as ArgminMul<Array1<$t>, Array1<$t>>>::mul(&a, &b);
-            //                 for i in 0..3 {
-            //                     assert!(((target[i] - res[i]) as f64).abs() < std::f64::EPSILON);
-            //                 }
-            //             }
-            //         }
-            //
-            //         item! {
-            //             #[test]
-            //             #[should_panic]
-            //             fn [<test_mul_vec_vec_panic_ $t>]() {
-            //                 let a = array![1 as $t, 4 as $t];
-            //                 let b = array![41 as $t, 38 as $t, 34 as $t];
-            //                 <Array1<$t> as ArgminMul<Array1<$t>, Array1<$t>>>::mul(&a, &b);
-            //             }
-            //         }
-            //
-            //         item! {
-            //             #[test]
-            //             #[should_panic]
-            //             fn [<test_mul_vec_vec_panic_2_ $t>]() {
-            //                 let a = array![];
-            //                 let b = array![41 as $t, 38 as $t, 34 as $t];
-            //                 <Array1<$t> as ArgminMul<Array1<$t>, Array1<$t>>>::mul(&a, &b);
-            //             }
-            //         }
-            //
-            //         item! {
-            //             #[test]
-            //             #[should_panic]
-            //             fn [<test_mul_vec_vec_panic_3_ $t>]() {
-            //                 let a = array![41 as $t, 38 as $t, 34 as $t];
-            //                 let b = array![];
-            //                 <Array1<$t> as ArgminMul<Array1<$t>, Array1<$t>>>::mul(&a, &b);
-            //             }
-            //         }
-            //
+            item! {
+                #[test]
+                fn [<test_mul_scalar_vec_ $t>]() {
+                    let a = array![1 as $t, 4 as $t, 8 as $t];
+                    let b = 2 as $t;
+                    let target = array![2 as $t, 8 as $t, 16 as $t];
+                    let res = <$t as ArgminMul<Array1<$t>, Array1<$t>>>::mul(&b, &a);
+                    for i in 0..3 {
+                        assert!(((target[i] - res[i]) as f64).abs() < std::f64::EPSILON);
+                    }
+                }
+            }
+
+            item! {
+                #[test]
+                fn [<test_mul_vec_vec_ $t>]() {
+                    let a = array![1 as $t, 4 as $t, 8 as $t];
+                    let b = array![2 as $t, 3 as $t, 4 as $t];
+                    let target = array![2 as $t, 12 as $t, 32 as $t];
+                    let res = <Array1<$t> as ArgminMul<Array1<$t>, Array1<$t>>>::mul(&a, &b);
+                    for i in 0..3 {
+                        assert!(((target[i] - res[i]) as f64).abs() < std::f64::EPSILON);
+                    }
+                }
+            }
+
+            item! {
+                #[test]
+                #[should_panic]
+                fn [<test_mul_vec_vec_panic_ $t>]() {
+                    let a = array![1 as $t, 4 as $t];
+                    let b = array![41 as $t, 38 as $t, 34 as $t];
+                    <Array1<$t> as ArgminMul<Array1<$t>, Array1<$t>>>::mul(&a, &b);
+                }
+            }
+
+            item! {
+                #[test]
+                #[should_panic]
+                fn [<test_mul_vec_vec_panic_2_ $t>]() {
+                    let a = array![];
+                    let b = array![41 as $t, 38 as $t, 34 as $t];
+                    <Array1<$t> as ArgminMul<Array1<$t>, Array1<$t>>>::mul(&a, &b);
+                }
+            }
+
+            item! {
+                #[test]
+                #[should_panic]
+                fn [<test_mul_vec_vec_panic_3_ $t>]() {
+                    let a = array![41 as $t, 38 as $t, 34 as $t];
+                    let b = array![];
+                    <Array1<$t> as ArgminMul<Array1<$t>, Array1<$t>>>::mul(&a, &b);
+                }
+            }
+
             //         item! {
             //             #[test]
             //             fn [<test_mul_mat_mat_ $t>]() {
