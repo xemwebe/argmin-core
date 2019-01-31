@@ -25,6 +25,8 @@ mod dot_vec;
 #[cfg(feature = "ndarrayl")]
 mod eye_ndarray;
 mod eye_vec;
+mod mul;
+mod mul_vec;
 mod scale;
 mod sub;
 #[cfg(feature = "ndarrayl")]
@@ -45,6 +47,8 @@ pub use crate::math::dot_vec::*;
 #[cfg(feature = "ndarrayl")]
 pub use crate::math::eye_ndarray::*;
 pub use crate::math::eye_vec::*;
+pub use crate::math::mul::*;
+pub use crate::math::mul_vec::*;
 pub use crate::math::scale::*;
 pub use crate::math::sub::*;
 #[cfg(feature = "ndarrayl")]
@@ -111,6 +115,12 @@ pub trait ArgminAdd<T, U> {
 pub trait ArgminSub<T, U> {
     /// Subtract a `T` from `self`
     fn sub(&self, other: &T) -> U;
+}
+
+/// Subtract a `T` from `self`
+pub trait ArgminMul<T, U> {
+    /// Subtract a `T` from `self`
+    fn mul(&self, other: &T) -> U;
 }
 
 // ---------- REFACTORING MARKER -----------
