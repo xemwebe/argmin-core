@@ -94,6 +94,152 @@ mod tests {
                     a.scaled_add(&b, &c);
                 }
             }
+
+            item! {
+                #[test]
+                fn [<test_scaledadd_mat_mat_ $t>]() {
+                    let a = vec![
+                        vec![1 as $t, 2 as $t],
+                        vec![3 as $t, 4 as $t],
+                    ];
+                    let b = vec![
+                        vec![4 as $t, 3 as $t],
+                        vec![2 as $t, 1 as $t],
+                    ];
+                    let c = vec![
+                        vec![1 as $t, 2 as $t],
+                        vec![2 as $t, 1 as $t],
+                    ];
+                    let res = a.scaled_add(&b, &c);
+                    let target = vec![
+                        vec![5 as $t, 8 as $t],
+                        vec![7 as $t, 5 as $t],
+                    ];
+                    for i in 0..2 {
+                        for j in 0..2 {
+                            assert!((((res[i][j] - target[i][j]) as f64).abs()) < std::f64::EPSILON);
+                        }
+                    }
+                }
+            }
+
+            item! {
+                #[test]
+                #[should_panic]
+                fn [<test_scaledadd_mat_mat_panic_1_ $t>]() {
+                    let a = vec![
+                        vec![1 as $t],
+                        vec![3 as $t, 4 as $t],
+                    ];
+                    let b = vec![
+                        vec![4 as $t, 3 as $t],
+                        vec![2 as $t, 1 as $t],
+                    ];
+                    let c = vec![
+                        vec![1 as $t, 2 as $t],
+                        vec![2 as $t, 1 as $t],
+                    ];
+                    a.scaled_add(&b, &c);
+                }
+            }
+
+            item! {
+                #[test]
+                #[should_panic]
+                fn [<test_scaledadd_mat_mat_panic_2_ $t>]() {
+                    let a = vec![
+                        vec![1 as $t, 2 as $t],
+                        vec![3 as $t, 4 as $t],
+                    ];
+                    let b = vec![
+                        vec![4 as $t, 3 as $t],
+                        vec![1 as $t],
+                    ];
+                    let c = vec![
+                        vec![1 as $t, 2 as $t],
+                        vec![2 as $t, 1 as $t],
+                    ];
+                    a.scaled_add(&b, &c);
+                }
+            }
+
+            item! {
+                #[test]
+                #[should_panic]
+                fn [<test_scaledadd_mat_mat_panic_3_ $t>]() {
+                    let a = vec![
+                        vec![1 as $t, 2 as $t],
+                        vec![3 as $t, 4 as $t],
+                    ];
+                    let b = vec![
+                        vec![4 as $t, 3 as $t],
+                        vec![2 as $t, 1 as $t],
+                    ];
+                    let c = vec![
+                        vec![1 as $t],
+                        vec![2 as $t, 1 as $t],
+                    ];
+                    a.scaled_add(&b, &c);
+                }
+            }
+
+            item! {
+                #[test]
+                #[should_panic]
+                fn [<test_scaledadd_mat_mat_panic_4_ $t>]() {
+                    let a = vec![
+                        vec![1 as $t, 2 as $t],
+                    ];
+                    let b = vec![
+                        vec![4 as $t, 3 as $t],
+                        vec![2 as $t, 1 as $t],
+                    ];
+                    let c = vec![
+                        vec![1 as $t, 2 as $t],
+                        vec![2 as $t, 1 as $t],
+                    ];
+                    a.scaled_add(&b, &c);
+
+                }
+            }
+
+            item! {
+                #[test]
+                #[should_panic]
+                fn [<test_scaledadd_mat_mat_panic_5_ $t>]() {
+                    let a = vec![
+                        vec![1 as $t, 2 as $t],
+                        vec![3 as $t, 4 as $t],
+                    ];
+                    let b = vec![
+                        vec![4 as $t, 3 as $t],
+                    ];
+                    let c = vec![
+                        vec![1 as $t, 2 as $t],
+                        vec![2 as $t, 1 as $t],
+                    ];
+                    a.scaled_add(&b, &c);
+                }
+            }
+
+            item! {
+                #[test]
+                #[should_panic]
+                fn [<test_scaledadd_mat_mat_panic_6_ $t>]() {
+                    let a = vec![
+                        vec![1 as $t, 2 as $t],
+                        vec![3 as $t, 4 as $t],
+                    ];
+                    let b = vec![
+                        vec![4 as $t, 3 as $t],
+                        vec![2 as $t, 1 as $t],
+                    ];
+                    let c = vec![
+                        vec![2 as $t, 1 as $t],
+                    ];
+                    a.scaled_add(&b, &c);
+                }
+            }
         };
     }
 
