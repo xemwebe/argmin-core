@@ -54,6 +54,20 @@ macro_rules! make_mul {
                     .collect()
             }
         }
+
+        impl ArgminMul<$t, Vec<Vec<$t>>> for Vec<Vec<$t>> {
+            #[inline]
+            fn mul(&self, other: &$t) -> Vec<Vec<$t>> {
+                self.iter().map(|a| a.mul(other)).collect()
+            }
+        }
+
+        impl ArgminMul<Vec<Vec<$t>>, Vec<Vec<$t>>> for $t {
+            #[inline]
+            fn mul(&self, other: &Vec<Vec<$t>>) -> Vec<Vec<$t>> {
+                other.iter().map(|a| a.mul(self)).collect()
+            }
+        }
     };
 }
 
