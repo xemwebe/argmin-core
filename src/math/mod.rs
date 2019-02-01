@@ -146,7 +146,7 @@ pub trait ArgminDiv<T, U> {
 /// Add a `T` scaled by an `U` to `self`
 pub trait ArgminScaledAdd<T, U, V> {
     /// Add a `T` scaled by an `U` to `self`
-    fn scaled_add(&self, factor: U, vec: &T) -> V;
+    fn scaled_add(&self, factor: &U, vec: &T) -> V;
 }
 
 // ---------- REFACTORING MARKER -----------
