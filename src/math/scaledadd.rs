@@ -5,18 +5,18 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use crate::math::{ArgminAdd, ArgminDot, ArgminScaledAdd};
+use crate::math::{ArgminAdd, ArgminMul, ArgminScaledAdd};
 
 // This is a very generic implementation. Once the specialization feature is stable, impls for
 // types, which allow efficient execution of scaled adds can be made.
 impl<T, U, W> ArgminScaledAdd<T, U, T> for W
 where
-    U: ArgminDot<T, T>,
+    U: ArgminMul<T, T>,
     W: ArgminAdd<T, T>,
 {
     #[inline]
     fn scaled_add(&self, factor: &U, vec: &T) -> T {
-        self.add(&factor.dot(vec))
+        self.add(&factor.mul(vec))
     }
 }
 
