@@ -240,6 +240,31 @@ mod tests {
                     a.scaled_add(&b, &c);
                 }
             }
+
+            item! {
+                #[test]
+                fn [<test_scaledadd_mat_scalar_ $t>]() {
+                    let a = vec![
+                        vec![1 as $t, 2 as $t],
+                        vec![3 as $t, 4 as $t],
+                    ];
+                    let b = 2 as $t;
+                    let c = vec![
+                        vec![1 as $t, 2 as $t],
+                        vec![2 as $t, 1 as $t],
+                    ];
+                    let res = a.scaled_add(&b, &c);
+                    let target = vec![
+                        vec![3 as $t, 6 as $t],
+                        vec![7 as $t, 6 as $t],
+                    ];
+                    for i in 0..2 {
+                        for j in 0..2 {
+                            assert!((((res[i][j] - target[i][j]) as f64).abs()) < std::f64::EPSILON);
+                        }
+                    }
+                }
+            }
         };
     }
 
