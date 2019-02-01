@@ -9,13 +9,13 @@ use crate::math::{ArgminAdd, ArgminMul, ArgminScaledAdd};
 
 // This is a very generic implementation. Once the specialization feature is stable, impls for
 // types, which allow efficient execution of scaled adds can be made.
-impl<T, U, W> ArgminScaledAdd<T, U, T> for W
+impl<T, U, W> ArgminScaledAdd<T, U, W> for W
 where
     U: ArgminMul<T, T>,
-    W: ArgminAdd<T, T>,
+    W: ArgminAdd<T, W>,
 {
     #[inline]
-    fn scaled_add(&self, factor: &U, vec: &T) -> T {
+    fn scaled_add(&self, factor: &U, vec: &T) -> W {
         self.add(&factor.mul(vec))
     }
 }

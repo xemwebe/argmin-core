@@ -47,6 +47,53 @@ mod tests {
                     a.scaled_add(&b, &c);
                 }
             }
+
+            item! {
+                #[test]
+                fn [<test_scaledadd_vec_vec_ $t>]() {
+                    let a = vec![1 as $t, 2 as $t, 3 as $t];
+                    let b = vec![3 as $t, 2 as $t, 1 as $t];
+                    let c = vec![4 as $t, 5 as $t, 6 as $t];
+                    let res = a.scaled_add(&b, &c);
+                    let target = vec![13 as $t, 12 as $t, 9 as $t];
+                    for i in 0..3 {
+                        assert!((((res[i] - target[i]) as f64).abs()) < std::f64::EPSILON);
+                    }
+                }
+            }
+
+            item! {
+                #[test]
+                #[should_panic]
+                fn [<test_scaledadd_vec_vec_panic_1_ $t>]() {
+                    let a = vec![1 as $t, 2 as $t];
+                    let b = vec![3 as $t, 2 as $t, 1 as $t];
+                    let c = vec![4 as $t, 5 as $t, 6 as $t];
+                    a.scaled_add(&b, &c);
+                }
+            }
+
+            item! {
+                #[test]
+                #[should_panic]
+                fn [<test_scaledadd_vec_vec_panic_2_ $t>]() {
+                    let a = vec![1 as $t, 2 as $t, 3 as $t];
+                    let b = vec![3 as $t, 2 as $t];
+                    let c = vec![4 as $t, 5 as $t, 6 as $t];
+                    a.scaled_add(&b, &c);
+                }
+            }
+
+            item! {
+                #[test]
+                #[should_panic]
+                fn [<test_scaledadd_vec_vec_panic_3_ $t>]() {
+                    let a = vec![1 as $t, 2 as $t, 3 as $t];
+                    let b = vec![3 as $t, 2 as $t, 1 as $t];
+                    let c = vec![4 as $t, 5 as $t];
+                    a.scaled_add(&b, &c);
+                }
+            }
         };
     }
 
