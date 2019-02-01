@@ -23,6 +23,7 @@ mod div;
 #[cfg(feature = "ndarrayl")]
 mod div_ndarray;
 mod div_vec;
+mod dot;
 #[cfg(feature = "ndarrayl")]
 mod dot_ndarray;
 mod dot_vec;
@@ -34,6 +35,7 @@ mod mul;
 mod mul_ndarray;
 mod mul_vec;
 mod scale;
+mod scaledadd;
 mod sub;
 #[cfg(feature = "ndarrayl")]
 mod sub_ndarray;
@@ -49,6 +51,7 @@ pub use crate::math::add_ndarray::*;
 pub use crate::math::add_vec::*;
 #[cfg(feature = "ndarrayl")]
 pub use crate::math::div_ndarray::*;
+pub use crate::math::dot::*;
 #[cfg(feature = "ndarrayl")]
 pub use crate::math::dot_ndarray::*;
 pub use crate::math::dot_vec::*;
@@ -60,6 +63,7 @@ pub use crate::math::mul::*;
 pub use crate::math::mul_ndarray::*;
 pub use crate::math::mul_vec::*;
 pub use crate::math::scale::*;
+pub use crate::math::scaledadd::*;
 pub use crate::math::sub::*;
 #[cfg(feature = "ndarrayl")]
 pub use crate::math::sub_ndarray::*;
@@ -143,17 +147,6 @@ pub trait ArgminDiv<T, U> {
 pub trait ArgminScaledAdd<T, U, V> {
     /// Add a `T` scaled by an `U` to `self`
     fn scaled_add(&self, factor: U, vec: &T) -> V;
-}
-
-impl<T, U, W> ArgminScaledAdd<T, U, T> for W
-where
-    U: ArgminDot<T, T>,
-    W: ArgminAdd<T, T>,
-{
-    #[inline]
-    fn scaled_add(&self, factor: U, vec: &T) -> T {
-        self.add(&factor.dot(vec))
-    }
 }
 
 // ---------- REFACTORING MARKER -----------
