@@ -36,6 +36,7 @@ mod mul_ndarray;
 mod mul_vec;
 mod scale;
 mod scaledadd;
+mod scaledadd_vec;
 mod sub;
 #[cfg(feature = "ndarrayl")]
 mod sub_ndarray;
@@ -64,6 +65,7 @@ pub use crate::math::mul_ndarray::*;
 pub use crate::math::mul_vec::*;
 pub use crate::math::scale::*;
 pub use crate::math::scaledadd::*;
+pub use crate::math::scaledadd_vec::*;
 pub use crate::math::sub::*;
 #[cfg(feature = "ndarrayl")]
 pub use crate::math::sub_ndarray::*;
