@@ -25,6 +25,28 @@ mod tests {
                     }
                 }
             }
+
+            item! {
+                #[test]
+                #[should_panic]
+                fn [<test_scaledadd_vec_panic_1_ $t>]() {
+                    let a = vec![1 as $t, 2 as $t, 3 as $t];
+                    let b = 2 as $t;
+                    let c = vec![4 as $t, 5 as $t];
+                    a.scaled_add(&b, &c);
+                }
+            }
+
+            item! {
+                #[test]
+                #[should_panic]
+                fn [<test_scaledadd_vec_panic_2_ $t>]() {
+                    let a = vec![1 as $t, 2 as $t];
+                    let b = 2 as $t;
+                    let c = vec![4 as $t, 5 as $t, 6 as $t];
+                    a.scaled_add(&b, &c);
+                }
+            }
         };
     }
 
