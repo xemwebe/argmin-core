@@ -26,28 +26,28 @@ mod tests {
                 }
             }
 
-            // item! {
-            //     #[test]
-            //     #[should_panic]
-            //     fn [<test_scaledsub_vec_panic_1_ $t>]() {
-            //         let a = vec![1 as $t, 2 as $t, 3 as $t];
-            //         let b = 2 as $t;
-            //         let c = vec![4 as $t, 5 as $t];
-            //         a.scaled_sub(&b, &c);
-            //     }
-            // }
-            //
-            // item! {
-            //     #[test]
-            //     #[should_panic]
-            //     fn [<test_scaledsub_vec_panic_2_ $t>]() {
-            //         let a = vec![1 as $t, 2 as $t];
-            //         let b = 2 as $t;
-            //         let c = vec![4 as $t, 5 as $t, 6 as $t];
-            //         a.scaled_sub(&b, &c);
-            //     }
-            // }
-            //
+            item! {
+                #[test]
+                #[should_panic]
+                fn [<test_scaledsub_vec_panic_1_ $t>]() {
+                    let a = vec![1 as $t, 2 as $t, 3 as $t];
+                    let b = 2 as $t;
+                    let c = vec![4 as $t, 5 as $t];
+                    a.scaled_sub(&b, &c);
+                }
+            }
+
+            item! {
+                #[test]
+                #[should_panic]
+                fn [<test_scaledsub_vec_panic_2_ $t>]() {
+                    let a = vec![1 as $t, 2 as $t];
+                    let b = 2 as $t;
+                    let c = vec![4 as $t, 5 as $t, 6 as $t];
+                    a.scaled_sub(&b, &c);
+                }
+            }
+
             // item! {
             //     #[test]
             //     fn [<test_scaledsub_vec_vec_ $t>]() {
