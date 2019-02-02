@@ -34,7 +34,6 @@ mod mul;
 #[cfg(feature = "ndarrayl")]
 mod mul_ndarray;
 mod mul_vec;
-mod scale;
 mod scaledadd;
 #[cfg(feature = "ndarrayl")]
 mod scaledadd_ndarray;
@@ -65,7 +64,6 @@ pub use crate::math::mul::*;
 #[cfg(feature = "ndarrayl")]
 pub use crate::math::mul_ndarray::*;
 pub use crate::math::mul_vec::*;
-pub use crate::math::scale::*;
 pub use crate::math::scaledadd::*;
 #[cfg(feature = "ndarrayl")]
 pub use crate::math::scaledadd_ndarray::*;
@@ -112,12 +110,6 @@ pub trait ArgminZero {
     fn zero_like(&self) -> Self;
     /// Return zero(s)
     fn zero() -> Self;
-}
-
-/// Scale `self` by a `U`
-pub trait ArgminScale<U> {
-    /// Scale `self` by a `U`
-    fn scale(&self, factor: U) -> Self;
 }
 
 pub trait ArgminEye {
