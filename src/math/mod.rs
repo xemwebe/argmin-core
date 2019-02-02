@@ -399,26 +399,6 @@ macro_rules! make_math3 {
     };
 }
 
-// /// Implement a subset of the mathematics traits
-// #[cfg(feature = "ndarrayl")]
-// macro_rules! make_math_ndarray {
-//     ($t:ty) => {
-//         impl<'a> ArgminScaledSub<ndarray::Array1<$t>, $t> for ndarray::Array1<$t> {
-//             #[inline]
-//             fn scaled_sub(&self, scale: $t, other: &ndarray::Array1<$t>) -> ndarray::Array1<$t> {
-//                 self - &(scale * other)
-//             }
-//         }
-//
-//         impl<'a> ArgminScaledSub<ndarray::Array2<$t>, $t> for ndarray::Array2<$t> {
-//             #[inline]
-//             fn scaled_sub(&self, scale: $t, other: &ndarray::Array2<$t>) -> ndarray::Array2<$t> {
-//                 self - &(scale * other)
-//             }
-//         }
-//     };
-// }
-
 #[cfg(feature = "ndarrayl")]
 macro_rules! make_math_ndarray3 {
     ($t:ty) => {
@@ -442,42 +422,9 @@ macro_rules! make_math_ndarray3 {
     };
 }
 
-// make_math!(Vec<f32>, f32, Vec<f32>);
-// make_math!(Vec<f64>, f64, Vec<f64>);
-// make_math!(Vec<i8>, i8, Vec<i8>);
-// make_math!(Vec<i16>, i16, Vec<i16>);
-// make_math!(Vec<i32>, i32, Vec<i32>);
-// make_math!(Vec<i64>, i64, Vec<i64>);
-// make_math!(Vec<u8>, u8, Vec<u8>);
-// make_math!(Vec<u16>, u16, Vec<u16>);
-// make_math!(Vec<u32>, u32, Vec<u32>);
-// make_math!(Vec<u64>, u64, Vec<u64>);
-// make_math!(Vec<isize>, isize, Vec<isize>);
-// make_math!(Vec<usize>, usize, Vec<usize>);
-
 make_math3!(f32, Vec<f32>);
 make_math3!(f64, Vec<f64>);
 
-// #[cfg(feature = "ndarrayl")]
-// make_math_ndarray!(f32);
-// #[cfg(feature = "ndarrayl")]
-// make_math_ndarray!(f64);
-// #[cfg(feature = "ndarrayl")]
-// make_math_ndarray!(i8);
-// #[cfg(feature = "ndarrayl")]
-// make_math_ndarray!(i16);
-// #[cfg(feature = "ndarrayl")]
-// make_math_ndarray!(i32);
-// #[cfg(feature = "ndarrayl")]
-// make_math_ndarray!(i64);
-// #[cfg(feature = "ndarrayl")]
-// make_math_ndarray!(u8);
-// #[cfg(feature = "ndarrayl")]
-// make_math_ndarray!(u16);
-// #[cfg(feature = "ndarrayl")]
-// make_math_ndarray!(u32);
-// #[cfg(feature = "ndarrayl")]
-// make_math_ndarray!(u64);
 #[cfg(feature = "ndarrayl")]
 make_math_ndarray3!(f32);
 #[cfg(feature = "ndarrayl")]
