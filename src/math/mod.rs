@@ -72,6 +72,7 @@ pub use crate::math::scaledadd::*;
 pub use crate::math::scaledadd_ndarray::*;
 pub use crate::math::scaledadd_vec::*;
 pub use crate::math::scaledsub::*;
+#[cfg(feature = "ndarrayl")]
 pub use crate::math::scaledsub_ndarray::*;
 pub use crate::math::scaledsub_vec::*;
 pub use crate::math::sub::*;
