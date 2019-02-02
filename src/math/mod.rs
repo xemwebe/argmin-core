@@ -372,21 +372,6 @@ impl ArgminTranspose for Vec<Vec<f32>> {
     }
 }
 
-// /// Implement a subset of the mathematics traits
-// macro_rules! make_math {
-//     ($t:ty, $u:ty, $v:ty) => {
-//         // impl<'a> ArgminScaledSub<$t, $u> for $v {
-//         //     #[inline]
-//         //     fn scaled_sub(&self, scale: $u, other: &$t) -> $v {
-//         //         self.iter()
-//         //             .zip(other.iter())
-//         //             .map(|(a, b)| a - scale * b)
-//         //             .collect()
-//         //     }
-//         // }
-//     };
-// }
-
 /// Implement yet another subset of the mathematics traits
 macro_rules! make_math3 {
     ($u:ty, $v:ty) => {
