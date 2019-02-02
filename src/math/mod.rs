@@ -147,13 +147,13 @@ pub trait ArgminScaledAdd<T, U, V> {
     fn scaled_add(&self, factor: &U, vec: &T) -> V;
 }
 
-// ---------- REFACTORING MARKER -----------
-
 /// Subtract a `T` scaled by an `U` from `self`
 pub trait ArgminScaledSub<T, U> {
     /// Subtract a `T` scaled by an `U` from `self`
     fn scaled_sub(&self, factor: U, vec: &T) -> Self;
 }
+
+// ---------- REFACTORING MARKER -----------
 
 /// Compute the l2-norm (`U`) of `self`
 pub trait ArgminNorm<U> {
@@ -368,16 +368,6 @@ impl ArgminTranspose for Vec<Vec<f32>> {
 /// Implement a subset of the mathematics traits
 macro_rules! make_math {
     ($t:ty, $u:ty, $v:ty) => {
-        // impl<'a> ArgminScaledAdd<$t, $u> for $v {
-        //     #[inline]
-        //     fn scaled_add(&self, scale: $u, other: &$t) -> $v {
-        //         self.iter()
-        //             .zip(other.iter())
-        //             .map(|(a, b)| a + scale * b)
-        //             .collect()
-        //     }
-        // }
-
         impl<'a> ArgminScaledSub<$t, $u> for $v {
             #[inline]
             fn scaled_sub(&self, scale: $u, other: &$t) -> $v {
@@ -406,20 +396,6 @@ macro_rules! make_math3 {
 #[cfg(feature = "ndarrayl")]
 macro_rules! make_math_ndarray {
     ($t:ty) => {
-        // impl<'a> ArgminScaledAdd<ndarray::Array1<$t>, $t> for ndarray::Array1<$t> {
-        //     #[inline]
-        //     fn scaled_add(&self, scale: $t, other: &ndarray::Array1<$t>) -> ndarray::Array1<$t> {
-        //         self + &(scale * other)
-        //     }
-        // }
-
-        // impl<'a> ArgminScaledAdd<ndarray::Array2<$t>, $t> for ndarray::Array2<$t> {
-        //     #[inline]
-        //     fn scaled_add(&self, scale: $t, other: &ndarray::Array2<$t>) -> ndarray::Array2<$t> {
-        //         self + &(scale * other)
-        //     }
-        // }
-
         impl<'a> ArgminScaledSub<ndarray::Array1<$t>, $t> for ndarray::Array1<$t> {
             #[inline]
             fn scaled_sub(&self, scale: $t, other: &ndarray::Array1<$t>) -> ndarray::Array1<$t> {
