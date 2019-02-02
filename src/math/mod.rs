@@ -39,6 +39,7 @@ mod scaledadd;
 mod scaledadd_ndarray;
 mod scaledadd_vec;
 mod scaledsub;
+mod scaledsub_ndarray;
 mod scaledsub_vec;
 mod sub;
 #[cfg(feature = "ndarrayl")]
@@ -71,6 +72,7 @@ pub use crate::math::scaledadd::*;
 pub use crate::math::scaledadd_ndarray::*;
 pub use crate::math::scaledadd_vec::*;
 pub use crate::math::scaledsub::*;
+pub use crate::math::scaledsub_ndarray::*;
 pub use crate::math::scaledsub_vec::*;
 pub use crate::math::sub::*;
 #[cfg(feature = "ndarrayl")]
