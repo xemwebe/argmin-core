@@ -30,6 +30,7 @@ mod dot_vec;
 #[cfg(feature = "ndarrayl")]
 mod eye_ndarray;
 mod eye_vec;
+mod inv_ndarray;
 mod mul;
 #[cfg(feature = "ndarrayl")]
 mod mul_ndarray;
@@ -71,6 +72,8 @@ pub use crate::math::dot_vec::*;
 #[cfg(feature = "ndarrayl")]
 pub use crate::math::eye_ndarray::*;
 pub use crate::math::eye_vec::*;
+#[cfg(feature = "ndarrayl")]
+pub use crate::math::inv_ndarray::*;
 pub use crate::math::mul::*;
 #[cfg(feature = "ndarrayl")]
 pub use crate::math::mul_ndarray::*;
@@ -102,10 +105,10 @@ pub use crate::math::zero_ndarray::*;
 pub use crate::math::zero_vec::*;
 
 use crate::Error;
-#[cfg(feature = "ndarrayl")]
-use ndarray;
-#[cfg(feature = "ndarrayl")]
-use ndarray_linalg::Inverse;
+// #[cfg(feature = "ndarrayl")]
+// use ndarray;
+// #[cfg(feature = "ndarrayl")]
+// use ndarray_linalg::Inverse;
 
 /// Modified Cholesky decompositions
 pub mod modcholesky {
@@ -187,30 +190,28 @@ pub trait ArgminTranspose {
     fn t(self) -> Self;
 }
 
-// ---------- REFACTORING MARKER -----------
-
 /// Compute the inverse (`T`) of `self`
 pub trait ArgminInv<T> {
-    fn ainv(&self) -> Result<T, Error>;
+    fn inv(&self) -> Result<T, Error>;
 }
 
-#[cfg(feature = "ndarrayl")]
-macro_rules! make_math_ndarray3 {
-    ($t:ty) => {
-        impl<'a> ArgminInv<ndarray::Array2<$t>> for ndarray::Array2<$t>
-        where
-            ndarray::Array2<$t>: Inverse,
-        {
-            #[inline]
-            fn ainv(&self) -> Result<ndarray::Array2<$t>, Error> {
-                // Stupid error types...
-                Ok(self.inv()?)
-            }
-        }
-    };
-}
-
-#[cfg(feature = "ndarrayl")]
-make_math_ndarray3!(f32);
-#[cfg(feature = "ndarrayl")]
-make_math_ndarray3!(f64);
+// #[cfg(feature = "ndarrayl")]
+// macro_rules! make_math_ndarray3 {
+//     ($t:ty) => {
+//         impl<'a> ArgminInv<ndarray::Array2<$t>> for ndarray::Array2<$t>
+//         where
+//             ndarray::Array2<$t>: Inverse,
+//         {
+//             #[inline]
+//             fn ainv(&self) -> Result<ndarray::Array2<$t>, Error> {
+//                 // Stupid error types...
+//                 Ok(self.inv()?)
+//             }
+//         }
+//     };
+// }
+//
+// #[cfg(feature = "ndarrayl")]
+// make_math_ndarray3!(f32);
+// #[cfg(feature = "ndarrayl")]
+// make_math_ndarray3!(f64);
