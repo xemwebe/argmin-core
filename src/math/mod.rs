@@ -35,6 +35,8 @@ mod mul;
 mod mul_ndarray;
 mod mul_vec;
 mod norm;
+#[cfg(feature = "ndarrayl")]
+mod norm_ndarray;
 mod norm_vec;
 mod scaledadd;
 #[cfg(feature = "ndarrayl")]
@@ -70,6 +72,8 @@ pub use crate::math::mul::*;
 pub use crate::math::mul_ndarray::*;
 pub use crate::math::mul_vec::*;
 pub use crate::math::norm::*;
+#[cfg(feature = "ndarrayl")]
+pub use crate::math::norm_ndarray::*;
 pub use crate::math::norm_vec::*;
 pub use crate::math::scaledadd::*;
 #[cfg(feature = "ndarrayl")]
@@ -391,12 +395,12 @@ impl ArgminTranspose for Vec<Vec<f32>> {
 #[cfg(feature = "ndarrayl")]
 macro_rules! make_math_ndarray3 {
     ($t:ty) => {
-        impl<'a> ArgminNorm<$t> for ndarray::Array1<$t> {
-            #[inline]
-            fn norm(&self) -> $t {
-                self.iter().map(|a| (*a).powi(2)).sum::<$t>().sqrt()
-            }
-        }
+        // impl<'a> ArgminNorm<$t> for ndarray::Array1<$t> {
+        //     #[inline]
+        //     fn norm(&self) -> $t {
+        //         self.iter().map(|a| (*a).powi(2)).sum::<$t>().sqrt()
+        //     }
+        // }
 
         impl<'a> ArgminInv<ndarray::Array2<$t>> for ndarray::Array2<$t>
         where
