@@ -380,28 +380,9 @@ impl ArgminTranspose for Vec<Vec<f32>> {
     }
 }
 
-/// Implement yet another subset of the mathematics traits
-// macro_rules! make_math3 {
-//     ($u:ty, $v:ty) => {
-//         impl<'a> ArgminNorm<$u> for $v {
-//             #[inline]
-//             fn norm(&self) -> $u {
-//                 self.iter().map(|a| a.powi(2)).sum::<$u>().sqrt()
-//             }
-//         }
-//     };
-// }
-
 #[cfg(feature = "ndarrayl")]
 macro_rules! make_math_ndarray3 {
     ($t:ty) => {
-        // impl<'a> ArgminNorm<$t> for ndarray::Array1<$t> {
-        //     #[inline]
-        //     fn norm(&self) -> $t {
-        //         self.iter().map(|a| (*a).powi(2)).sum::<$t>().sqrt()
-        //     }
-        // }
-
         impl<'a> ArgminInv<ndarray::Array2<$t>> for ndarray::Array2<$t>
         where
             ndarray::Array2<$t>: Inverse,
@@ -414,9 +395,6 @@ macro_rules! make_math_ndarray3 {
         }
     };
 }
-
-// make_math3!(f32, Vec<f32>);
-// make_math3!(f64, Vec<f64>);
 
 #[cfg(feature = "ndarrayl")]
 make_math_ndarray3!(f32);
