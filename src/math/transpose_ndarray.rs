@@ -5,6 +5,9 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
+// Note: This is not really the preferred way I think. Maybe this should also be implemented for
+// ArrayViews, which would probably make it more efficient.
+
 use crate::math::ArgminTranspose;
 use ndarray::{Array1, Array2};
 
