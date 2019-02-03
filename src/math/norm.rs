@@ -60,6 +60,19 @@ mod tests {
         };
     }
 
+    macro_rules! make_test_signed {
+        ($t:ty) => {
+            item! {
+                #[test]
+                fn [<test_norm_signed_ $t>]() {
+                    let a = -8 as $t;
+                    let res = <$t as ArgminNorm<$t>>::norm(&a);
+                    assert!(((8 as $t - res) as f64).abs() < std::f64::EPSILON);
+                }
+            }
+        };
+    }
+
     make_test!(isize);
     make_test!(usize);
     make_test!(i8);
@@ -72,4 +85,12 @@ mod tests {
     make_test!(u64);
     make_test!(f32);
     make_test!(f64);
+
+    make_test_signed!(isize);
+    make_test_signed!(i8);
+    make_test_signed!(i16);
+    make_test_signed!(i32);
+    make_test_signed!(i64);
+    make_test_signed!(f32);
+    make_test_signed!(f64);
 }
