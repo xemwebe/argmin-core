@@ -35,6 +35,7 @@ mod mul;
 mod mul_ndarray;
 mod mul_vec;
 mod norm;
+mod norm_vec;
 mod scaledadd;
 #[cfg(feature = "ndarrayl")]
 mod scaledadd_ndarray;
@@ -69,6 +70,7 @@ pub use crate::math::mul::*;
 pub use crate::math::mul_ndarray::*;
 pub use crate::math::mul_vec::*;
 pub use crate::math::norm::*;
+pub use crate::math::norm_vec::*;
 pub use crate::math::scaledadd::*;
 #[cfg(feature = "ndarrayl")]
 pub use crate::math::scaledadd_ndarray::*;
@@ -375,16 +377,16 @@ impl ArgminTranspose for Vec<Vec<f32>> {
 }
 
 /// Implement yet another subset of the mathematics traits
-macro_rules! make_math3 {
-    ($u:ty, $v:ty) => {
-        impl<'a> ArgminNorm<$u> for $v {
-            #[inline]
-            fn norm(&self) -> $u {
-                self.iter().map(|a| a.powi(2)).sum::<$u>().sqrt()
-            }
-        }
-    };
-}
+// macro_rules! make_math3 {
+//     ($u:ty, $v:ty) => {
+//         impl<'a> ArgminNorm<$u> for $v {
+//             #[inline]
+//             fn norm(&self) -> $u {
+//                 self.iter().map(|a| a.powi(2)).sum::<$u>().sqrt()
+//             }
+//         }
+//     };
+// }
 
 #[cfg(feature = "ndarrayl")]
 macro_rules! make_math_ndarray3 {
@@ -409,8 +411,8 @@ macro_rules! make_math_ndarray3 {
     };
 }
 
-make_math3!(f32, Vec<f32>);
-make_math3!(f64, Vec<f64>);
+// make_math3!(f32, Vec<f32>);
+// make_math3!(f64, Vec<f64>);
 
 #[cfg(feature = "ndarrayl")]
 make_math_ndarray3!(f32);
