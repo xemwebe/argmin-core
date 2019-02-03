@@ -30,11 +30,11 @@ modcholesky = "0.1.0"
 finitediff = "0.1.1"
 ndarray = { version = "0.12.1", optional = true }
 ndarray-linalg = { version = "0.10.0", optional = true }
-num = { version = "0.2", optional = true }
+num = { version = "0.2" }
 
 [features]
 default = []
-ndarrayl = ["ndarray", "ndarray-linalg", "num", "finitediff/ndarray"]
+ndarrayl = ["ndarray", "ndarray-linalg", "finitediff/ndarray"]
 
 [dev-dependencies]
 ndarray-linalg = { version = "0.10.0", features = ["openblas"] }

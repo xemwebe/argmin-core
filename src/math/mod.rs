@@ -30,6 +30,7 @@ mod dot_vec;
 #[cfg(feature = "ndarrayl")]
 mod eye_ndarray;
 mod eye_vec;
+#[cfg(feature = "ndarrayl")]
 mod inv_ndarray;
 mod mul;
 #[cfg(feature = "ndarrayl")]
@@ -44,6 +45,7 @@ mod scaledadd;
 mod scaledadd_ndarray;
 mod scaledadd_vec;
 mod scaledsub;
+#[cfg(feature = "ndarrayl")]
 mod scaledsub_ndarray;
 mod scaledsub_vec;
 mod sub;
