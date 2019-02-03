@@ -25,16 +25,6 @@ macro_rules! make_inv {
     };
 }
 
-// make_inv!(isize);
-// make_inv!(usize);
-// make_inv!(i8);
-// make_inv!(i16);
-// make_inv!(i32);
-// make_inv!(i64);
-// make_inv!(u8);
-// make_inv!(u16);
-// make_inv!(u32);
-// make_inv!(u64);
 make_inv!(f32);
 make_inv!(f64);
 
@@ -68,16 +58,6 @@ mod tests {
         };
     }
 
-    // make_test!(isize);
-    // make_test!(usize);
-    // make_test!(i8);
-    // make_test!(u8);
-    // make_test!(i16);
-    // make_test!(u16);
-    // make_test!(i32);
-    // make_test!(u32);
-    // make_test!(i64);
-    // make_test!(u64);
     make_test!(f32);
     make_test!(f64);
 }

@@ -105,10 +105,6 @@ pub use crate::math::zero_ndarray::*;
 pub use crate::math::zero_vec::*;
 
 use crate::Error;
-// #[cfg(feature = "ndarrayl")]
-// use ndarray;
-// #[cfg(feature = "ndarrayl")]
-// use ndarray_linalg::Inverse;
 
 /// Modified Cholesky decompositions
 pub mod modcholesky {
@@ -194,24 +190,3 @@ pub trait ArgminTranspose {
 pub trait ArgminInv<T> {
     fn inv(&self) -> Result<T, Error>;
 }
-
-// #[cfg(feature = "ndarrayl")]
-// macro_rules! make_math_ndarray3 {
-//     ($t:ty) => {
-//         impl<'a> ArgminInv<ndarray::Array2<$t>> for ndarray::Array2<$t>
-//         where
-//             ndarray::Array2<$t>: Inverse,
-//         {
-//             #[inline]
-//             fn ainv(&self) -> Result<ndarray::Array2<$t>, Error> {
-//                 // Stupid error types...
-//                 Ok(self.inv()?)
-//             }
-//         }
-//     };
-// }
-//
-// #[cfg(feature = "ndarrayl")]
-// make_math_ndarray3!(f32);
-// #[cfg(feature = "ndarrayl")]
-// make_math_ndarray3!(f64);
