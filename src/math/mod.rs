@@ -34,6 +34,7 @@ mod mul;
 #[cfg(feature = "ndarrayl")]
 mod mul_ndarray;
 mod mul_vec;
+mod norm;
 mod scaledadd;
 #[cfg(feature = "ndarrayl")]
 mod scaledadd_ndarray;
@@ -67,6 +68,7 @@ pub use crate::math::mul::*;
 #[cfg(feature = "ndarrayl")]
 pub use crate::math::mul_ndarray::*;
 pub use crate::math::mul_vec::*;
+pub use crate::math::norm::*;
 pub use crate::math::scaledadd::*;
 #[cfg(feature = "ndarrayl")]
 pub use crate::math::scaledadd_ndarray::*;
@@ -160,13 +162,13 @@ pub trait ArgminScaledSub<T, U, V> {
     fn scaled_sub(&self, factor: &U, vec: &T) -> V;
 }
 
-// ---------- REFACTORING MARKER -----------
-
 /// Compute the l2-norm (`U`) of `self`
 pub trait ArgminNorm<U> {
     /// Compute the l2-norm (`U`) of `self`
     fn norm(&self) -> U;
 }
+
+// ---------- REFACTORING MARKER -----------
 
 /// Compute the inverse (`T`) of `self`
 pub trait ArgminInv<T> {
