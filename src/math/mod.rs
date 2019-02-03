@@ -49,6 +49,7 @@ mod sub;
 #[cfg(feature = "ndarrayl")]
 mod sub_ndarray;
 mod sub_vec;
+mod transpose;
 mod weighteddot;
 mod zero;
 #[cfg(feature = "ndarrayl")]
@@ -87,6 +88,7 @@ pub use crate::math::sub::*;
 #[cfg(feature = "ndarrayl")]
 pub use crate::math::sub_ndarray::*;
 pub use crate::math::sub_vec::*;
+pub use crate::math::transpose::*;
 pub use crate::math::weighteddot::*;
 pub use crate::math::zero::*;
 #[cfg(feature = "ndarrayl")]
@@ -174,16 +176,16 @@ pub trait ArgminNorm<U> {
     fn norm(&self) -> U;
 }
 
+// Suboptimal: self is moved. ndarray however offers array views...
+pub trait ArgminTranspose {
+    fn t(self) -> Self;
+}
+
 // ---------- REFACTORING MARKER -----------
 
 /// Compute the inverse (`T`) of `self`
 pub trait ArgminInv<T> {
     fn ainv(&self) -> Result<T, Error>;
-}
-
-// Suboptimal: self is moved. ndarray however offers array views...
-pub trait ArgminTranspose {
-    fn t(self) -> Self;
 }
 
 #[cfg(feature = "ndarrayl")]
