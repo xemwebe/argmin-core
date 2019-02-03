@@ -272,8 +272,9 @@ mod tests {
                         vec![3 as $t, 2 as $t, 1 as $t]
                     ];
                     let b = vec![
-                        vec![3 as $t, 2 as $t, 1 as $t],
-                        vec![6 as $t, 5 as $t, 4 as $t],
+                        vec![3 as $t, 2 as $t],
+                        vec![6 as $t, 5 as $t],
+                        vec![3 as $t, 2 as $t]
                     ];
                     a.dot(&b);
                 }
