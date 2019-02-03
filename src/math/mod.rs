@@ -50,6 +50,7 @@ mod sub;
 mod sub_ndarray;
 mod sub_vec;
 mod transpose;
+mod transpose_ndarray;
 mod weighteddot;
 mod zero;
 #[cfg(feature = "ndarrayl")]
@@ -89,6 +90,8 @@ pub use crate::math::sub::*;
 pub use crate::math::sub_ndarray::*;
 pub use crate::math::sub_vec::*;
 pub use crate::math::transpose::*;
+#[cfg(feature = "ndarrayl")]
+pub use crate::math::transpose_ndarray::*;
 pub use crate::math::weighteddot::*;
 pub use crate::math::zero::*;
 #[cfg(feature = "ndarrayl")]
@@ -188,20 +191,20 @@ pub trait ArgminInv<T> {
     fn ainv(&self) -> Result<T, Error>;
 }
 
-#[cfg(feature = "ndarrayl")]
-impl ArgminTranspose for ndarray::Array2<f64> {
-    fn t(self) -> Self {
-        self.reversed_axes()
-    }
-}
-
-#[cfg(feature = "ndarrayl")]
-impl ArgminTranspose for ndarray::Array2<f32> {
-    fn t(self) -> Self {
-        self.reversed_axes()
-    }
-}
-
+// #[cfg(feature = "ndarrayl")]
+// impl ArgminTranspose for ndarray::Array2<f64> {
+//     fn t(self) -> Self {
+//         self.reversed_axes()
+//     }
+// }
+//
+// #[cfg(feature = "ndarrayl")]
+// impl ArgminTranspose for ndarray::Array2<f32> {
+//     fn t(self) -> Self {
+//         self.reversed_axes()
+//     }
+// }
+//
 // could be more efficient!
 impl ArgminTranspose for Vec<Vec<i8>> {
     fn t(self) -> Self {
