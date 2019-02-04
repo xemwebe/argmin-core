@@ -156,7 +156,7 @@ pub trait ArgminSolver: ArgminNextIter {
     fn set_target_cost(&mut self, cost: f64);
 
     /// Add a logger to the array of loggers
-    fn add_logger(&mut self, logger: Box<ArgminLog>);
+    fn add_logger(&mut self, logger: std::rc::Rc<ArgminLog>);
 
     /// Add a writer to the array of writers
     fn add_writer(&mut self, writer: Box<ArgminWrite<Param = Self::Parameters>>);

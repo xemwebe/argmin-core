@@ -25,6 +25,7 @@ use crate::ArgminResult;
 use crate::ArgminWrite;
 use crate::Error;
 use std;
+use std::rc::Rc;
 
 /// Storage for data needed by most solvers
 ///
@@ -368,7 +369,7 @@ where
     }
 
     /// Add a logger to the list of loggers
-    pub fn add_logger(&mut self, logger: Box<ArgminLog>) -> &mut Self {
+    pub fn add_logger(&mut self, logger: Rc<ArgminLog>) -> &mut Self {
         self.logger.push(logger);
         self
     }
