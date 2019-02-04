@@ -20,7 +20,7 @@ use crate::ArgminWrite;
 use crate::Error;
 use std::rc::Rc;
 
-#[derive(Default)]
+#[derive(Clone, Default)]
 pub struct ArgminWriter<T> {
     writers: Vec<Rc<ArgminWrite<Param = T>>>,
 }

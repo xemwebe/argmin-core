@@ -31,6 +31,7 @@ use std::rc::Rc;
 ///
 /// TODO: cur_cost, best_cost and target_cost should be `U`, but then initialization is difficult
 /// as it cannot be expected that each `U` has something like `INFINITY` and `NEG_INFINITY`...
+#[derive(Clone)]
 pub struct ArgminBase<'a, T, U, H> {
     /// The operator/cost function
     operator: &'a ArgminOperator<Parameters = T, OperatorOutput = U, Hessian = H>,
