@@ -332,13 +332,23 @@ pub trait ArgminOperator {
 }
 
 #[derive(Clone, Default)]
-pub struct NoOperator<T: Clone, U: Clone, H: Clone> {
+pub struct NoOperator<T, U, H>
+where
+    T: Clone + std::default::Default,
+    U: Clone + std::default::Default,
+    H: Clone + std::default::Default,
+{
     param: std::marker::PhantomData<*const T>,
     output: std::marker::PhantomData<*const U>,
     hessian: std::marker::PhantomData<*const H>,
 }
 
-impl<T: Clone, U: Clone, H: Clone> NoOperator<T, U, H> {
+impl<T, U, H> NoOperator<T, U, H>
+where
+    T: Clone + std::default::Default,
+    U: Clone + std::default::Default,
+    H: Clone + std::default::Default,
+{
     pub fn new() -> Self {
         NoOperator {
             param: std::marker::PhantomData,

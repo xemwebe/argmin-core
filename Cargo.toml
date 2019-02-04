@@ -25,6 +25,8 @@ slog = "2.4.1"
 slog-term = "2.2.4"
 slog-async = "2.3.0"
 slog-json = "2.3.0"
+serde = { version = "1.0", features = ["derive"] }
+# erased-serde = "0.3"
 rand = "0.6.1"
 modcholesky = "0.1.0"
 finitediff = "0.1.1"

@@ -24,6 +24,7 @@ use crate::ArgminOperator;
 use crate::ArgminResult;
 use crate::ArgminWrite;
 use crate::Error;
+// use serde::Serialize;
 use std;
 use std::rc::Rc;
 
@@ -31,9 +32,11 @@ use std::rc::Rc;
 ///
 /// TODO: cur_cost, best_cost and target_cost should be `U`, but then initialization is difficult
 /// as it cannot be expected that each `U` has something like `INFINITY` and `NEG_INFINITY`...
+// #[derive(Clone, Serialize)]
 #[derive(Clone)]
 pub struct ArgminBase<'a, T, U, H> {
     /// The operator/cost function
+    // #[serde(skip)]
     operator: &'a ArgminOperator<Parameters = T, OperatorOutput = U, Hessian = H>,
 
     /// Current parameter vector
@@ -79,9 +82,11 @@ pub struct ArgminBase<'a, T, U, H> {
     total_time: std::time::Duration,
 
     /// Storage for loggers
+    // #[serde(skip)]
     logger: ArgminLogger,
 
     /// Storage for writers
+    // #[serde(skip)]
     writer: ArgminWriter<T>,
 }
 
