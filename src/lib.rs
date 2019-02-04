@@ -159,7 +159,7 @@ pub trait ArgminSolver: ArgminNextIter {
     fn add_logger(&mut self, logger: std::rc::Rc<ArgminLog>);
 
     /// Add a writer to the array of writers
-    fn add_writer(&mut self, writer: Box<ArgminWrite<Param = Self::Parameters>>);
+    fn add_writer(&mut self, writer: std::rc::Rc<ArgminWrite<Param = Self::Parameters>>);
 
     /// Reset the base of the algorithm to its initial state
     fn base_reset(&mut self);

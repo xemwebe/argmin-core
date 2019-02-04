@@ -375,7 +375,7 @@ where
     }
 
     /// Add a writer to the list of writers
-    pub fn add_writer(&mut self, writer: Box<ArgminWrite<Param = T>>) -> &mut Self {
+    pub fn add_writer(&mut self, writer: Rc<ArgminWrite<Param = T>>) -> &mut Self {
         self.writer.push(writer);
         self
     }

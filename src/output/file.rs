@@ -10,14 +10,15 @@
 use crate::ArgminWrite;
 use crate::Error;
 use std;
+use std::rc::Rc;
 
 pub struct WriteToFile<T> {
     _param: std::marker::PhantomData<T>,
 }
 
 impl<T> WriteToFile<T> {
-    pub fn new() -> Box<Self> {
-        Box::new(WriteToFile {
+    pub fn new() -> Rc<Self> {
+        Rc::new(WriteToFile {
             _param: std::marker::PhantomData,
         })
     }

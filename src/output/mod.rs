@@ -18,10 +18,11 @@ pub mod file;
 
 use crate::ArgminWrite;
 use crate::Error;
+use std::rc::Rc;
 
 #[derive(Default)]
 pub struct ArgminWriter<T> {
-    writers: Vec<Box<ArgminWrite<Param = T>>>,
+    writers: Vec<Rc<ArgminWrite<Param = T>>>,
 }
 
 impl<T> ArgminWriter<T> {
@@ -29,7 +30,7 @@ impl<T> ArgminWriter<T> {
         ArgminWriter { writers: vec![] }
     }
 
-    pub fn push(&mut self, writer: Box<ArgminWrite<Param = T>>) -> &mut Self {
+    pub fn push(&mut self, writer: Rc<ArgminWrite<Param = T>>) -> &mut Self {
         self.writers.push(writer);
         self
     }
