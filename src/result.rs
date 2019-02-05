@@ -14,9 +14,12 @@
 //!   * Maybe it is more appropriate to return the `base` struct?
 
 use crate::termination::TerminationReason;
+use std::cmp::Ordering;
+// use derive_more::Display;
 
 /// Return struct for all solvers.
 #[derive(Debug, Clone)]
+// #[display(fmt = "Param: {:?}\ncost:{}", param, cost)]
 pub struct ArgminResult<T> {
     /// Final parameter vector
     pub param: T,
@@ -45,5 +48,32 @@ impl<T> ArgminResult<T> {
             terminated: termination_reason.terminated(),
             termination_reason,
         }
+    }
+}
+
+impl<T> PartialEq for ArgminResult<T> {
+    fn eq(&self, other: &ArgminResult<T>) -> bool {
+        (self.cost - other.cost).abs() < std::f64::EPSILON
+    }
+}
+
+impl<T> Eq for ArgminResult<T> {}
+
+impl<T> Ord for ArgminResult<T> {
+    fn cmp(&self, other: &ArgminResult<T>) -> Ordering {
+        let t = self.cost - other.cost;
+        if t.abs() < std::f64::EPSILON {
+            Ordering::Equal
+        } else if t > 0.0 {
+            Ordering::Greater
+        } else {
+            Ordering::Less
+        }
+    }
+}
+
+impl<T> PartialOrd for ArgminResult<T> {
+    fn partial_cmp(&self, other: &ArgminResult<T>) -> Option<Ordering> {
+        Some(self.cmp(other))
     }
 }
