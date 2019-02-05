@@ -17,7 +17,7 @@
 use serde::{Deserialize, Serialize};
 
 /// Indicates why the optimization algorithm stopped
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, Ord, PartialOrd, Hash)]
 pub enum TerminationReason {
     /// In case it has not terminated yet
     NotTerminated,
