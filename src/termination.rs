@@ -62,3 +62,9 @@ impl TerminationReason {
         }
     }
 }
+
+impl Default for TerminationReason {
+    fn default() -> Self {
+        TerminationReason::NotTerminated
+    }
+}

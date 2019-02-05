@@ -18,7 +18,7 @@ use std::cmp::Ordering;
 // use derive_more::Display;
 
 /// Return struct for all solvers.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 // #[display(fmt = "Param: {:?}\ncost:{}", param, cost)]
 pub struct ArgminResult<T> {
     /// Final parameter vector
