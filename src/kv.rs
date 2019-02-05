@@ -13,12 +13,14 @@
 //!   * Either use something existing, or at least evaluate the performance and if necessary,
 //!     improve performance.
 
+use serde::{Deserialize, Serialize};
 use std;
 
 /// A simple key-value storage
-#[derive(Clone, Default)]
+#[derive(Clone, Default, Serialize, Deserialize, Eq, PartialEq)]
 pub struct ArgminKV {
     /// The actual key value storage
+    #[serde(borrow)]
     pub kv: Vec<(&'static str, String)>,
 }
 
