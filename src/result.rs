@@ -87,3 +87,10 @@ impl<T> PartialOrd for ArgminResult<T> {
         Some(self.cmp(other))
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    send_sync_test!(argmin_result, ArgminResult<Vec<f64>>);
+}

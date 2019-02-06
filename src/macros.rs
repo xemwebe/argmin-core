@@ -37,11 +37,11 @@ macro_rules! check_param {
 
 #[cfg(test)]
 macro_rules! send_sync_test {
-    ($t:ty) => {
+    ($n:ident, $t:ty) => {
         paste::item! {
             #[test]
             #[allow(non_snake_case)]
-            fn [<test_send_ $t>]() {
+            fn [<test_send_ $n>]() {
                 fn assert_send<T: Send>() {}
                 assert_send::<$t>();
             }
@@ -50,7 +50,7 @@ macro_rules! send_sync_test {
         paste::item! {
             #[test]
             #[allow(non_snake_case)]
-            fn [<test_sync_ $t>]() {
+            fn [<test_sync_ $n>]() {
                 fn assert_sync<T: Sync>() {}
                 assert_sync::<$t>();
             }

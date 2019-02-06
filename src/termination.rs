@@ -77,5 +77,5 @@ impl Default for TerminationReason {
 mod tests {
     use super::*;
 
-    send_sync_test!(TerminationReason);
+    send_sync_test!(termination_reason, TerminationReason);
 }
