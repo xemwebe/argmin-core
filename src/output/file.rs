@@ -10,21 +10,21 @@
 use crate::ArgminWrite;
 use crate::Error;
 use std;
-use std::rc::Rc;
+use std::sync::Arc;
 
 pub struct WriteToFile<T> {
     _param: std::marker::PhantomData<T>,
 }
 
 impl<T> WriteToFile<T> {
-    pub fn new() -> Rc<Self> {
-        Rc::new(WriteToFile {
+    pub fn new() -> Arc<Self> {
+        Arc::new(WriteToFile {
             _param: std::marker::PhantomData,
         })
     }
 }
 
-impl<T> ArgminWrite for WriteToFile<T> {
+impl<T: Send + Sync> ArgminWrite for WriteToFile<T> {
     type Param = T;
     fn write(&self, _param: &T) -> Result<(), Error> {
         println!("Writing!");

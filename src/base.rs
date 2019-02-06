@@ -26,14 +26,13 @@ use crate::ArgminWrite;
 use crate::Error;
 use serde::Serialize;
 use std;
-use std::rc::Rc;
+use std::default::Default;
 use std::sync::Arc;
 
 /// Storage for data needed by most solvers
 ///
 /// TODO: cur_cost, best_cost and target_cost should be `U`, but then initialization is difficult
 /// as it cannot be expected that each `U` has something like `INFINITY` and `NEG_INFINITY`...
-// #[derive(Clone)]
 #[derive(Clone, Serialize)]
 pub struct ArgminBase<'a, T, U, H> {
     /// The operator/cost function
@@ -93,8 +92,8 @@ pub struct ArgminBase<'a, T, U, H> {
 
 impl<'a, T, U, H> ArgminBase<'a, T, U, H>
 where
-    T: Clone + std::default::Default,
-    H: Clone + std::default::Default,
+    T: Clone + Default,
+    H: Clone + Default,
 {
     /// Constructor
     pub fn new(
@@ -382,7 +381,7 @@ where
     }
 
     /// Add a writer to the list of writers
-    pub fn add_writer(&mut self, writer: Rc<ArgminWrite<Param = T>>) -> &mut Self {
+    pub fn add_writer(&mut self, writer: Arc<ArgminWrite<Param = T>>) -> &mut Self {
         self.writer.push(writer);
         self
     }
@@ -420,9 +419,9 @@ impl<'a, T, U, H> std::fmt::Debug for ArgminBase<'a, T, U, H> {
     }
 }
 
-// #[cfg(test)]
-// mod tests {
-//     use super::*;
-//
-//     send_sync_test!(argmin_base, ArgminBase<'_, Vec<f64>, f64, Vec<Vec<f64>>>);
-// }
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    send_sync_test!(argmin_base, ArgminBase<'_, Vec<f64>, f64, Vec<Vec<f64>>>);
+}

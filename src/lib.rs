@@ -161,7 +161,7 @@ pub trait ArgminSolver: ArgminNextIter {
     fn add_logger(&mut self, logger: std::sync::Arc<ArgminLog>);
 
     /// Add a writer to the array of writers
-    fn add_writer(&mut self, writer: std::rc::Rc<ArgminWrite<Param = Self::Parameters>>);
+    fn add_writer(&mut self, writer: std::sync::Arc<ArgminWrite<Param = Self::Parameters>>);
 
     /// Reset the base of the algorithm to its initial state
     fn base_reset(&mut self);
@@ -230,7 +230,7 @@ pub trait ArgminLog: Send + Sync {
 
 /// Every writer (which is something that writes parameter vectors somewhere after each iteration)
 /// needs to implement this.
-pub trait ArgminWrite {
+pub trait ArgminWrite: Send + Sync {
     type Param;
 
     /// Writes the parameter vector somewhere
@@ -333,59 +333,59 @@ pub trait ArgminOperator {
     }
 }
 
-#[derive(Clone, Default, Debug)]
-pub struct NoOperator<T, U, H>
-where
-    T: Clone + Default + Debug,
-    U: Clone + Default + Debug,
-    H: Clone + std::default::Default + Debug,
-{
-    param: std::marker::PhantomData<*const T>,
-    output: std::marker::PhantomData<*const U>,
-    hessian: std::marker::PhantomData<*const H>,
-}
-
-impl<T, U, H> NoOperator<T, U, H>
-where
-    T: Clone + Default + Debug,
-    U: Clone + Default + Debug,
-    H: Clone + Default + Debug,
-{
-    pub fn new() -> Self {
-        NoOperator {
-            param: std::marker::PhantomData,
-            output: std::marker::PhantomData,
-            hessian: std::marker::PhantomData,
-        }
-    }
-}
-
-impl<T, U, H> ArgminOperator for NoOperator<T, U, H>
-where
-    T: Clone + Default + Debug,
-    U: Clone + Default + Debug,
-    H: Clone + Default + Debug,
-{
-    type Parameters = T;
-    type OperatorOutput = U;
-    type Hessian = H;
-
-    fn apply(&self, _p: &Self::Parameters) -> Result<Self::OperatorOutput, Error> {
-        Ok(Self::OperatorOutput::default())
-    }
-
-    fn gradient(&self, _p: &Self::Parameters) -> Result<Self::Parameters, Error> {
-        Ok(Self::Parameters::default())
-    }
-
-    fn hessian(&self, _p: &Self::Parameters) -> Result<Self::Hessian, Error> {
-        Ok(Self::Hessian::default())
-    }
-
-    fn modify(&self, _p: &Self::Parameters, _t: f64) -> Result<Self::Parameters, Error> {
-        Ok(Self::Parameters::default())
-    }
-}
+// #[derive(Clone, Default, Debug)]
+// pub struct NoOperator<T, U, H>
+// where
+//     T: Clone + Default + Debug,
+//     U: Clone + Default + Debug,
+//     H: Clone + std::default::Default + Debug,
+// {
+//     param: std::marker::PhantomData<*const T>,
+//     output: std::marker::PhantomData<*const U>,
+//     hessian: std::marker::PhantomData<*const H>,
+// }
+//
+// impl<T, U, H> NoOperator<T, U, H>
+// where
+//     T: Clone + Default + Debug,
+//     U: Clone + Default + Debug,
+//     H: Clone + Default + Debug,
+// {
+//     pub fn new() -> Self {
+//         NoOperator {
+//             param: std::marker::PhantomData,
+//             output: std::marker::PhantomData,
+//             hessian: std::marker::PhantomData,
+//         }
+//     }
+// }
+//
+// impl<T, U, H> ArgminOperator for NoOperator<T, U, H>
+// where
+//     T: Clone + Default + Debug,
+//     U: Clone + Default + Debug,
+//     H: Clone + Default + Debug,
+// {
+//     type Parameters = T;
+//     type OperatorOutput = U;
+//     type Hessian = H;
+//
+//     fn apply(&self, _p: &Self::Parameters) -> Result<Self::OperatorOutput, Error> {
+//         Ok(Self::OperatorOutput::default())
+//     }
+//
+//     fn gradient(&self, _p: &Self::Parameters) -> Result<Self::Parameters, Error> {
+//         Ok(Self::Parameters::default())
+//     }
+//
+//     fn hessian(&self, _p: &Self::Parameters) -> Result<Self::Hessian, Error> {
+//         Ok(Self::Hessian::default())
+//     }
+//
+//     fn modify(&self, _p: &Self::Parameters, _t: f64) -> Result<Self::Parameters, Error> {
+//         Ok(Self::Parameters::default())
+//     }
+// }
 
 /// Defines a common interface to line search methods. Requires that `ArgminSolver` is implemented
 /// for the line search method as well.

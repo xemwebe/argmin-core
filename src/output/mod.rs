@@ -18,11 +18,11 @@ pub mod file;
 
 use crate::ArgminWrite;
 use crate::Error;
-use std::rc::Rc;
+use std::sync::Arc;
 
 #[derive(Clone, Default)]
 pub struct ArgminWriter<T> {
-    writers: Vec<Rc<ArgminWrite<Param = T>>>,
+    writers: Vec<Arc<ArgminWrite<Param = T>>>,
 }
 
 impl<T> ArgminWriter<T> {
@@ -30,7 +30,7 @@ impl<T> ArgminWriter<T> {
         ArgminWriter { writers: vec![] }
     }
 
-    pub fn push(&mut self, writer: Rc<ArgminWrite<Param = T>>) -> &mut Self {
+    pub fn push(&mut self, writer: Arc<ArgminWrite<Param = T>>) -> &mut Self {
         self.writers.push(writer);
         self
     }
@@ -44,4 +44,11 @@ impl<T: Clone> ArgminWrite for ArgminWriter<T> {
         }
         Ok(())
     }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    send_sync_test!(argmin_write, ArgminWriter<Vec<f64>>);
 }

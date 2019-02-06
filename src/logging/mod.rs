@@ -12,7 +12,6 @@
 pub mod slog_logger;
 
 use crate::{ArgminKV, ArgminLog, Error};
-use std::rc::Rc;
 use std::sync::Arc;
 
 /// Container for `ArgminLog`gers
