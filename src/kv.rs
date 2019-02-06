@@ -57,3 +57,15 @@ impl ArgminKV {
         self
     }
 }
+
+impl std::iter::FromIterator<(&'static str, String)> for ArgminKV {
+    fn from_iter<I: IntoIterator<Item = (&'static str, String)>>(iter: I) -> Self {
+        let mut c = ArgminKV::new();
+
+        for i in iter {
+            c.push(i.0, i.1);
+        }
+
+        c
+    }
+}
