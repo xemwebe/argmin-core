@@ -52,6 +52,8 @@ pub use crate::output::ArgminWriter;
 pub use crate::result::ArgminResult;
 pub use crate::termination::TerminationReason;
 pub use failure::Error;
+use std::default::Default;
+use std::fmt::Debug;
 
 pub mod finitediff {
     //! Finite Differentiation
@@ -331,12 +333,12 @@ pub trait ArgminOperator {
     }
 }
 
-#[derive(Clone, Default)]
+#[derive(Clone, Default, Debug)]
 pub struct NoOperator<T, U, H>
 where
-    T: Clone + std::default::Default,
-    U: Clone + std::default::Default,
-    H: Clone + std::default::Default,
+    T: Clone + Default + Debug,
+    U: Clone + Default + Debug,
+    H: Clone + std::default::Default + Debug,
 {
     param: std::marker::PhantomData<*const T>,
     output: std::marker::PhantomData<*const U>,
@@ -345,9 +347,9 @@ where
 
 impl<T, U, H> NoOperator<T, U, H>
 where
-    T: Clone + std::default::Default,
-    U: Clone + std::default::Default,
-    H: Clone + std::default::Default,
+    T: Clone + Default + Debug,
+    U: Clone + Default + Debug,
+    H: Clone + Default + Debug,
 {
     pub fn new() -> Self {
         NoOperator {
@@ -360,9 +362,9 @@ where
 
 impl<T, U, H> ArgminOperator for NoOperator<T, U, H>
 where
-    T: Clone + std::default::Default,
-    U: Clone + std::default::Default,
-    H: Clone + std::default::Default,
+    T: Clone + Default + Debug,
+    U: Clone + Default + Debug,
+    H: Clone + Default + Debug,
 {
     type Parameters = T;
     type OperatorOutput = U;
