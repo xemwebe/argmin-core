@@ -36,3 +36,10 @@ pub enum ArgminError {
     #[fail(display = "Impossible Error: {}", text)]
     ImpossibleError { text: String },
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    send_sync_test!(error, ArgminError);
+}

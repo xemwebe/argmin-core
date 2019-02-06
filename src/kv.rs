@@ -77,3 +77,10 @@ impl std::iter::Extend<(&'static str, String)> for ArgminKV {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    send_sync_test!(argmin_kv, ArgminKV);
+}

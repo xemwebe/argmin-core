@@ -13,12 +13,13 @@ pub mod slog_logger;
 
 use crate::{ArgminKV, ArgminLog, Error};
 use std::rc::Rc;
+use std::sync::Arc;
 
 /// Container for `ArgminLog`gers
 #[derive(Clone, Default)]
 pub struct ArgminLogger {
     /// Vector of boxed types which implement `ArgminLog`
-    logger: Vec<Rc<ArgminLog>>,
+    logger: Vec<Arc<ArgminLog>>,
 }
 
 impl ArgminLogger {
@@ -28,7 +29,7 @@ impl ArgminLogger {
     }
 
     /// Push another `ArgminLog` to the `logger` field
-    pub fn push(&mut self, logger: Rc<ArgminLog>) -> &mut Self {
+    pub fn push(&mut self, logger: Arc<ArgminLog>) -> &mut Self {
         self.logger.push(logger);
         self
     }
@@ -53,4 +54,11 @@ impl ArgminLog for ArgminLogger {
         }
         Ok(())
     }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    send_sync_test!(argmin_logger, ArgminLogger);
 }

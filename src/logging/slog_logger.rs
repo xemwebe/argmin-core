@@ -115,3 +115,10 @@ impl ArgminLog for ArgminSlogLogger {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    send_sync_test!(argmin_slog_loggerv, ArgminSlogLogger);
+}

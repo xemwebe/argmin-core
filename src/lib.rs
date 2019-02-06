@@ -158,7 +158,7 @@ pub trait ArgminSolver: ArgminNextIter {
     fn set_target_cost(&mut self, cost: f64);
 
     /// Add a logger to the array of loggers
-    fn add_logger(&mut self, logger: std::rc::Rc<ArgminLog>);
+    fn add_logger(&mut self, logger: std::sync::Arc<ArgminLog>);
 
     /// Add a writer to the array of writers
     fn add_writer(&mut self, writer: std::rc::Rc<ArgminWrite<Param = Self::Parameters>>);
@@ -218,7 +218,7 @@ pub trait ArgminNextIter {
 }
 
 /// Defince the interface every logger needs to expose
-pub trait ArgminLog {
+pub trait ArgminLog: Send + Sync {
     /// Logs general information (a message `msg` and/or key-value pairs `kv`).
     fn log_info(&self, msg: &str, kv: &ArgminKV) -> Result<(), Error>;
 

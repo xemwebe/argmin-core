@@ -27,6 +27,7 @@ use crate::Error;
 use serde::Serialize;
 use std;
 use std::rc::Rc;
+use std::sync::Arc;
 
 /// Storage for data needed by most solvers
 ///
@@ -375,7 +376,7 @@ where
     }
 
     /// Add a logger to the list of loggers
-    pub fn add_logger(&mut self, logger: Rc<ArgminLog>) -> &mut Self {
+    pub fn add_logger(&mut self, logger: Arc<ArgminLog>) -> &mut Self {
         self.logger.push(logger);
         self
     }
@@ -418,3 +419,10 @@ impl<'a, T, U, H> std::fmt::Debug for ArgminBase<'a, T, U, H> {
         Ok(())
     }
 }
+
+// #[cfg(test)]
+// mod tests {
+//     use super::*;
+//
+//     send_sync_test!(argmin_base, ArgminBase<'_, Vec<f64>, f64, Vec<Vec<f64>>>);
+// }
