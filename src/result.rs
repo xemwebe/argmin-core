@@ -16,11 +16,9 @@
 use crate::termination::TerminationReason;
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
-// use derive_more::Display;
 
 /// Return struct for all solvers.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
-// #[display(fmt = "Param: {:?}\ncost:{}", param, cost)]
 pub struct ArgminResult<T> {
     /// Final parameter vector
     pub param: T,
