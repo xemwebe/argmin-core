@@ -47,8 +47,6 @@ impl TerminationReason {
     }
 
     /// Returns a texual representation of what happened
-    ///
-    /// TODO: I am not sure if this is the best way to solve this.
     pub fn text(&self) -> &str {
         match *self {
             TerminationReason::NotTerminated => "Not terminated",
