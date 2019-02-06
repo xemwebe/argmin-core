@@ -34,3 +34,26 @@ macro_rules! check_param {
         check_param!($param, $msg, NotInitialized);
     };
 }
+
+#[cfg(test)]
+macro_rules! send_sync_test {
+    ($t:ty) => {
+        paste::item! {
+            #[test]
+            #[allow(non_snake_case)]
+            fn [<test_send_ $t>]() {
+                fn assert_send<T: Send>() {}
+                assert_send::<$t>();
+            }
+        }
+
+        paste::item! {
+            #[test]
+            #[allow(non_snake_case)]
+            fn [<test_sync_ $t>]() {
+                fn assert_sync<T: Sync>() {}
+                assert_sync::<$t>();
+            }
+        }
+    };
+}

@@ -72,3 +72,10 @@ impl Default for TerminationReason {
         TerminationReason::NotTerminated
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    send_sync_test!(TerminationReason);
+}
