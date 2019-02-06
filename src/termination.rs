@@ -63,6 +63,12 @@ impl TerminationReason {
     }
 }
 
+impl std::fmt::Display for TerminationReason {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 impl Default for TerminationReason {
     fn default() -> Self {
         TerminationReason::NotTerminated
