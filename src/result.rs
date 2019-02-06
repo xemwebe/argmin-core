@@ -50,6 +50,17 @@ impl<T> ArgminResult<T> {
     }
 }
 
+impl<T: std::fmt::Debug> std::fmt::Display for ArgminResult<T> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "ArgminResult:\n")?;
+        write!(f, "    param:       {:?}\n", self.param)?;
+        write!(f, "    cost:        {}\n", self.cost)?;
+        write!(f, "    iters:       {}\n", self.iters)?;
+        write!(f, "    termination: {}\n", self.termination_reason)?;
+        Ok(())
+    }
+}
+
 impl<T> PartialEq for ArgminResult<T> {
     fn eq(&self, other: &ArgminResult<T>) -> bool {
         (self.cost - other.cost).abs() < std::f64::EPSILON
