@@ -69,3 +69,11 @@ impl std::iter::FromIterator<(&'static str, String)> for ArgminKV {
         c
     }
 }
+
+impl std::iter::Extend<(&'static str, String)> for ArgminKV {
+    fn extend<I: IntoIterator<Item = (&'static str, String)>>(&mut self, iter: I) {
+        for i in iter {
+            self.push(i.0, i.1);
+        }
+    }
+}
