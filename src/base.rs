@@ -401,3 +401,20 @@ where
         self.writer.write(param)
     }
 }
+
+impl<'a, T, U, H> std::fmt::Debug for ArgminBase<'a, T, U, H> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "ArgminBase struct\n")?;
+        write!(f, "   cur_cost:           {}\n", self.cur_cost)?;
+        write!(f, "   best_cost:          {}\n", self.best_cost)?;
+        write!(f, "   target_cost:        {}\n", self.target_cost)?;
+        write!(f, "   cur_iter:           {}\n", self.cur_iter)?;
+        write!(f, "   max_iter:           {}\n", self.max_iters)?;
+        write!(f, "   cost_func_count:    {}\n", self.cost_func_count)?;
+        write!(f, "   grad_func_count:    {}\n", self.grad_func_count)?;
+        write!(f, "   hessian_func_count: {}\n", self.hessian_func_count)?;
+        write!(f, "   termination_reason: {:?}\n", self.termination_reason)?;
+        write!(f, "   total_time:         {:?}\n", self.total_time)?;
+        Ok(())
+    }
+}
