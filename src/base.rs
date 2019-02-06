@@ -404,7 +404,7 @@ where
 
 impl<'a, T, U, H> std::fmt::Debug for ArgminBase<'a, T, U, H> {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "ArgminBase struct\n")?;
+        write!(f, "ArgminBase:\n")?;
         write!(f, "   cur_cost:           {}\n", self.cur_cost)?;
         write!(f, "   best_cost:          {}\n", self.best_cost)?;
         write!(f, "   target_cost:        {}\n", self.target_cost)?;

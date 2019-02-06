@@ -24,6 +24,17 @@ pub struct ArgminKV {
     pub kv: Vec<(&'static str, String)>,
 }
 
+impl std::fmt::Display for ArgminKV {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "ArgminKV\n")?;
+        self.kv
+            .iter()
+            .map(|(key, val)| -> std::fmt::Result { write!(f, "   {}: {}\n", key, val) })
+            .count();
+        Ok(())
+    }
+}
+
 impl ArgminKV {
     /// Constructor
     pub fn new() -> Self {
