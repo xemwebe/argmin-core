@@ -52,8 +52,6 @@ pub use crate::output::ArgminWriter;
 pub use crate::result::ArgminResult;
 pub use crate::termination::TerminationReason;
 pub use failure::Error;
-use std::default::Default;
-use std::fmt::Debug;
 
 pub mod finitediff {
     //! Finite Differentiation
