@@ -24,7 +24,7 @@ use crate::ArgminOperator;
 use crate::ArgminResult;
 use crate::ArgminWrite;
 use crate::Error;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use std;
 use std::default::Default;
 use std::sync::Arc;
@@ -34,10 +34,13 @@ use std::sync::Arc;
 /// TODO: cur_cost, best_cost and target_cost should be `U`, but then initialization is difficult
 /// as it cannot be expected that each `U` has something like `INFINITY` and `NEG_INFINITY`...
 #[derive(Clone, Serialize)]
-pub struct ArgminBase<'a, T, U, H> {
+pub struct ArgminBase<T, U, H, O>
+where
+    O: ArgminOperator<Parameters = T, OperatorOutput = U, Hessian = H>,
+{
     /// The operator/cost function
     #[serde(skip)]
-    operator: &'a ArgminOperator<Parameters = T, OperatorOutput = U, Hessian = H>,
+    operator: O,
 
     /// Current parameter vector
     cur_param: T,
@@ -90,16 +93,14 @@ pub struct ArgminBase<'a, T, U, H> {
     writer: ArgminWriter<T>,
 }
 
-impl<'a, T, U, H> ArgminBase<'a, T, U, H>
+impl<T, U, H, O> ArgminBase<T, U, H, O>
 where
     T: Clone + Default,
     H: Clone + Default,
+    O: ArgminOperator<Parameters = T, OperatorOutput = U, Hessian = H>,
 {
     /// Constructor
-    pub fn new(
-        operator: &'a ArgminOperator<Parameters = T, OperatorOutput = U, Hessian = H>,
-        param: T,
-    ) -> Self {
+    pub fn new(operator: O, param: T) -> Self {
         ArgminBase {
             operator,
             cur_param: param.clone(),
@@ -402,7 +403,10 @@ where
     }
 }
 
-impl<'a, T, U, H> std::fmt::Debug for ArgminBase<'a, T, U, H> {
+impl<T, U, H, O> std::fmt::Debug for ArgminBase<T, U, H, O>
+where
+    O: ArgminOperator<Parameters = T, OperatorOutput = U, Hessian = H>,
+{
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "ArgminBase:\n")?;
         write!(f, "   cur_cost:           {}\n", self.cur_cost)?;
@@ -423,5 +427,5 @@ impl<'a, T, U, H> std::fmt::Debug for ArgminBase<'a, T, U, H> {
 mod tests {
     use super::*;
 
-    send_sync_test!(argmin_base, ArgminBase<'_, Vec<f64>, f64, Vec<Vec<f64>>>);
+    send_sync_test!(argmin_base, ArgminBase<Vec<f64>, f64, Vec<Vec<f64>>>);
 }

@@ -289,7 +289,7 @@ impl<T: Clone> ArgminIterationData<T> {
 /// implementation which is essentially returning an error which indicates that the method has not
 /// been implemented. Those methods (`gradient` and `modify`) only need to be implemented if the
 /// uses solver requires it.
-pub trait ArgminOperator: Send + Sync {
+pub trait ArgminOperator: Clone + Send + Sync {
     /// Type of the parameter vector
     type Parameters;
     /// Output of the operator. Most solvers expect `f64`.
