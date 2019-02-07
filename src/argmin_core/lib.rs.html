@@ -683,7 +683,7 @@
 <span class="doccomment">/// implementation which is essentially returning an error which indicates that the method has not</span>
 <span class="doccomment">/// been implemented. Those methods (`gradient` and `modify`) only need to be implemented if the</span>
 <span class="doccomment">/// uses solver requires it.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ArgminOperator</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> {
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ArgminOperator</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> {
     <span class="doccomment">/// Type of the parameter vector</span>
     <span class="kw">type</span> <span class="ident">Parameters</span>;
     <span class="doccomment">/// Output of the operator. Most solvers expect `f64`.</span>
