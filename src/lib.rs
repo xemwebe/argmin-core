@@ -33,10 +33,15 @@ mod kv;
 mod logging;
 /// Math utilities
 mod math;
+/// Phony Operator
+#[cfg(test)]
+mod nooperator;
 /// Output
 mod output;
 /// Definition of the return type of the solvers
 mod result;
+/// Serialization of `ArgminSolver`s
+mod serialization;
 /// Definition of termination reasons
 mod termination;
 
@@ -52,6 +57,7 @@ pub use crate::output::ArgminWriter;
 pub use crate::result::ArgminResult;
 pub use crate::termination::TerminationReason;
 pub use failure::Error;
+pub use serialization::*;
 
 pub mod finitediff {
     //! Finite Differentiation

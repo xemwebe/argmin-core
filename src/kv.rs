@@ -17,7 +17,7 @@ use serde::{Deserialize, Serialize};
 use std;
 
 /// A simple key-value storage
-#[derive(Clone, Default, Serialize, Deserialize, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
+#[derive(Clone, Default, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Serialize, Deserialize)]
 pub struct ArgminKV {
     /// The actual key value storage
     #[serde(borrow)]

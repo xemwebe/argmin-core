@@ -33,13 +33,12 @@ use std::sync::Arc;
 ///
 /// TODO: cur_cost, best_cost and target_cost should be `U`, but then initialization is difficult
 /// as it cannot be expected that each `U` has something like `INFINITY` and `NEG_INFINITY`...
-#[derive(Clone, Serialize)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct ArgminBase<T, U, H, O>
 where
     O: ArgminOperator<Parameters = T, OperatorOutput = U, Hessian = H>,
 {
     /// The operator/cost function
-    #[serde(skip)]
     operator: O,
 
     /// Current parameter vector
@@ -427,5 +426,13 @@ where
 mod tests {
     use super::*;
 
-    send_sync_test!(argmin_base, ArgminBase<Vec<f64>, f64, Vec<Vec<f64>>>);
+    send_sync_test!(
+        argmin_base,
+        ArgminBase<
+            Vec<f64>,
+            f64,
+            Vec<Vec<f64>>,
+            crate::nooperator::NoOperator<Vec<f64>, f64, Vec<Vec<f64>>>,
+        >
+    );
 }
