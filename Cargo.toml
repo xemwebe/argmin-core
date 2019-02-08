@@ -41,6 +41,8 @@ default = []
 ndarrayl = ["ndarray", "ndarray-linalg", "finitediff/ndarray"]
 
 [dev-dependencies]
+argmin_codegen = { git = "https://github.com/argmin-rs/argmin-codegen.git", branch = "master"}
+# argmin_codegen = { path = "../argmin-codegen"}
 ndarray-linalg = { version = "0.10.0", features = ["openblas"] }
 paste = "0.1.4"
 
