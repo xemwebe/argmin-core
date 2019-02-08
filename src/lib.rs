@@ -34,7 +34,7 @@ mod logging;
 /// Math utilities
 mod math;
 /// Phony Operator
-#[cfg(test)]
+// #[cfg(test)]
 mod nooperator;
 /// Output
 mod output;

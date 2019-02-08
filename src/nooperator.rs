@@ -6,10 +6,11 @@
 // copied, modified, or distributed except according to those terms.
 
 use crate::{ArgminOperator, Error};
+use serde::{Deserialize, Serialize};
 use std::default::Default;
 use std::fmt::Debug;
 
-#[derive(Clone, Default, Debug)]
+#[derive(Clone, Default, Debug, Serialize, Deserialize)]
 pub struct NoOperator<T, U, H>
 where
     T: Clone + Default + Debug + Send + Sync,
@@ -27,6 +28,7 @@ where
     U: Clone + Default + Debug + Send + Sync,
     H: Clone + Default + Debug + Send + Sync,
 {
+    #[allow(dead_code)]
     pub fn new() -> Self {
         NoOperator {
             param: std::marker::PhantomData,
