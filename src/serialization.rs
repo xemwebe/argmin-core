@@ -116,32 +116,32 @@ mod tests {
     #[derive(ArgminSolver, Serialize, Deserialize, Clone, Debug)]
     pub struct PhonySolver<O>
     where
-        O: ArgminOperator,
+        O: ArgminOp,
     {
         base: ArgminBase<O>,
     }
 
     impl<O> PhonySolver<O>
     where
-        O: ArgminOperator,
+        O: ArgminOp,
     {
         /// Constructor
-        pub fn new(op: O, init_param: <O as ArgminOperator>::Parameters) -> Self {
+        pub fn new(op: O, init_param: <O as ArgminOp>::Param) -> Self {
             PhonySolver {
                 base: ArgminBase::new(op, init_param),
             }
         }
     }
 
-    impl<O> ArgminNextIter for PhonySolver<O>
+    impl<O> ArgminIter for PhonySolver<O>
     where
-        O: ArgminOperator,
+        O: ArgminOp,
     {
-        type Parameters = <O as ArgminOperator>::Parameters;
-        type OperatorOutput = <O as ArgminOperator>::OperatorOutput;
-        type Hessian = <O as ArgminOperator>::Hessian;
+        type Param = <O as ArgminOp>::Param;
+        type Output = <O as ArgminOp>::Output;
+        type Hessian = <O as ArgminOp>::Hessian;
 
-        fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error> {
+        fn next_iter(&mut self) -> Result<ArgminIterData<Self::Param>, Error> {
             unimplemented!()
         }
     }

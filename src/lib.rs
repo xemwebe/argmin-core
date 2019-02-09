@@ -69,62 +69,62 @@ pub mod finitediff {
 
 /// Defines the interface to a solver. Usually, there is no need to implement this manually, use
 /// the `argmin_derive` crate instead.
-pub trait ArgminSolver: ArgminNextIter {
+pub trait ArgminSolver: ArgminIter {
     /// apply cost function or operator to a parameter vector
     fn apply(
         &mut self,
-        param: &<Self as ArgminNextIter>::Parameters,
-    ) -> Result<<Self as ArgminNextIter>::OperatorOutput, Error>;
+        param: &<Self as ArgminIter>::Param,
+    ) -> Result<<Self as ArgminIter>::Output, Error>;
 
     /// compute the gradient for a parameter vector
     fn gradient(
         &mut self,
-        param: &<Self as ArgminNextIter>::Parameters,
-    ) -> Result<<Self as ArgminNextIter>::Parameters, Error>;
+        param: &<Self as ArgminIter>::Param,
+    ) -> Result<<Self as ArgminIter>::Param, Error>;
 
     /// compute the hessian for a parameter vector
     fn hessian(
         &mut self,
-        param: &<Self as ArgminNextIter>::Parameters,
-    ) -> Result<<Self as ArgminNextIter>::Hessian, Error>;
+        param: &<Self as ArgminIter>::Param,
+    ) -> Result<<Self as ArgminIter>::Hessian, Error>;
 
     /// modify the parameter vector
     fn modify(
         &self,
-        param: &<Self as ArgminNextIter>::Parameters,
+        param: &<Self as ArgminIter>::Param,
         extent: f64,
-    ) -> Result<<Self as ArgminNextIter>::Parameters, Error>;
+    ) -> Result<<Self as ArgminIter>::Param, Error>;
 
     /// return current parameter vector
-    fn cur_param(&self) -> <Self as ArgminNextIter>::Parameters;
+    fn cur_param(&self) -> <Self as ArgminIter>::Param;
 
     /// return current gradient
-    fn cur_grad(&self) -> <Self as ArgminNextIter>::Parameters;
+    fn cur_grad(&self) -> <Self as ArgminIter>::Param;
 
     /// return current gradient
-    fn cur_hessian(&self) -> <Self as ArgminNextIter>::Hessian;
+    fn cur_hessian(&self) -> <Self as ArgminIter>::Hessian;
 
     /// set current parameter vector
-    fn set_cur_param(&mut self, param: <Self as ArgminNextIter>::Parameters);
+    fn set_cur_param(&mut self, param: <Self as ArgminIter>::Param);
 
     /// set current gradient
-    fn set_cur_grad(&mut self, grad: <Self as ArgminNextIter>::Parameters);
+    fn set_cur_grad(&mut self, grad: <Self as ArgminIter>::Param);
 
     /// set current gradient
-    fn set_cur_hessian(&mut self, hessian: <Self as ArgminNextIter>::Hessian);
+    fn set_cur_hessian(&mut self, hessian: <Self as ArgminIter>::Hessian);
 
     /// set current parameter vector
-    fn set_best_param(&mut self, param: <Self as ArgminNextIter>::Parameters);
+    fn set_best_param(&mut self, param: <Self as ArgminIter>::Param);
 
     /// Execute the optimization algorithm.
-    fn run(&mut self) -> Result<ArgminResult<<Self as ArgminNextIter>::Parameters>, Error>;
+    fn run(&mut self) -> Result<ArgminResult<<Self as ArgminIter>::Param>, Error>;
 
     /// Execute the optimization algorithm without Ctrl-C handling, logging, writing and anything
     /// else which may cost unnecessary time.
-    fn run_fast(&mut self) -> Result<ArgminResult<<Self as ArgminNextIter>::Parameters>, Error>;
+    fn run_fast(&mut self) -> Result<ArgminResult<<Self as ArgminIter>::Param>, Error>;
 
     /// Returns the best solution found during optimization.
-    fn result(&self) -> ArgminResult<<Self as ArgminNextIter>::Parameters>;
+    fn result(&self) -> ArgminResult<<Self as ArgminIter>::Param>;
 
     /// Set termination reason (doesn't terminate yet! -- this is helpful for terminating within
     /// the iterations)
@@ -152,11 +152,11 @@ pub trait ArgminSolver: ArgminNextIter {
     fn set_cur_cost(&mut self, cost: f64);
 
     /// Get best cost function value
-    // fn best_cost(&self) -> <Self as ArgminNextIter>::OperatorOutput;
+    // fn best_cost(&self) -> <Self as ArgminIter>::Output;
     fn best_cost(&self) -> f64;
 
     /// set best cost value
-    // fn set_best_cost(&mut self, <Self as ArgminNextIter>::OperatorOutput);
+    // fn set_best_cost(&mut self, <Self as ArgminIter>::Output);
     fn set_best_cost(&mut self, cost: f64);
 
     /// Set the target cost function value which is used as a stopping criterion
@@ -166,7 +166,7 @@ pub trait ArgminSolver: ArgminNextIter {
     fn add_logger(&mut self, logger: std::sync::Arc<ArgminLog>);
 
     /// Add a writer to the array of writers
-    fn add_writer(&mut self, writer: std::sync::Arc<ArgminWrite<Param = Self::Parameters>>);
+    fn add_writer(&mut self, writer: std::sync::Arc<ArgminWrite<Param = Self::Param>>);
 
     /// Reset the base of the algorithm to its initial state
     fn base_reset(&mut self);
@@ -202,16 +202,16 @@ pub trait ArgminSolver: ArgminNextIter {
 /// Main part of every solver: `next_iter` computes one iteration of the algorithm and `init` is
 /// executed before these iterations. The `init` method comes with a default implementation which
 /// corresponds to doing nothing.
-pub trait ArgminNextIter {
+pub trait ArgminIter {
     /// Parameter vectors
-    type Parameters;
+    type Param;
     /// Output of the operator
-    type OperatorOutput;
+    type Output;
     /// Hessian
     type Hessian;
 
     /// Computes one iteration of the algorithm.
-    fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error>;
+    fn next_iter(&mut self) -> Result<ArgminIterData<Self::Param>, Error>;
 
     /// Initializes the algorithm
     ///
@@ -242,11 +242,11 @@ pub trait ArgminWrite: Send + Sync {
     fn write(&self, param: &Self::Param) -> Result<(), Error>;
 }
 
-/// The datastructure which is returned by the `next_iter` method of the `ArgminNextIter` trait.
+/// The datastructure which is returned by the `next_iter` method of the `ArgminIter` trait.
 ///
 /// TODO: think about removing this or replacing it with something better. Actually, a tuple would
 /// be sufficient.
-pub struct ArgminIterationData<T> {
+pub struct ArgminIterData<T> {
     /// Current parameter vector
     param: T,
     /// Current cost function value
@@ -256,10 +256,10 @@ pub struct ArgminIterationData<T> {
     kv: Option<ArgminKV>,
 }
 
-impl<T: Clone> ArgminIterationData<T> {
+impl<T: Clone> ArgminIterData<T> {
     /// Constructor
     pub fn new(param: T, cost: f64) -> Self {
-        ArgminIterationData {
+        ArgminIterData {
             param,
             cost,
             kv: None,
@@ -296,43 +296,43 @@ impl<T: Clone> ArgminIterationData<T> {
 /// implementation which is essentially returning an error which indicates that the method has not
 /// been implemented. Those methods (`gradient` and `modify`) only need to be implemented if the
 /// uses solver requires it.
-pub trait ArgminOperator: Clone + Default + Send + Sync {
+pub trait ArgminOp: Clone + Default + Send + Sync {
     /// Type of the parameter vector
-    type Parameters: Clone + Default + serde::Serialize + serde::de::DeserializeOwned;
+    type Param: Clone + Default + serde::Serialize + serde::de::DeserializeOwned;
     /// Output of the operator. Most solvers expect `f64`.
-    type OperatorOutput;
+    type Output;
     /// Type of Hessian
     type Hessian: Clone + Default + serde::Serialize + serde::de::DeserializeOwned;
 
     /// Applies the operator/cost function to parameters
-    fn apply(&self, _param: &Self::Parameters) -> Result<Self::OperatorOutput, Error> {
+    fn apply(&self, _param: &Self::Param) -> Result<Self::Output, Error> {
         Err(ArgminError::NotImplemented {
-            text: "Method `apply` of ArgminOperator trait not implemented!".to_string(),
+            text: "Method `apply` of ArgminOp trait not implemented!".to_string(),
         }
         .into())
     }
 
     /// Computes the gradient at the given parameters
-    fn gradient(&self, _param: &Self::Parameters) -> Result<Self::Parameters, Error> {
+    fn gradient(&self, _param: &Self::Param) -> Result<Self::Param, Error> {
         Err(ArgminError::NotImplemented {
-            text: "Method `gradient` of ArgminOperator trait not implemented!".to_string(),
+            text: "Method `gradient` of ArgminOp trait not implemented!".to_string(),
         }
         .into())
     }
 
     /// Computes the hessian at the given parameters
-    fn hessian(&self, _param: &Self::Parameters) -> Result<Self::Hessian, Error> {
+    fn hessian(&self, _param: &Self::Param) -> Result<Self::Hessian, Error> {
         Err(ArgminError::NotImplemented {
-            text: "Method `hessian` of ArgminOperator trait not implemented!".to_string(),
+            text: "Method `hessian` of ArgminOp trait not implemented!".to_string(),
         }
         .into())
     }
 
     /// Modifies a parameter vector. Comes with a variable that indicates the "degree" of the
     /// modification.
-    fn modify(&self, _param: &Self::Parameters, _extent: f64) -> Result<Self::Parameters, Error> {
+    fn modify(&self, _param: &Self::Param, _extent: f64) -> Result<Self::Param, Error> {
         Err(ArgminError::NotImplemented {
-            text: "Method `modify` of ArgminOperator trait not implemented!".to_string(),
+            text: "Method `modify` of ArgminOp trait not implemented!".to_string(),
         }
         .into())
     }
@@ -349,10 +349,10 @@ pub trait ArgminOperator: Clone + Default + Send + Sync {
 /// avoids unneccessary computation of those values.
 pub trait ArgminLineSearch: ArgminSolver {
     /// Set the initial parameter (starting point)
-    fn set_initial_parameter(&mut self, param: <Self as ArgminNextIter>::Parameters);
+    fn set_initial_parameter(&mut self, param: <Self as ArgminIter>::Param);
 
     /// Set the search direction
-    fn set_search_direction(&mut self, direction: <Self as ArgminNextIter>::Parameters);
+    fn set_search_direction(&mut self, direction: <Self as ArgminIter>::Param);
 
     /// Set the initial step length
     fn set_initial_alpha(&mut self, step_length: f64) -> Result<(), Error>;
@@ -363,7 +363,7 @@ pub trait ArgminLineSearch: ArgminSolver {
 
     /// Set the gradient at the starting point as opposed to computing it (see
     /// `calc_initial_gradient`)
-    fn set_initial_gradient(&mut self, grad: <Self as ArgminNextIter>::Parameters);
+    fn set_initial_gradient(&mut self, grad: <Self as ArgminIter>::Param);
 
     /// calculate the initial cost function value using an operator as opposed to setting it
     /// manually (see `set_initial_cost`)
@@ -378,16 +378,16 @@ pub trait ArgminLineSearch: ArgminSolver {
 /// methods. Requires that `ArgminSolver` is implemented as well.
 pub trait ArgminTrustRegion: ArgminSolver {
     // /// Set the initial parameter (starting point)
-    // fn set_initial_parameter(&mut self, <Self as ArgminNextIter>::Parameters);
+    // fn set_initial_parameter(&mut self, <Self as ArgminIter>::Parameters);
 
     /// Set the initial step length
     fn set_radius(&mut self, radius: f64);
 
     /// Set the gradient at the starting point
-    fn set_grad(&mut self, grad: <Self as ArgminNextIter>::Parameters);
+    fn set_grad(&mut self, grad: <Self as ArgminIter>::Param);
 
     /// Set the gradient at the starting point
-    fn set_hessian(&mut self, hessian: <Self as ArgminNextIter>::Hessian);
+    fn set_hessian(&mut self, hessian: <Self as ArgminIter>::Hessian);
 }
 
 /// Every method for the update of beta needs to implement this trait.
