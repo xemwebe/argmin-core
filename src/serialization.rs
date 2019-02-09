@@ -5,7 +5,6 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use crate::ArgminSolver;
 use crate::Error;
 use serde::{Deserialize, Serialize};
 use std::default::Default;
@@ -81,31 +80,6 @@ impl ArgminCheckpoint {
         Ok(())
     }
 }
-
-// pub trait ArgminCheckpoint {
-//     fn store(&self, info: ArgminCheckpointInfo) -> Result<(), Error>;
-//     fn load() -> Self;
-// }
-
-// impl<'de, T> ArgminCheckpoint for T
-// where
-//     T: ArgminSolver + Serialize + Deserialize<'de>,
-// {
-//     fn store(&self, info: ArgminCheckpointInfo) -> Result<(), Error> {
-//         let mut filename = info.prefix();
-//         filename.push_str(".arg");
-//         let dir = Path::new(&info.dir()).join(Path::new(&filename));
-//         println!("{:?}", dir);
-//         let f = BufWriter::new(File::create(dir).unwrap());
-//         serde_json::to_writer_pretty(f, self).unwrap();
-//         // serde_json::to_string_pretty(self).unwrap()
-//         Ok(())
-//     }
-//
-//     fn load() -> Self {
-//         unimplemented!();
-//     }
-// }
 
 #[cfg(test)]
 mod tests {
