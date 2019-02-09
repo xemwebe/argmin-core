@@ -116,8 +116,9 @@ mod tests {
     #[derive(ArgminSolver, Serialize, Deserialize, Clone, Debug)]
     pub struct PhonySolver<T, H, O>
     where
-        T: Clone + Default + Debug,
-        H: Clone + Default + Debug,
+        T: Default,
+        // T: Clone + Default + Debug,
+        // H: Clone + Default + Debug,
         O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
     {
         base: ArgminBase<T, H, O>,
