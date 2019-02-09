@@ -27,23 +27,23 @@ impl Default for CheckpointMode {
 }
 
 #[derive(Clone, Serialize, Deserialize, Eq, PartialEq, Ord, PartialOrd, Debug, Hash)]
-pub struct ArgminCheckpointInfo {
+pub struct ArgminCheckpoint {
     mode: CheckpointMode,
     directory: String,
     prefix: String,
 }
 
-impl Default for ArgminCheckpointInfo {
-    fn default() -> ArgminCheckpointInfo {
-        let out = ArgminCheckpointInfo::new("checkpoints".to_string(), CheckpointMode::default());
+impl Default for ArgminCheckpoint {
+    fn default() -> ArgminCheckpoint {
+        let out = ArgminCheckpoint::new("checkpoints".to_string(), CheckpointMode::default());
         match out {
             Ok(cp) => cp,
-            Err(_) => panic!("Cannot create default ArgminCheckpointInfo."),
+            Err(_) => panic!("Cannot create default ArgminCheckpoint."),
         }
     }
 }
 
-impl ArgminCheckpointInfo {
+impl ArgminCheckpoint {
     pub fn new(directory: String, mode: CheckpointMode) -> Result<Self, Error> {
         match mode {
             CheckpointMode::Every(_) | CheckpointMode::Always => {
@@ -52,7 +52,7 @@ impl ArgminCheckpointInfo {
             _ => {}
         }
         let prefix = "solver".to_string();
-        Ok(ArgminCheckpointInfo {
+        Ok(ArgminCheckpoint {
             mode,
             directory,
             prefix,
@@ -70,32 +70,42 @@ impl ArgminCheckpointInfo {
     pub fn prefix(&self) -> String {
         self.prefix.clone()
     }
-}
 
-pub trait ArgminCheckpoint {
-    fn store(&self, info: ArgminCheckpointInfo) -> Result<(), Error>;
-    fn load() -> Self;
-}
-
-impl<'de, T> ArgminCheckpoint for T
-where
-    T: ArgminSolver + Serialize + Deserialize<'de>,
-{
-    fn store(&self, info: ArgminCheckpointInfo) -> Result<(), Error> {
-        let mut filename = info.prefix();
+    pub fn store<T: Serialize>(&self, solver: &T) -> Result<(), Error> {
+        let mut filename = self.prefix();
         filename.push_str(".arg");
-        let dir = Path::new(&info.dir()).join(Path::new(&filename));
-        println!("{:?}", dir);
+        let dir = Path::new(&self.dir()).join(Path::new(&filename));
         let f = BufWriter::new(File::create(dir).unwrap());
-        serde_json::to_writer_pretty(f, self).unwrap();
+        serde_json::to_writer_pretty(f, solver).unwrap();
         // serde_json::to_string_pretty(self).unwrap()
         Ok(())
     }
-
-    fn load() -> Self {
-        unimplemented!();
-    }
 }
+
+// pub trait ArgminCheckpoint {
+//     fn store(&self, info: ArgminCheckpointInfo) -> Result<(), Error>;
+//     fn load() -> Self;
+// }
+
+// impl<'de, T> ArgminCheckpoint for T
+// where
+//     T: ArgminSolver + Serialize + Deserialize<'de>,
+// {
+//     fn store(&self, info: ArgminCheckpointInfo) -> Result<(), Error> {
+//         let mut filename = info.prefix();
+//         filename.push_str(".arg");
+//         let dir = Path::new(&info.dir()).join(Path::new(&filename));
+//         println!("{:?}", dir);
+//         let f = BufWriter::new(File::create(dir).unwrap());
+//         serde_json::to_writer_pretty(f, self).unwrap();
+//         // serde_json::to_string_pretty(self).unwrap()
+//         Ok(())
+//     }
+//
+//     fn load() -> Self {
+//         unimplemented!();
+//     }
+// }
 
 #[cfg(test)]
 mod tests {
@@ -144,8 +154,8 @@ mod tests {
     fn test_store() {
         let op: NoOperator<Vec<f64>, f64, ()> = NoOperator::new();
         let solver = PhonySolver::new(op, vec![0.0, 0.0]);
-        let checkinfo =
-            ArgminCheckpointInfo::new("checkpoints".to_string(), CheckpointMode::Always).unwrap();
-        solver.store(checkinfo).unwrap();
+        let check =
+            ArgminCheckpoint::new("checkpoints".to_string(), CheckpointMode::Always).unwrap();
+        check.store(&solver).unwrap();
     }
 }
