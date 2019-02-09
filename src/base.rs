@@ -427,7 +427,6 @@ mod tests {
         argmin_base,
         ArgminBase<
             Vec<f64>,
-            f64,
             Vec<Vec<f64>>,
             crate::nooperator::NoOperator<Vec<f64>, f64, Vec<Vec<f64>>>,
         >

@@ -119,7 +119,7 @@ mod tests {
         H: Clone + Default + Debug,
         O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
     {
-        base: ArgminBase<T, f64, H, O>,
+        base: ArgminBase<T, H, O>,
     }
 
     impl<T, H, O> PhonySolver<T, H, O>
