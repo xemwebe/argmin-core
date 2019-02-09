@@ -8,21 +8,38 @@
 use crate::ArgminSolver;
 use crate::Error;
 use serde::{Deserialize, Serialize};
+use std::default::Default;
 use std::fs::File;
 use std::io::BufWriter;
 use std::path::Path;
 
-#[derive(Clone, Serialize, Deserialize, Eq, PartialEq, Debug, Hash, Copy)]
+#[derive(Clone, Serialize, Deserialize, Eq, PartialEq, Ord, PartialOrd, Debug, Hash, Copy)]
 pub enum CheckpointMode {
     Never,
     Every(u64),
     Always,
 }
 
-#[derive(Clone, Serialize, Deserialize, Eq, PartialEq, Debug, Hash)]
+impl Default for CheckpointMode {
+    fn default() -> CheckpointMode {
+        CheckpointMode::Never
+    }
+}
+
+#[derive(Clone, Serialize, Deserialize, Eq, PartialEq, Ord, PartialOrd, Debug, Hash)]
 pub struct ArgminCheckpointInfo {
     mode: CheckpointMode,
     directory: String,
+}
+
+impl Default for ArgminCheckpointInfo {
+    fn default() -> ArgminCheckpointInfo {
+        let out = ArgminCheckpointInfo::new("checkpoints".to_string(), CheckpointMode::default());
+        match out {
+            Ok(cp) => cp,
+            Err(_) => panic!("Cannot create default ArgminCheckpointInfo."),
+        }
+    }
 }
 
 impl ArgminCheckpointInfo {
