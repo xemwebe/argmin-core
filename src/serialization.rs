@@ -111,41 +111,35 @@ mod tests {
     use crate::nooperator::MinimalNoOperator;
     use crate::*;
     use argmin_codegen::ArgminSolver;
-    use std::fmt::Debug;
+    // use std::fmt::Debug;
 
     #[derive(ArgminSolver, Serialize, Deserialize, Clone, Debug)]
-    pub struct PhonySolver<T, H, O>
+    pub struct PhonySolver<O>
     where
-        T: Clone + Default + Debug,
-        H: Clone + Default + Debug,
-        O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
+        O: ArgminOperator,
     {
-        base: ArgminBase<T, H, O>,
+        base: ArgminBase<O>,
     }
 
-    impl<T, H, O> PhonySolver<T, H, O>
+    impl<O> PhonySolver<O>
     where
-        T: Clone + Default + Debug,
-        H: Clone + Default + Debug,
-        O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
+        O: ArgminOperator,
     {
         /// Constructor
-        pub fn new(op: O, init_param: T) -> Self {
+        pub fn new(op: O, init_param: <O as ArgminOperator>::Parameters) -> Self {
             PhonySolver {
                 base: ArgminBase::new(op, init_param),
             }
         }
     }
 
-    impl<T, H, O> ArgminNextIter for PhonySolver<T, H, O>
+    impl<O> ArgminNextIter for PhonySolver<O>
     where
-        T: Clone + Default + Debug,
-        H: Clone + Default + Debug,
-        O: ArgminOperator<Parameters = T, OperatorOutput = f64, Hessian = H>,
+        O: ArgminOperator,
     {
-        type Parameters = T;
-        type OperatorOutput = f64;
-        type Hessian = H;
+        type Parameters = <O as ArgminOperator>::Parameters;
+        type OperatorOutput = <O as ArgminOperator>::OperatorOutput;
+        type Hessian = <O as ArgminOperator>::Hessian;
 
         fn next_iter(&mut self) -> Result<ArgminIterationData<Self::Parameters>, Error> {
             unimplemented!()
@@ -159,7 +153,7 @@ mod tests {
         let check = ArgminCheckpoint::new("checkpoints", CheckpointMode::Always).unwrap();
         check.store_cond(&solver, 20).unwrap();
 
-        let loaded: PhonySolver<Vec<f64>, Vec<Vec<f64>>, MinimalNoOperator> =
+        let loaded: PhonySolver<MinimalNoOperator> =
             load_checkpoint("checkpoints/solver.arg").unwrap();
         println!("{:?}", loaded);
     }

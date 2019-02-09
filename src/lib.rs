@@ -296,13 +296,13 @@ impl<T: Clone> ArgminIterationData<T> {
 /// implementation which is essentially returning an error which indicates that the method has not
 /// been implemented. Those methods (`gradient` and `modify`) only need to be implemented if the
 /// uses solver requires it.
-pub trait ArgminOperator: Clone + Send + Sync {
+pub trait ArgminOperator: Clone + Default + Send + Sync {
     /// Type of the parameter vector
-    type Parameters;
+    type Parameters: Clone + Default + serde::Serialize + serde::de::DeserializeOwned;
     /// Output of the operator. Most solvers expect `f64`.
     type OperatorOutput;
     /// Type of Hessian
-    type Hessian;
+    type Hessian: Clone + Default + serde::Serialize + serde::de::DeserializeOwned;
 
     /// Applies the operator/cost function to parameters
     fn apply(&self, _param: &Self::Parameters) -> Result<Self::OperatorOutput, Error> {

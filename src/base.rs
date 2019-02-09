@@ -34,17 +34,17 @@ use std::sync::Arc;
 /// TODO: cur_cost, best_cost and target_cost should be `U`, but then initialization is difficult
 /// as it cannot be expected that each `U` has something like `INFINITY` and `NEG_INFINITY`...
 #[derive(Clone, Serialize, Deserialize)]
-pub struct ArgminBase<T, H, O> {
+pub struct ArgminBase<O: ArgminOperator> {
     /// The operator/cost function
     operator: O,
 
     /// Current parameter vector
     // #[serde(bound = "T: Default")]
-    cur_param: T,
+    cur_param: <O as ArgminOperator>::Parameters,
 
     /// Current best parameter vector
     // #[serde(bound = "T: Default")]
-    best_param: T,
+    best_param: <O as ArgminOperator>::Parameters,
 
     /// Current cost function value
     cur_cost: f64,
@@ -56,10 +56,10 @@ pub struct ArgminBase<T, H, O> {
     target_cost: f64,
 
     /// Current gradient
-    cur_grad: T,
+    cur_grad: <O as ArgminOperator>::Parameters,
 
     /// Current hessian
-    cur_hessian: H,
+    cur_hessian: <O as ArgminOperator>::Hessian,
 
     /// Current iteration number
     cur_iter: u64,
@@ -88,17 +88,15 @@ pub struct ArgminBase<T, H, O> {
 
     /// Storage for writers
     #[serde(skip)]
-    writer: ArgminWriter<T>,
+    writer: ArgminWriter<<O as ArgminOperator>::Parameters>,
 }
 
-impl<T, U, H, O> ArgminBase<T, H, O>
+impl<O> ArgminBase<O>
 where
-    T: Clone + Default,
-    H: Clone + Default,
-    O: ArgminOperator<Parameters = T, OperatorOutput = U, Hessian = H>,
+    O: ArgminOperator,
 {
     /// Constructor
-    pub fn new(operator: O, param: T) -> Self {
+    pub fn new(operator: O, param: <O as ArgminOperator>::Parameters) -> Self {
         ArgminBase {
             operator,
             cur_param: param.clone(),
@@ -106,8 +104,8 @@ where
             cur_cost: std::f64::INFINITY,
             best_cost: std::f64::INFINITY,
             target_cost: std::f64::NEG_INFINITY,
-            cur_grad: T::default(),
-            cur_hessian: H::default(),
+            cur_grad: <O as ArgminOperator>::Parameters::default(),
+            cur_hessian: <O as ArgminOperator>::Hessian::default(),
             cur_iter: 0,
             max_iters: std::u64::MAX,
             cost_func_count: 0,
@@ -159,47 +157,60 @@ where
     }
 
     /// Apply the operator to `param`
-    pub fn apply(&mut self, param: &T) -> Result<U, Error> {
+    pub fn apply(
+        &mut self,
+        param: &<O as ArgminOperator>::Parameters,
+    ) -> Result<<O as ArgminOperator>::OperatorOutput, Error> {
         self.increment_cost_func_count();
         self.operator.apply(param)
     }
 
     /// Compute the gradient at `param`
-    pub fn gradient(&mut self, param: &T) -> Result<T, Error> {
+    pub fn gradient(
+        &mut self,
+        param: &<O as ArgminOperator>::Parameters,
+    ) -> Result<<O as ArgminOperator>::Parameters, Error> {
         self.increment_grad_func_count();
         self.operator.gradient(param)
     }
 
     /// Compute the hessian at `param`
-    pub fn hessian(&mut self, param: &T) -> Result<H, Error> {
+    pub fn hessian(
+        &mut self,
+        param: &<O as ArgminOperator>::Parameters,
+    ) -> Result<<O as ArgminOperator>::Hessian, Error> {
         self.increment_hessian_func_count();
         self.operator.hessian(param)
     }
 
     /// Modify a `param` with the `modify` method of `operator`.
-    pub fn modify(&self, param: &T, factor: f64) -> Result<T, Error> {
+    pub fn modify(
+        &self,
+        param: &<O as ArgminOperator>::Parameters,
+        factor: f64,
+    ) -> Result<<O as ArgminOperator>::Parameters, Error> {
         self.operator.modify(&param, factor)
     }
 
     /// Set the current parameter vector
-    pub fn set_cur_param(&mut self, param: T) -> &mut Self {
+    pub fn set_cur_param(&mut self, param: <O as ArgminOperator>::Parameters) -> &mut Self {
         self.cur_param = param;
         self
     }
 
     /// Return the current parameter vector
-    pub fn cur_param(&self) -> T {
+    pub fn cur_param(&self) -> <O as ArgminOperator>::Parameters {
         self.cur_param.clone()
     }
 
     /// Set the new best parameter vector
-    pub fn set_best_param(&mut self, param: T) -> &mut Self {
+    pub fn set_best_param(&mut self, param: <O as ArgminOperator>::Parameters) -> &mut Self {
         self.best_param = param;
         self
     }
 
     /// Return the current best parameter vector
-    pub fn best_param(&self) -> T {
+    pub fn best_param(&self) -> <O as ArgminOperator>::Parameters {
         self.best_param.clone()
     }
 
@@ -226,24 +237,24 @@ where
     }
 
     /// Set the current gradient
-    pub fn set_cur_grad(&mut self, grad: T) -> &mut Self {
+    pub fn set_cur_grad(&mut self, grad: <O as ArgminOperator>::Parameters) -> &mut Self {
         self.cur_grad = grad;
         self
     }
 
     /// Return the current gradient
-    pub fn cur_grad(&self) -> T {
+    pub fn cur_grad(&self) -> <O as ArgminOperator>::Parameters {
         self.cur_grad.clone()
     }
 
     /// Set the current hessian
-    pub fn set_cur_hessian(&mut self, hessian: H) -> &mut Self {
+    pub fn set_cur_hessian(&mut self, hessian: <O as ArgminOperator>::Hessian) -> &mut Self {
         self.cur_hessian = hessian;
         self
     }
 
     /// Return the current hessian
-    pub fn cur_hessian(&self) -> H {
+    pub fn cur_hessian(&self) -> <O as ArgminOperator>::Hessian {
         self.cur_hessian.clone()
     }
 
@@ -353,7 +364,7 @@ where
     }
 
     /// Return the result.
-    pub fn result(&self) -> ArgminResult<T> {
+    pub fn result(&self) -> ArgminResult<<O as ArgminOperator>::Parameters> {
         ArgminResult::new(
             self.best_param.clone(),
             self.best_cost(),
@@ -380,7 +391,10 @@ where
     }
 
     /// Add a writer to the list of writers
-    pub fn add_writer(&mut self, writer: Arc<ArgminWrite<Param = T>>) -> &mut Self {
+    pub fn add_writer(
+        &mut self,
+        writer: Arc<ArgminWrite<Param = <O as ArgminOperator>::Parameters>>,
+    ) -> &mut Self {
         self.writer.push(writer);
         self
     }
@@ -396,14 +410,14 @@ where
     }
 
     /// Write (TODO)
-    pub fn write(&self, param: &T) -> Result<(), Error> {
+    pub fn write(&self, param: &<O as ArgminOperator>::Parameters) -> Result<(), Error> {
         self.writer.write(param)
     }
 }
 
-impl<T, U, H, O> std::fmt::Debug for ArgminBase<T, H, O>
+impl<O> std::fmt::Debug for ArgminBase<O>
 where
-    O: ArgminOperator<Parameters = T, OperatorOutput = U, Hessian = H>,
+    O: ArgminOperator,
 {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "ArgminBase:\n")?;
@@ -427,10 +441,6 @@ mod tests {
 
     send_sync_test!(
         argmin_base,
-        ArgminBase<
-            Vec<f64>,
-            Vec<Vec<f64>>,
-            crate::nooperator::NoOperator<Vec<f64>, f64, Vec<Vec<f64>>>,
-        >
+        ArgminBase<crate::nooperator::NoOperator<Vec<f64>, f64, Vec<Vec<f64>>>>
     );
 }

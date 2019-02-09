@@ -6,6 +6,7 @@
 // copied, modified, or distributed except according to those terms.
 
 use crate::{ArgminOperator, Error};
+use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use std::default::Default;
 use std::fmt::Debug;
@@ -13,9 +14,9 @@ use std::fmt::Debug;
 #[derive(Clone, Default, Debug, Serialize, Deserialize)]
 pub struct NoOperator<T, U, H>
 where
-    T: Clone + Default + Debug + Send + Sync,
-    U: Clone + Default + Debug + Send + Sync,
-    H: Clone + Default + Debug + Send + Sync,
+    T: Clone + Default + Debug + Send + Sync + Serialize + DeserializeOwned,
+    U: Clone + Default + Debug + Send + Sync + Serialize + DeserializeOwned,
+    H: Clone + Default + Debug + Send + Sync + Serialize + DeserializeOwned,
 {
     param: std::marker::PhantomData<T>,
     output: std::marker::PhantomData<U>,
@@ -24,9 +25,9 @@ where
 
 impl<T, U, H> NoOperator<T, U, H>
 where
-    T: Clone + Default + Debug + Send + Sync,
-    U: Clone + Default + Debug + Send + Sync,
-    H: Clone + Default + Debug + Send + Sync,
+    T: Clone + Default + Debug + Send + Sync + Serialize + DeserializeOwned,
+    U: Clone + Default + Debug + Send + Sync + Serialize + DeserializeOwned,
+    H: Clone + Default + Debug + Send + Sync + Serialize + DeserializeOwned,
 {
     #[allow(dead_code)]
     pub fn new() -> Self {
@@ -40,9 +41,9 @@ where
 
 impl<T, U, H> ArgminOperator for NoOperator<T, U, H>
 where
-    T: Clone + Default + Debug + Send + Sync,
-    U: Clone + Default + Debug + Send + Sync,
-    H: Clone + Default + Debug + Send + Sync,
+    T: Clone + Default + Debug + Send + Sync + Serialize + DeserializeOwned,
+    U: Clone + Default + Debug + Send + Sync + Serialize + DeserializeOwned,
+    H: Clone + Default + Debug + Send + Sync + Serialize + DeserializeOwned,
 {
     type Parameters = T;
     type OperatorOutput = U;
