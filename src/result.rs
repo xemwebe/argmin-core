@@ -14,13 +14,11 @@
 //!   * Maybe it is more appropriate to return the `base` struct?
 
 use crate::termination::TerminationReason;
-#[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 
 /// Return struct for all solvers.
-#[derive(Debug, Clone, Default)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct ArgminResult<T> {
     /// Final parameter vector
     pub param: T,
