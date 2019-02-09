@@ -30,6 +30,7 @@ impl Default for CheckpointMode {
 pub struct ArgminCheckpointInfo {
     mode: CheckpointMode,
     directory: String,
+    prefix: String,
 }
 
 impl Default for ArgminCheckpointInfo {
@@ -50,16 +51,29 @@ impl ArgminCheckpointInfo {
             }
             _ => {}
         }
-        Ok(ArgminCheckpointInfo { mode, directory })
+        let prefix = "solver".to_string();
+        Ok(ArgminCheckpointInfo {
+            mode,
+            directory,
+            prefix,
+        })
     }
 
     pub fn dir(&self) -> String {
         self.directory.clone()
     }
+
+    pub fn set_prefix(&mut self, prefix: String) {
+        self.prefix = prefix;
+    }
+
+    pub fn prefix(&self) -> String {
+        self.prefix.clone()
+    }
 }
 
 pub trait ArgminCheckpoint {
-    fn store(&self, info: ArgminCheckpointInfo) -> String;
+    fn store(&self, info: ArgminCheckpointInfo) -> Result<(), Error>;
     fn load() -> Self;
 }
 
@@ -67,13 +81,15 @@ impl<'de, T> ArgminCheckpoint for T
 where
     T: ArgminSolver + Serialize + Deserialize<'de>,
 {
-    fn store(&self, info: ArgminCheckpointInfo) -> String {
-        let dir = Path::new(&info.dir()).join(Path::new("bla.arg"));
+    fn store(&self, info: ArgminCheckpointInfo) -> Result<(), Error> {
+        let mut filename = info.prefix();
+        filename.push_str(".arg");
+        let dir = Path::new(&info.dir()).join(Path::new(&filename));
         println!("{:?}", dir);
         let f = BufWriter::new(File::create(dir).unwrap());
         serde_json::to_writer_pretty(f, self).unwrap();
         // serde_json::to_string_pretty(self).unwrap()
-        String::default()
+        Ok(())
     }
 
     fn load() -> Self {
@@ -130,6 +146,6 @@ mod tests {
         let solver = PhonySolver::new(op, vec![0.0, 0.0]);
         let checkinfo =
             ArgminCheckpointInfo::new("checkpoints".to_string(), CheckpointMode::Always).unwrap();
-        println!("{}", solver.store(checkinfo));
+        solver.store(checkinfo).unwrap();
     }
 }
