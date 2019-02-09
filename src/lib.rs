@@ -204,7 +204,7 @@ pub trait ArgminSolver: ArgminNextIter {
 /// corresponds to doing nothing.
 pub trait ArgminNextIter {
     /// Parameter vectors
-    type Parameters: Clone;
+    type Parameters;
     /// Output of the operator
     type OperatorOutput;
     /// Hessian
@@ -246,7 +246,7 @@ pub trait ArgminWrite: Send + Sync {
 ///
 /// TODO: think about removing this or replacing it with something better. Actually, a tuple would
 /// be sufficient.
-pub struct ArgminIterationData<T: Clone> {
+pub struct ArgminIterationData<T> {
     /// Current parameter vector
     param: T,
     /// Current cost function value

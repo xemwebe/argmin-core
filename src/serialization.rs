@@ -6,6 +6,7 @@
 // copied, modified, or distributed except according to those terms.
 
 use crate::Error;
+use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use std::default::Default;
 use std::fs::File;
@@ -97,7 +98,7 @@ impl ArgminCheckpoint {
     }
 }
 
-pub fn load_checkpoint<T: for<'de> Deserialize<'de>, P: AsRef<Path>>(path: P) -> Result<T, Error> {
+pub fn load_checkpoint<T: DeserializeOwned, P: AsRef<Path>>(path: P) -> Result<T, Error> {
     let file = File::open(path)?;
     let reader = BufReader::new(file);
     // Ok(serde_json::from_reader(reader)?)
