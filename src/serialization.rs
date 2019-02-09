@@ -34,7 +34,7 @@ pub struct ArgminCheckpoint {
 
 impl Default for ArgminCheckpoint {
     fn default() -> ArgminCheckpoint {
-        let out = ArgminCheckpoint::new("checkpoints".to_string(), CheckpointMode::default());
+        let out = ArgminCheckpoint::new("checkpoints", CheckpointMode::default());
         match out {
             Ok(cp) => cp,
             Err(_) => panic!("Cannot create default ArgminCheckpoint."),
@@ -43,7 +43,7 @@ impl Default for ArgminCheckpoint {
 }
 
 impl ArgminCheckpoint {
-    pub fn new(directory: String, mode: CheckpointMode) -> Result<Self, Error> {
+    pub fn new(directory: &str, mode: CheckpointMode) -> Result<Self, Error> {
         match mode {
             CheckpointMode::Every(_) | CheckpointMode::Always => {
                 std::fs::create_dir_all(&directory)?
@@ -51,6 +51,7 @@ impl ArgminCheckpoint {
             _ => {}
         }
         let prefix = "solver".to_string();
+        let directory = directory.to_string();
         Ok(ArgminCheckpoint {
             mode,
             directory,
@@ -62,8 +63,8 @@ impl ArgminCheckpoint {
         self.directory.clone()
     }
 
-    pub fn set_prefix(&mut self, prefix: String) {
-        self.prefix = prefix;
+    pub fn set_prefix(&mut self, prefix: &str) {
+        self.prefix = prefix.to_string();
     }
 
     pub fn prefix(&self) -> String {
@@ -128,8 +129,7 @@ mod tests {
     fn test_store() {
         let op: NoOperator<Vec<f64>, f64, ()> = NoOperator::new();
         let solver = PhonySolver::new(op, vec![0.0, 0.0]);
-        let check =
-            ArgminCheckpoint::new("checkpoints".to_string(), CheckpointMode::Always).unwrap();
+        let check = ArgminCheckpoint::new("checkpoints", CheckpointMode::Always).unwrap();
         check.store(&solver).unwrap();
     }
 }
