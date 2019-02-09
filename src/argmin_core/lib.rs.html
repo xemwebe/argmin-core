@@ -391,6 +391,13 @@
 <span id="391">391</span>
 <span id="392">392</span>
 <span id="393">393</span>
+<span id="394">394</span>
+<span id="395">395</span>
+<span id="396">396</span>
+<span id="397">397</span>
+<span id="398">398</span>
+<span id="399">399</span>
+<span id="400">400</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -427,10 +434,15 @@
 <span class="kw">mod</span> <span class="ident">logging</span>;
 <span class="doccomment">/// Math utilities</span>
 <span class="kw">mod</span> <span class="ident">math</span>;
+<span class="doccomment">/// Phony Operator</span>
+<span class="comment">// #[cfg(test)]</span>
+<span class="kw">mod</span> <span class="ident">nooperator</span>;
 <span class="doccomment">/// Output</span>
 <span class="kw">mod</span> <span class="ident">output</span>;
 <span class="doccomment">/// Definition of the return type of the solvers</span>
 <span class="kw">mod</span> <span class="ident">result</span>;
+<span class="doccomment">/// Serialization of `ArgminSolver`s</span>
+<span class="kw">mod</span> <span class="ident">serialization</span>;
 <span class="doccomment">/// Definition of termination reasons</span>
 <span class="kw">mod</span> <span class="ident">termination</span>;
 
@@ -441,11 +453,13 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">logging</span>::<span class="ident">slog_logger</span>::<span class="ident">ArgminSlogLogger</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">logging</span>::<span class="ident">ArgminLogger</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">math</span>::<span class="kw-2">*</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">nooperator</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">output</span>::<span class="ident">file</span>::<span class="ident">WriteToFile</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">output</span>::<span class="ident">ArgminWriter</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">result</span>::<span class="ident">ArgminResult</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">termination</span>::<span class="ident">TerminationReason</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">failure</span>::<span class="ident">Error</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">serialization</span>::<span class="kw-2">*</span>;
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">finitediff</span> {
     <span class="doccomment">//! Finite Differentiation</span>
@@ -591,7 +605,7 @@
 <span class="doccomment">/// corresponds to doing nothing.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ArgminNextIter</span> {
     <span class="doccomment">/// Parameter vectors</span>
-    <span class="kw">type</span> <span class="ident">Parameters</span>: <span class="ident">Clone</span>;
+    <span class="kw">type</span> <span class="ident">Parameters</span>;
     <span class="doccomment">/// Output of the operator</span>
     <span class="kw">type</span> <span class="ident">OperatorOutput</span>;
     <span class="doccomment">/// Hessian</span>
@@ -633,7 +647,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// TODO: think about removing this or replacing it with something better. Actually, a tuple would</span>
 <span class="doccomment">/// be sufficient.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ArgminIterationData</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Clone</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ArgminIterationData</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Current parameter vector</span>
     <span class="ident">param</span>: <span class="ident">T</span>,
     <span class="doccomment">/// Current cost function value</span>
