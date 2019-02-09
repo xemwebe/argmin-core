@@ -34,10 +34,7 @@ use std::sync::Arc;
 /// TODO: cur_cost, best_cost and target_cost should be `U`, but then initialization is difficult
 /// as it cannot be expected that each `U` has something like `INFINITY` and `NEG_INFINITY`...
 #[derive(Clone, Serialize, Deserialize)]
-pub struct ArgminBase<T, U, H, O>
-where
-    O: ArgminOperator<Parameters = T, OperatorOutput = U, Hessian = H>,
-{
+pub struct ArgminBase<T, H, O> {
     /// The operator/cost function
     operator: O,
 
@@ -92,7 +89,7 @@ where
     writer: ArgminWriter<T>,
 }
 
-impl<T, U, H, O> ArgminBase<T, U, H, O>
+impl<T, U, H, O> ArgminBase<T, H, O>
 where
     T: Clone + Default,
     H: Clone + Default,
@@ -402,7 +399,7 @@ where
     }
 }
 
-impl<T, U, H, O> std::fmt::Debug for ArgminBase<T, U, H, O>
+impl<T, U, H, O> std::fmt::Debug for ArgminBase<T, H, O>
 where
     O: ArgminOperator<Parameters = T, OperatorOutput = U, Hessian = H>,
 {
