@@ -59,25 +59,37 @@ impl ArgminCheckpoint {
         })
     }
 
+    #[inline]
     pub fn dir(&self) -> String {
         self.directory.clone()
     }
 
+    #[inline]
     pub fn set_prefix(&mut self, prefix: &str) {
         self.prefix = prefix.to_string();
     }
 
+    #[inline]
     pub fn prefix(&self) -> String {
         self.prefix.clone()
     }
 
-    pub fn store<T: Serialize>(&self, solver: &T) -> Result<(), Error> {
+    fn store<T: Serialize>(&self, solver: &T) -> Result<(), Error> {
         let mut filename = self.prefix();
         filename.push_str(".arg");
-        let dir = Path::new(&self.dir()).join(Path::new(&filename));
-        let f = BufWriter::new(File::create(dir).unwrap());
-        serde_json::to_writer_pretty(f, solver).unwrap();
+        let dir = Path::new(&self.directory).join(Path::new(&filename));
+        let f = BufWriter::new(File::create(dir)?);
+        serde_json::to_writer_pretty(f, solver)?;
         // serde_json::to_string_pretty(self).unwrap()
+        Ok(())
+    }
+
+    pub fn store_cond<T: Serialize>(&self, solver: &T, iter: u64) -> Result<(), Error> {
+        match self.mode {
+            CheckpointMode::Always => self.store(solver)?,
+            CheckpointMode::Every(it) if iter % it == 0 => self.store(solver)?,
+            CheckpointMode::Never | CheckpointMode::Every(_) => {}
+        };
         Ok(())
     }
 }
@@ -130,6 +142,6 @@ mod tests {
         let op: NoOperator<Vec<f64>, f64, ()> = NoOperator::new();
         let solver = PhonySolver::new(op, vec![0.0, 0.0]);
         let check = ArgminCheckpoint::new("checkpoints", CheckpointMode::Always).unwrap();
-        check.store(&solver).unwrap();
+        check.store_cond(&solver, 20).unwrap();
     }
 }
