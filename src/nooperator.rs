@@ -64,3 +64,35 @@ where
         Ok(Self::Parameters::default())
     }
 }
+
+#[derive(Clone, Default, Debug, Serialize, Deserialize)]
+pub struct MinimalNoOperator {}
+
+impl MinimalNoOperator {
+    #[allow(dead_code)]
+    pub fn new() -> Self {
+        MinimalNoOperator {}
+    }
+}
+
+impl ArgminOperator for MinimalNoOperator {
+    type Parameters = Vec<f64>;
+    type OperatorOutput = f64;
+    type Hessian = Vec<Vec<f64>>;
+
+    fn apply(&self, _p: &Self::Parameters) -> Result<Self::OperatorOutput, Error> {
+        unimplemented!()
+    }
+
+    fn gradient(&self, _p: &Self::Parameters) -> Result<Self::Parameters, Error> {
+        unimplemented!()
+    }
+
+    fn hessian(&self, _p: &Self::Parameters) -> Result<Self::Hessian, Error> {
+        unimplemented!()
+    }
+
+    fn modify(&self, _p: &Self::Parameters, _t: f64) -> Result<Self::Parameters, Error> {
+        unimplemented!()
+    }
+}
