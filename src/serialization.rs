@@ -6,19 +6,57 @@
 // copied, modified, or distributed except according to those terms.
 
 use crate::ArgminSolver;
+use crate::Error;
 use serde::{Deserialize, Serialize};
+use std::fs::File;
+use std::io::BufWriter;
+use std::path::Path;
 
-pub trait ArgminSnapshot {
-    fn store(&self) -> String;
+#[derive(Clone, Serialize, Deserialize, Eq, PartialEq, Debug, Hash, Copy)]
+pub enum CheckpointMode {
+    Never,
+    Every(u64),
+    Always,
+}
+
+#[derive(Clone, Serialize, Deserialize, Eq, PartialEq, Debug, Hash)]
+pub struct ArgminCheckpointInfo {
+    mode: CheckpointMode,
+    directory: String,
+}
+
+impl ArgminCheckpointInfo {
+    pub fn new(directory: String, mode: CheckpointMode) -> Result<Self, Error> {
+        match mode {
+            CheckpointMode::Every(_) | CheckpointMode::Always => {
+                std::fs::create_dir_all(&directory)?
+            }
+            _ => {}
+        }
+        Ok(ArgminCheckpointInfo { mode, directory })
+    }
+
+    pub fn dir(&self) -> String {
+        self.directory.clone()
+    }
+}
+
+pub trait ArgminCheckpoint {
+    fn store(&self, info: ArgminCheckpointInfo) -> String;
     fn load() -> Self;
 }
 
-impl<'de, T> ArgminSnapshot for T
+impl<'de, T> ArgminCheckpoint for T
 where
     T: ArgminSolver + Serialize + Deserialize<'de>,
 {
-    fn store(&self) -> String {
-        serde_json::to_string_pretty(self).unwrap()
+    fn store(&self, info: ArgminCheckpointInfo) -> String {
+        let dir = Path::new(&info.dir()).join(Path::new("bla.arg"));
+        println!("{:?}", dir);
+        let f = BufWriter::new(File::create(dir).unwrap());
+        serde_json::to_writer_pretty(f, self).unwrap();
+        // serde_json::to_string_pretty(self).unwrap()
+        String::default()
     }
 
     fn load() -> Self {
@@ -73,6 +111,8 @@ mod tests {
     fn test_store() {
         let op: NoOperator<Vec<f64>, f64, ()> = NoOperator::new();
         let solver = PhonySolver::new(op, vec![0.0, 0.0]);
-        println!("{}", solver.store());
+        let checkinfo =
+            ArgminCheckpointInfo::new("checkpoints".to_string(), CheckpointMode::Always).unwrap();
+        println!("{}", solver.store(checkinfo));
     }
 }
