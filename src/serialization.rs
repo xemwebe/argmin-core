@@ -74,7 +74,7 @@ impl ArgminCheckpoint {
         self.prefix.clone()
     }
 
-    fn store<T: Serialize>(&self, solver: &T) -> Result<(), Error> {
+    pub fn store<T: Serialize>(&self, solver: &T) -> Result<(), Error> {
         let mut filename = self.prefix();
         filename.push_str(".arg");
         let dir = Path::new(&self.directory).join(Path::new(&filename));
