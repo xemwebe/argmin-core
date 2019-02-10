@@ -470,62 +470,62 @@
 
 <span class="doccomment">/// Defines the interface to a solver. Usually, there is no need to implement this manually, use</span>
 <span class="doccomment">/// the `argmin_derive` crate instead.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ArgminSolver</span>: <span class="ident">ArgminNextIter</span> {
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ArgminSolver</span>: <span class="ident">ArgminIter</span> {
     <span class="doccomment">/// apply cost function or operator to a parameter vector</span>
     <span class="kw">fn</span> <span class="ident">apply</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">param</span>: <span class="kw-2">&amp;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span>,
-    ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">OperatorOutput</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
+        <span class="ident">param</span>: <span class="kw-2">&amp;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminIter</span><span class="op">&gt;</span>::<span class="ident">Param</span>,
+    ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminIter</span><span class="op">&gt;</span>::<span class="ident">Output</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// compute the gradient for a parameter vector</span>
     <span class="kw">fn</span> <span class="ident">gradient</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">param</span>: <span class="kw-2">&amp;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span>,
-    ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
+        <span class="ident">param</span>: <span class="kw-2">&amp;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminIter</span><span class="op">&gt;</span>::<span class="ident">Param</span>,
+    ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminIter</span><span class="op">&gt;</span>::<span class="ident">Param</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// compute the hessian for a parameter vector</span>
     <span class="kw">fn</span> <span class="ident">hessian</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">param</span>: <span class="kw-2">&amp;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span>,
-    ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Hessian</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
+        <span class="ident">param</span>: <span class="kw-2">&amp;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminIter</span><span class="op">&gt;</span>::<span class="ident">Param</span>,
+    ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminIter</span><span class="op">&gt;</span>::<span class="ident">Hessian</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// modify the parameter vector</span>
     <span class="kw">fn</span> <span class="ident">modify</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">param</span>: <span class="kw-2">&amp;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span>,
+        <span class="ident">param</span>: <span class="kw-2">&amp;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminIter</span><span class="op">&gt;</span>::<span class="ident">Param</span>,
         <span class="ident">extent</span>: <span class="ident">f64</span>,
-    ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
+    ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminIter</span><span class="op">&gt;</span>::<span class="ident">Param</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// return current parameter vector</span>
-    <span class="kw">fn</span> <span class="ident">cur_param</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span>;
+    <span class="kw">fn</span> <span class="ident">cur_param</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminIter</span><span class="op">&gt;</span>::<span class="ident">Param</span>;
 
     <span class="doccomment">/// return current gradient</span>
-    <span class="kw">fn</span> <span class="ident">cur_grad</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span>;
+    <span class="kw">fn</span> <span class="ident">cur_grad</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminIter</span><span class="op">&gt;</span>::<span class="ident">Param</span>;
 
     <span class="doccomment">/// return current gradient</span>
-    <span class="kw">fn</span> <span class="ident">cur_hessian</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Hessian</span>;
+    <span class="kw">fn</span> <span class="ident">cur_hessian</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminIter</span><span class="op">&gt;</span>::<span class="ident">Hessian</span>;
 
     <span class="doccomment">/// set current parameter vector</span>
-    <span class="kw">fn</span> <span class="ident">set_cur_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">param</span>: <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span>);
+    <span class="kw">fn</span> <span class="ident">set_cur_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">param</span>: <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminIter</span><span class="op">&gt;</span>::<span class="ident">Param</span>);
 
     <span class="doccomment">/// set current gradient</span>
-    <span class="kw">fn</span> <span class="ident">set_cur_grad</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">grad</span>: <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span>);
+    <span class="kw">fn</span> <span class="ident">set_cur_grad</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">grad</span>: <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminIter</span><span class="op">&gt;</span>::<span class="ident">Param</span>);
 
     <span class="doccomment">/// set current gradient</span>
-    <span class="kw">fn</span> <span class="ident">set_cur_hessian</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">hessian</span>: <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Hessian</span>);
+    <span class="kw">fn</span> <span class="ident">set_cur_hessian</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">hessian</span>: <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminIter</span><span class="op">&gt;</span>::<span class="ident">Hessian</span>);
 
     <span class="doccomment">/// set current parameter vector</span>
-    <span class="kw">fn</span> <span class="ident">set_best_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">param</span>: <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span>);
+    <span class="kw">fn</span> <span class="ident">set_best_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">param</span>: <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminIter</span><span class="op">&gt;</span>::<span class="ident">Param</span>);
 
     <span class="doccomment">/// Execute the optimization algorithm.</span>
-    <span class="kw">fn</span> <span class="ident">run</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ArgminResult</span><span class="op">&lt;&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">run</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ArgminResult</span><span class="op">&lt;&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminIter</span><span class="op">&gt;</span>::<span class="ident">Param</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Execute the optimization algorithm without Ctrl-C handling, logging, writing and anything</span>
     <span class="doccomment">/// else which may cost unnecessary time.</span>
-    <span class="kw">fn</span> <span class="ident">run_fast</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ArgminResult</span><span class="op">&lt;&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">run_fast</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ArgminResult</span><span class="op">&lt;&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminIter</span><span class="op">&gt;</span>::<span class="ident">Param</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Returns the best solution found during optimization.</span>
-    <span class="kw">fn</span> <span class="ident">result</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">ArgminResult</span><span class="op">&lt;&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">result</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">ArgminResult</span><span class="op">&lt;&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminIter</span><span class="op">&gt;</span>::<span class="ident">Param</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Set termination reason (doesn&#39;t terminate yet! -- this is helpful for terminating within</span>
     <span class="doccomment">/// the iterations)</span>
@@ -553,11 +553,11 @@
     <span class="kw">fn</span> <span class="ident">set_cur_cost</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cost</span>: <span class="ident">f64</span>);
 
     <span class="doccomment">/// Get best cost function value</span>
-    <span class="comment">// fn best_cost(&amp;self) -&gt; &lt;Self as ArgminNextIter&gt;::OperatorOutput;</span>
+    <span class="comment">// fn best_cost(&amp;self) -&gt; &lt;Self as ArgminIter&gt;::Output;</span>
     <span class="kw">fn</span> <span class="ident">best_cost</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">f64</span>;
 
     <span class="doccomment">/// set best cost value</span>
-    <span class="comment">// fn set_best_cost(&amp;mut self, &lt;Self as ArgminNextIter&gt;::OperatorOutput);</span>
+    <span class="comment">// fn set_best_cost(&amp;mut self, &lt;Self as ArgminIter&gt;::Output);</span>
     <span class="kw">fn</span> <span class="ident">set_best_cost</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cost</span>: <span class="ident">f64</span>);
 
     <span class="doccomment">/// Set the target cost function value which is used as a stopping criterion</span>
@@ -567,7 +567,7 @@
     <span class="kw">fn</span> <span class="ident">add_logger</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">logger</span>: <span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ArgminLog</span><span class="op">&gt;</span>);
 
     <span class="doccomment">/// Add a writer to the array of writers</span>
-    <span class="kw">fn</span> <span class="ident">add_writer</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">writer</span>: <span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ArgminWrite</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="self">Self</span>::<span class="ident">Parameters</span><span class="op">&gt;&gt;</span>);
+    <span class="kw">fn</span> <span class="ident">add_writer</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">writer</span>: <span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ArgminWrite</span><span class="op">&lt;</span><span class="ident">Param</span> <span class="op">=</span> <span class="self">Self</span>::<span class="ident">Param</span><span class="op">&gt;&gt;</span>);
 
     <span class="doccomment">/// Reset the base of the algorithm to its initial state</span>
     <span class="kw">fn</span> <span class="ident">base_reset</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>);
@@ -603,16 +603,16 @@
 <span class="doccomment">/// Main part of every solver: `next_iter` computes one iteration of the algorithm and `init` is</span>
 <span class="doccomment">/// executed before these iterations. The `init` method comes with a default implementation which</span>
 <span class="doccomment">/// corresponds to doing nothing.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ArgminNextIter</span> {
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ArgminIter</span> {
     <span class="doccomment">/// Parameter vectors</span>
-    <span class="kw">type</span> <span class="ident">Parameters</span>;
+    <span class="kw">type</span> <span class="ident">Param</span>;
     <span class="doccomment">/// Output of the operator</span>
-    <span class="kw">type</span> <span class="ident">OperatorOutput</span>;
+    <span class="kw">type</span> <span class="ident">Output</span>;
     <span class="doccomment">/// Hessian</span>
     <span class="kw">type</span> <span class="ident">Hessian</span>;
 
     <span class="doccomment">/// Computes one iteration of the algorithm.</span>
-    <span class="kw">fn</span> <span class="ident">next_iter</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ArgminIterationData</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Parameters</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">next_iter</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ArgminIterData</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Param</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Initializes the algorithm</span>
     <span class="doccomment">///</span>
@@ -643,11 +643,11 @@
     <span class="kw">fn</span> <span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">param</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Param</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span>;
 }
 
-<span class="doccomment">/// The datastructure which is returned by the `next_iter` method of the `ArgminNextIter` trait.</span>
+<span class="doccomment">/// The datastructure which is returned by the `next_iter` method of the `ArgminIter` trait.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// TODO: think about removing this or replacing it with something better. Actually, a tuple would</span>
 <span class="doccomment">/// be sufficient.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ArgminIterationData</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ArgminIterData</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Current parameter vector</span>
     <span class="ident">param</span>: <span class="ident">T</span>,
     <span class="doccomment">/// Current cost function value</span>
@@ -657,10 +657,10 @@
     <span class="ident">kv</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ArgminKV</span><span class="op">&gt;</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Clone</span><span class="op">&gt;</span> <span class="ident">ArgminIterationData</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Clone</span><span class="op">&gt;</span> <span class="ident">ArgminIterData</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Constructor</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">param</span>: <span class="ident">T</span>, <span class="ident">cost</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
-        <span class="ident">ArgminIterationData</span> {
+        <span class="ident">ArgminIterData</span> {
             <span class="ident">param</span>,
             <span class="ident">cost</span>,
             <span class="ident">kv</span>: <span class="prelude-val">None</span>,
@@ -697,43 +697,43 @@
 <span class="doccomment">/// implementation which is essentially returning an error which indicates that the method has not</span>
 <span class="doccomment">/// been implemented. Those methods (`gradient` and `modify`) only need to be implemented if the</span>
 <span class="doccomment">/// uses solver requires it.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ArgminOperator</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> {
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ArgminOp</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Default</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> {
     <span class="doccomment">/// Type of the parameter vector</span>
-    <span class="kw">type</span> <span class="ident">Parameters</span>;
+    <span class="kw">type</span> <span class="ident">Param</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Default</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">serde</span>::<span class="ident">Serialize</span> <span class="op">+</span> <span class="ident">serde</span>::<span class="ident">de</span>::<span class="ident">DeserializeOwned</span>;
     <span class="doccomment">/// Output of the operator. Most solvers expect `f64`.</span>
-    <span class="kw">type</span> <span class="ident">OperatorOutput</span>;
+    <span class="kw">type</span> <span class="ident">Output</span>;
     <span class="doccomment">/// Type of Hessian</span>
-    <span class="kw">type</span> <span class="ident">Hessian</span>;
+    <span class="kw">type</span> <span class="ident">Hessian</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Default</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">serde</span>::<span class="ident">Serialize</span> <span class="op">+</span> <span class="ident">serde</span>::<span class="ident">de</span>::<span class="ident">DeserializeOwned</span>;
 
     <span class="doccomment">/// Applies the operator/cost function to parameters</span>
-    <span class="kw">fn</span> <span class="ident">apply</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_param</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Parameters</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">OperatorOutput</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">apply</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_param</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Param</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Output</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">NotImplemented</span> {
-            <span class="ident">text</span>: <span class="string">&quot;Method `apply` of ArgminOperator trait not implemented!&quot;</span>.<span class="ident">to_string</span>(),
+            <span class="ident">text</span>: <span class="string">&quot;Method `apply` of ArgminOp trait not implemented!&quot;</span>.<span class="ident">to_string</span>(),
         }
         .<span class="ident">into</span>())
     }
 
     <span class="doccomment">/// Computes the gradient at the given parameters</span>
-    <span class="kw">fn</span> <span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_param</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Parameters</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Parameters</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">gradient</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_param</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Param</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Param</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">NotImplemented</span> {
-            <span class="ident">text</span>: <span class="string">&quot;Method `gradient` of ArgminOperator trait not implemented!&quot;</span>.<span class="ident">to_string</span>(),
+            <span class="ident">text</span>: <span class="string">&quot;Method `gradient` of ArgminOp trait not implemented!&quot;</span>.<span class="ident">to_string</span>(),
         }
         .<span class="ident">into</span>())
     }
 
     <span class="doccomment">/// Computes the hessian at the given parameters</span>
-    <span class="kw">fn</span> <span class="ident">hessian</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_param</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Parameters</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Hessian</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">hessian</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_param</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Param</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Hessian</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">NotImplemented</span> {
-            <span class="ident">text</span>: <span class="string">&quot;Method `hessian` of ArgminOperator trait not implemented!&quot;</span>.<span class="ident">to_string</span>(),
+            <span class="ident">text</span>: <span class="string">&quot;Method `hessian` of ArgminOp trait not implemented!&quot;</span>.<span class="ident">to_string</span>(),
         }
         .<span class="ident">into</span>())
     }
 
     <span class="doccomment">/// Modifies a parameter vector. Comes with a variable that indicates the &quot;degree&quot; of the</span>
     <span class="doccomment">/// modification.</span>
-    <span class="kw">fn</span> <span class="ident">modify</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_param</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Parameters</span>, <span class="ident">_extent</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Parameters</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">modify</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_param</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Param</span>, <span class="ident">_extent</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Param</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Err</span>(<span class="ident">ArgminError</span>::<span class="ident">NotImplemented</span> {
-            <span class="ident">text</span>: <span class="string">&quot;Method `modify` of ArgminOperator trait not implemented!&quot;</span>.<span class="ident">to_string</span>(),
+            <span class="ident">text</span>: <span class="string">&quot;Method `modify` of ArgminOp trait not implemented!&quot;</span>.<span class="ident">to_string</span>(),
         }
         .<span class="ident">into</span>())
     }
@@ -750,10 +750,10 @@
 <span class="doccomment">/// avoids unneccessary computation of those values.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ArgminLineSearch</span>: <span class="ident">ArgminSolver</span> {
     <span class="doccomment">/// Set the initial parameter (starting point)</span>
-    <span class="kw">fn</span> <span class="ident">set_initial_parameter</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">param</span>: <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span>);
+    <span class="kw">fn</span> <span class="ident">set_initial_parameter</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">param</span>: <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminIter</span><span class="op">&gt;</span>::<span class="ident">Param</span>);
 
     <span class="doccomment">/// Set the search direction</span>
-    <span class="kw">fn</span> <span class="ident">set_search_direction</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">direction</span>: <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span>);
+    <span class="kw">fn</span> <span class="ident">set_search_direction</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">direction</span>: <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminIter</span><span class="op">&gt;</span>::<span class="ident">Param</span>);
 
     <span class="doccomment">/// Set the initial step length</span>
     <span class="kw">fn</span> <span class="ident">set_initial_alpha</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">step_length</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span>;
@@ -764,7 +764,7 @@
 
     <span class="doccomment">/// Set the gradient at the starting point as opposed to computing it (see</span>
     <span class="doccomment">/// `calc_initial_gradient`)</span>
-    <span class="kw">fn</span> <span class="ident">set_initial_gradient</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">grad</span>: <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span>);
+    <span class="kw">fn</span> <span class="ident">set_initial_gradient</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">grad</span>: <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminIter</span><span class="op">&gt;</span>::<span class="ident">Param</span>);
 
     <span class="doccomment">/// calculate the initial cost function value using an operator as opposed to setting it</span>
     <span class="doccomment">/// manually (see `set_initial_cost`)</span>
@@ -779,16 +779,16 @@
 <span class="doccomment">/// methods. Requires that `ArgminSolver` is implemented as well.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ArgminTrustRegion</span>: <span class="ident">ArgminSolver</span> {
     <span class="comment">// /// Set the initial parameter (starting point)</span>
-    <span class="comment">// fn set_initial_parameter(&amp;mut self, &lt;Self as ArgminNextIter&gt;::Parameters);</span>
+    <span class="comment">// fn set_initial_parameter(&amp;mut self, &lt;Self as ArgminIter&gt;::Parameters);</span>
 
     <span class="doccomment">/// Set the initial step length</span>
     <span class="kw">fn</span> <span class="ident">set_radius</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">radius</span>: <span class="ident">f64</span>);
 
     <span class="doccomment">/// Set the gradient at the starting point</span>
-    <span class="kw">fn</span> <span class="ident">set_grad</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">grad</span>: <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span>);
+    <span class="kw">fn</span> <span class="ident">set_grad</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">grad</span>: <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminIter</span><span class="op">&gt;</span>::<span class="ident">Param</span>);
 
     <span class="doccomment">/// Set the gradient at the starting point</span>
-    <span class="kw">fn</span> <span class="ident">set_hessian</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">hessian</span>: <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminNextIter</span><span class="op">&gt;</span>::<span class="ident">Hessian</span>);
+    <span class="kw">fn</span> <span class="ident">set_hessian</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">hessian</span>: <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ArgminIter</span><span class="op">&gt;</span>::<span class="ident">Hessian</span>);
 }
 
 <span class="doccomment">/// Every method for the update of beta needs to implement this trait.</span>
