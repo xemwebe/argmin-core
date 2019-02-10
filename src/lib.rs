@@ -298,11 +298,11 @@ impl<T: Clone> ArgminIterData<T> {
 /// uses solver requires it.
 pub trait ArgminOp: Clone + Default + Send + Sync {
     /// Type of the parameter vector
-    type Param: Clone + Default + serde::Serialize + serde::de::DeserializeOwned;
+    type Param: Clone + Default + Send + Sync + serde::Serialize + serde::de::DeserializeOwned;
     /// Output of the operator. Most solvers expect `f64`.
     type Output;
     /// Type of Hessian
-    type Hessian: Clone + Default + serde::Serialize + serde::de::DeserializeOwned;
+    type Hessian: Clone + Default + Send + Sync + serde::Serialize + serde::de::DeserializeOwned;
 
     /// Applies the operator/cost function to parameters
     fn apply(&self, _param: &Self::Param) -> Result<Self::Output, Error> {

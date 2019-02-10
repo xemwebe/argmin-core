@@ -6,62 +6,64 @@
 // copied, modified, or distributed except according to those terms.
 
 use crate::{ArgminOp, Error};
+use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
+use std::fmt::Debug;
 
-// #[derive(Clone, Default, Debug, Serialize, Deserialize)]
-// pub struct NoOperator<T, U, H>
-// where
-//     T: Clone + Default + Debug + Send + Sync + Serialize + DeserializeOwned,
-//     U: Clone + Default + Debug + Send + Sync + Serialize + DeserializeOwned,
-//     H: Clone + Default + Debug + Send + Sync + Serialize + DeserializeOwned,
-// {
-//     param: std::marker::PhantomData<T>,
-//     output: std::marker::PhantomData<U>,
-//     hessian: std::marker::PhantomData<H>,
-// }
-//
-// impl<T, U, H> NoOperator<T, U, H>
-// where
-//     T: Clone + Default + Debug + Send + Sync + Serialize + DeserializeOwned,
-//     U: Clone + Default + Debug + Send + Sync + Serialize + DeserializeOwned,
-//     H: Clone + Default + Debug + Send + Sync + Serialize + DeserializeOwned,
-// {
-//     #[allow(dead_code)]
-//     pub fn new() -> Self {
-//         NoOperator {
-//             param: std::marker::PhantomData,
-//             output: std::marker::PhantomData,
-//             hessian: std::marker::PhantomData,
-//         }
-//     }
-// }
-//
-// impl<T, U, H> ArgminOp for NoOperator<T, U, H>
-// where
-//     T: Clone + Default + Debug + Send + Sync + Serialize + DeserializeOwned,
-//     U: Clone + Default + Debug + Send + Sync + Serialize + DeserializeOwned,
-//     H: Clone + Default + Debug + Send + Sync + Serialize + DeserializeOwned,
-// {
-//     type Param = T;
-//     type OperatorOutput = U;
-//     type Hessian = H;
-//
-//     fn apply(&self, _p: &Self::Param) -> Result<Self::OperatorOutput, Error> {
-//         Ok(Self::OperatorOutput::default())
-//     }
-//
-//     fn gradient(&self, _p: &Self::Param) -> Result<Self::Param, Error> {
-//         Ok(Self::Param::default())
-//     }
-//
-//     fn hessian(&self, _p: &Self::Param) -> Result<Self::Hessian, Error> {
-//         Ok(Self::Hessian::default())
-//     }
-//
-//     fn modify(&self, _p: &Self::Param, _t: f64) -> Result<Self::Param, Error> {
-//         Ok(Self::Param::default())
-//     }
-// }
+#[derive(Clone, Default, Debug, Serialize, Deserialize)]
+pub struct NoOperator<T, U, H>
+where
+    T: Clone + Default + Debug + Send + Sync + Serialize + DeserializeOwned,
+    U: Clone + Default + Debug + Send + Sync + Serialize + DeserializeOwned,
+    H: Clone + Default + Debug + Send + Sync + Serialize + DeserializeOwned,
+{
+    param: std::marker::PhantomData<T>,
+    output: std::marker::PhantomData<U>,
+    hessian: std::marker::PhantomData<H>,
+}
+
+impl<T, U, H> NoOperator<T, U, H>
+where
+    T: Clone + Default + Debug + Send + Sync + Serialize + DeserializeOwned,
+    U: Clone + Default + Debug + Send + Sync + Serialize + DeserializeOwned,
+    H: Clone + Default + Debug + Send + Sync + Serialize + DeserializeOwned,
+{
+    #[allow(dead_code)]
+    pub fn new() -> Self {
+        NoOperator {
+            param: std::marker::PhantomData,
+            output: std::marker::PhantomData,
+            hessian: std::marker::PhantomData,
+        }
+    }
+}
+
+impl<T, U, H> ArgminOp for NoOperator<T, U, H>
+where
+    T: Clone + Default + Debug + Send + Sync + Serialize + DeserializeOwned,
+    U: Clone + Default + Debug + Send + Sync + Serialize + DeserializeOwned,
+    H: Clone + Default + Debug + Send + Sync + Serialize + DeserializeOwned,
+{
+    type Param = T;
+    type Output = U;
+    type Hessian = H;
+
+    fn apply(&self, _p: &Self::Param) -> Result<Self::Output, Error> {
+        Ok(Self::Output::default())
+    }
+
+    fn gradient(&self, _p: &Self::Param) -> Result<Self::Param, Error> {
+        Ok(Self::Param::default())
+    }
+
+    fn hessian(&self, _p: &Self::Param) -> Result<Self::Hessian, Error> {
+        Ok(Self::Hessian::default())
+    }
+
+    fn modify(&self, _p: &Self::Param, _t: f64) -> Result<Self::Param, Error> {
+        Ok(Self::Param::default())
+    }
+}
 
 #[derive(Clone, Default, Debug, Serialize, Deserialize)]
 pub struct MinimalNoOperator {}
