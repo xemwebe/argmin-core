@@ -1,10 +1,10 @@
 [package]
 name = "argmin_core"
-version = "0.1.6"
+version = "0.1.7"
 authors = ["Stefan Kroboth <stefan.kroboth@gmail.com>"]
 edition = "2018"
 license = "MIT OR Apache-2.0"
-description = "A pure Rust optimization toolbox (core functionality)"
+description = "Pure Rust optimization tools (core functionality)"
 documentation = "https://argmin-rs.github.io/argmin-core/argmin_core/"
 homepage = "https://github.com/argmin-rs/argmin-core"
 repository = "https://github.com/argmin-rs/argmin-core"
@@ -40,8 +40,9 @@ default = []
 ndarrayl = ["ndarray", "ndarray-linalg", "finitediff/ndarray"]
 
 [dev-dependencies]
-argmin_codegen = { git = "https://github.com/argmin-rs/argmin-codegen.git", branch = "master"}
+# argmin_codegen = { git = "https://github.com/argmin-rs/argmin-codegen.git", branch = "master"}
 # argmin_codegen = { path = "../argmin-codegen"}
+argmin_codegen = { version = "0.1.7"}
 ndarray-linalg = { version = "0.10.0", features = ["openblas"] }
 paste = "0.1.4"
 
