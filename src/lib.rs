@@ -58,7 +58,9 @@ pub use crate::output::ArgminWriter;
 pub use crate::result::ArgminResult;
 pub use crate::termination::TerminationReason;
 pub use failure::Error;
+use serde::de::DeserializeOwned;
 pub use serialization::*;
+use std::path::Path;
 
 pub mod finitediff {
     //! Finite Differentiation
@@ -67,9 +69,24 @@ pub mod finitediff {
     pub use finitediff::*;
 }
 
+// pub trait ArgminFromCheckpoint
+// where
+//     Self: Sized + DeserializeOwned,
+// {
+// }
+
 /// Defines the interface to a solver. Usually, there is no need to implement this manually, use
 /// the `argmin_derive` crate instead.
 pub trait ArgminSolver: ArgminIter {
+    /// Load solver from checkpoint
+    // fn from_checkpoint<T: DeserializeOwned, P: AsRef<Path>>(path: P) -> Result<T, Error>
+    fn from_checkpoint<P: AsRef<Path>>(path: P) -> Result<Self, Error>
+    where
+        Self: Sized + DeserializeOwned,
+    {
+        load_checkpoint(path)
+    }
+
     /// apply cost function or operator to a parameter vector
     fn apply(
         &mut self,
