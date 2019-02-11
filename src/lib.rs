@@ -388,7 +388,7 @@ pub trait ArgminLineSearch: ArgminSolver + Serialize {
 
 /// Defines a common interface to methods which calculate approximate steps for trust region
 /// methods. Requires that `ArgminSolver` is implemented as well.
-pub trait ArgminTrustRegion: ArgminSolver {
+pub trait ArgminTrustRegion: ArgminSolver + Serialize {
     // /// Set the initial parameter (starting point)
     // fn set_initial_parameter(&mut self, <Self as ArgminIter>::Parameters);
 
