@@ -24,6 +24,7 @@ use crate::ArgminOp;
 use crate::ArgminResult;
 use crate::ArgminWrite;
 use crate::Error;
+use crate::{ArgminCheckpoint, CheckpointMode};
 use serde::{Deserialize, Serialize};
 use std;
 use std::default::Default;
@@ -89,6 +90,9 @@ pub struct ArgminBase<O: ArgminOp> {
     /// Storage for writers
     #[serde(skip)]
     writer: ArgminWriter<<O as ArgminOp>::Param>,
+
+    /// Checkpoint
+    checkpoint: ArgminCheckpoint,
 }
 
 impl<O> ArgminBase<O>
@@ -115,6 +119,7 @@ where
             total_time: std::time::Duration::new(0, 0),
             logger: ArgminLogger::new(),
             writer: ArgminWriter::new(),
+            checkpoint: ArgminCheckpoint::default(),
         }
     }
 
@@ -412,6 +417,24 @@ where
     /// Write (TODO)
     pub fn write(&self, param: &<O as ArgminOp>::Param) -> Result<(), Error> {
         self.writer.write(param)
+    }
+
+    /// Set checkpoint directory
+    pub fn set_checkpoint_dir(&mut self, dir: &str) {
+        self.checkpoint.set_dir(dir);
+    }
+
+    /// Set checkpoint prefix
+    pub fn set_checkpoint_prefix(&mut self, dir: &str) {
+        self.checkpoint.set_prefix(dir);
+    }
+
+    pub fn set_checkpoint_mode(&mut self, mode: CheckpointMode) {
+        self.checkpoint.set_mode(mode);
+    }
+
+    pub fn store_checkpoint<T: Serialize>(&self, solver: &T) -> Result<(), Error> {
+        self.checkpoint.store_cond(solver, self.cur_iter())
     }
 }
 

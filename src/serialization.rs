@@ -35,10 +35,15 @@ pub struct ArgminCheckpoint {
 
 impl Default for ArgminCheckpoint {
     fn default() -> ArgminCheckpoint {
-        let out = ArgminCheckpoint::new("checkpoints", CheckpointMode::default());
-        match out {
-            Ok(cp) => cp,
-            Err(_) => panic!("Cannot create default ArgminCheckpoint."),
+        // let out = ArgminCheckpoint::new("checkpoints", CheckpointMode::default());
+        // match out {
+        //     Ok(cp) => cp,
+        //     Err(_) => panic!("Cannot create default ArgminCheckpoint."),
+        // }
+        ArgminCheckpoint {
+            mode: CheckpointMode::Never,
+            directory: "".to_string(),
+            prefix: "".to_string(),
         }
     }
 }
@@ -61,6 +66,11 @@ impl ArgminCheckpoint {
     }
 
     #[inline]
+    pub fn set_dir(&mut self, dir: &str) {
+        self.directory = dir.to_string();
+    }
+
+    #[inline]
     pub fn dir(&self) -> String {
         self.directory.clone()
     }
@@ -76,11 +86,21 @@ impl ArgminCheckpoint {
     }
 
     #[inline]
+    pub fn set_mode(&mut self, mode: CheckpointMode) {
+        self.mode = mode
+    }
+
+    #[inline]
     pub fn store<T: Serialize>(&self, solver: &T) -> Result<(), Error> {
         let mut filename = self.prefix();
         filename.push_str(".arg");
-        let dir = Path::new(&self.directory).join(Path::new(&filename));
-        let f = BufWriter::new(File::create(dir)?);
+        let dir = Path::new(&self.directory);
+        if !dir.exists() {
+            std::fs::create_dir_all(&dir)?
+        }
+        let fname = dir.join(Path::new(&filename));
+
+        let f = BufWriter::new(File::create(fname)?);
         // serde_json::to_writer_pretty(f, solver)?;
         bincode::serialize_into(f, solver)?;
         // serde_json::to_string_pretty(self).unwrap()
@@ -111,7 +131,6 @@ mod tests {
     use crate::nooperator::MinimalNoOperator;
     use crate::*;
     use argmin_codegen::ArgminSolver;
-    // use std::fmt::Debug;
 
     #[derive(ArgminSolver, Serialize, Deserialize, Clone, Debug)]
     pub struct PhonySolver<O>
