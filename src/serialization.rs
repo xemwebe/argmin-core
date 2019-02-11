@@ -131,6 +131,7 @@ mod tests {
     use crate::nooperator::MinimalNoOperator;
     use crate::*;
     use argmin_codegen::ArgminSolver;
+    use serde::de;
 
     #[derive(ArgminSolver, Serialize, Deserialize, Clone, Debug)]
     pub struct PhonySolver<O>

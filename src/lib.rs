@@ -59,6 +59,7 @@ pub use crate::result::ArgminResult;
 pub use crate::termination::TerminationReason;
 pub use failure::Error;
 use serde::de::DeserializeOwned;
+use serde::Serialize;
 pub use serialization::*;
 use std::path::Path;
 
@@ -68,12 +69,6 @@ pub mod finitediff {
     //! Reexport of `finitediff` crate.
     pub use finitediff::*;
 }
-
-// pub trait ArgminFromCheckpoint
-// where
-//     Self: Sized + DeserializeOwned,
-// {
-// }
 
 /// Defines the interface to a solver. Usually, there is no need to implement this manually, use
 /// the `argmin_derive` crate instead.
@@ -313,7 +308,7 @@ impl<T: Clone> ArgminIterData<T> {
 /// implementation which is essentially returning an error which indicates that the method has not
 /// been implemented. Those methods (`gradient` and `modify`) only need to be implemented if the
 /// uses solver requires it.
-pub trait ArgminOp: Clone + Default + Send + Sync {
+pub trait ArgminOp: Clone + Default + Send + Sync + Serialize {
     /// Type of the parameter vector
     type Param: Clone + Default + Send + Sync + serde::Serialize + serde::de::DeserializeOwned;
     /// Output of the operator. Most solvers expect `f64`.
@@ -364,7 +359,7 @@ pub trait ArgminOp: Clone + Default + Send + Sync {
 /// former is convenient if cost and gradient at the starting point are already known for some
 /// reason (i.e. the solver which uses the line search has already computed cost and gradient) and
 /// avoids unneccessary computation of those values.
-pub trait ArgminLineSearch: ArgminSolver {
+pub trait ArgminLineSearch: ArgminSolver + Serialize {
     /// Set the initial parameter (starting point)
     fn set_initial_parameter(&mut self, param: <Self as ArgminIter>::Param);
 
@@ -408,7 +403,7 @@ pub trait ArgminTrustRegion: ArgminSolver {
 }
 
 /// Every method for the update of beta needs to implement this trait.
-pub trait ArgminNLCGBetaUpdate<T> {
+pub trait ArgminNLCGBetaUpdate<T>: Serialize {
     /// Update beta
     /// Parameter 1: \nabla f_k
     /// Parameter 2: \nabla f_{k+1}
