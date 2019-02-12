@@ -91,9 +91,7 @@ impl ArgminCheckpoint {
     }
 
     #[inline]
-    pub fn store<T: Serialize>(&self, solver: &T) -> Result<(), Error> {
-        let mut filename = self.prefix();
-        filename.push_str(".arg");
+    pub fn store<T: Serialize>(&self, solver: &T, filename: String) -> Result<(), Error> {
         let dir = Path::new(&self.directory);
         if !dir.exists() {
             std::fs::create_dir_all(&dir)?
@@ -101,17 +99,19 @@ impl ArgminCheckpoint {
         let fname = dir.join(Path::new(&filename));
 
         let f = BufWriter::new(File::create(fname)?);
-        // serde_json::to_writer_pretty(f, solver)?;
         bincode::serialize_into(f, solver)?;
-        // serde_json::to_string_pretty(self).unwrap()
         Ok(())
     }
 
     #[inline]
     pub fn store_cond<T: Serialize>(&self, solver: &T, iter: u64) -> Result<(), Error> {
+        let mut filename = self.prefix();
+        filename.push_str("_");
+        filename.push_str(&iter.to_string());
+        filename.push_str(".arg");
         match self.mode {
-            CheckpointMode::Always => self.store(solver)?,
-            CheckpointMode::Every(it) if iter % it == 0 => self.store(solver)?,
+            CheckpointMode::Always => self.store(solver, filename)?,
+            CheckpointMode::Every(it) if iter % it == 0 => self.store(solver, filename)?,
             CheckpointMode::Never | CheckpointMode::Every(_) => {}
         };
         Ok(())
@@ -121,7 +121,6 @@ impl ArgminCheckpoint {
 pub fn load_checkpoint<T: DeserializeOwned, P: AsRef<Path>>(path: P) -> Result<T, Error> {
     let file = File::open(path)?;
     let reader = BufReader::new(file);
-    // Ok(serde_json::from_reader(reader)?)
     Ok(bincode::deserialize_from(reader)?)
 }
 
@@ -131,7 +130,6 @@ mod tests {
     use crate::nooperator::MinimalNoOperator;
     use crate::*;
     use argmin_codegen::ArgminSolver;
-    use serde::de;
 
     #[derive(ArgminSolver, Serialize, Deserialize, Clone, Debug)]
     pub struct PhonySolver<O>

@@ -209,6 +209,15 @@ pub trait ArgminSolver: ArgminIter {
 
     /// Return the gradient evaluation count
     fn hessian_func_count(&self) -> u64;
+
+    /// Set checkpoint directory
+    fn set_checkpoint_dir(&mut self, dir: &str);
+
+    /// Set checkpoint prefix
+    fn set_checkpoint_prefix(&mut self, dir: &str);
+
+    /// Set checkpoint mode
+    fn set_checkpoint_mode(&mut self, mode: CheckpointMode);
 }
 
 /// Main part of every solver: `next_iter` computes one iteration of the algorithm and `init` is
