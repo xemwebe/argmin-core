@@ -43,6 +43,10 @@
 <span id="43">43</span>
 <span id="44">44</span>
 <span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -77,6 +81,10 @@
     <span class="doccomment">/// Indicates that a condition is violated</span>
     <span class="attribute">#[<span class="ident">fail</span>(<span class="ident">display</span> <span class="op">=</span> <span class="string">&quot;Condition violated: {}&quot;</span>, <span class="ident">text</span>)]</span>
     <span class="ident">ConditionViolated</span> { <span class="ident">text</span>: <span class="ident">String</span> },
+
+    <span class="doccomment">/// Checkpoint was not found</span>
+    <span class="attribute">#[<span class="ident">fail</span>(<span class="ident">display</span> <span class="op">=</span> <span class="string">&quot;Checkpoint not found: {}&quot;</span>, <span class="ident">text</span>)]</span>
+    <span class="ident">CheckpointNotFound</span> { <span class="ident">text</span>: <span class="ident">String</span> },
 
     <span class="doccomment">/// Indicates an impossible error</span>
     <span class="attribute">#[<span class="ident">fail</span>(<span class="ident">display</span> <span class="op">=</span> <span class="string">&quot;Impossible Error: {}&quot;</span>, <span class="ident">text</span>)]</span>
