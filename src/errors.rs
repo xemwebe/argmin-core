@@ -32,6 +32,10 @@ pub enum ArgminError {
     #[fail(display = "Condition violated: {}", text)]
     ConditionViolated { text: String },
 
+    /// Checkpoint was not found
+    #[fail(display = "Checkpoint not found: {}", text)]
+    CheckpointNotFound { text: String },
+
     /// Indicates an impossible error
     #[fail(display = "Impossible Error: {}", text)]
     ImpossibleError { text: String },

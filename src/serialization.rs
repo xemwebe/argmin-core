@@ -5,7 +5,7 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use crate::Error;
+use crate::{ArgminError, Error};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use std::default::Default;
@@ -35,15 +35,10 @@ pub struct ArgminCheckpoint {
 
 impl Default for ArgminCheckpoint {
     fn default() -> ArgminCheckpoint {
-        // let out = ArgminCheckpoint::new("checkpoints", CheckpointMode::default());
-        // match out {
-        //     Ok(cp) => cp,
-        //     Err(_) => panic!("Cannot create default ArgminCheckpoint."),
-        // }
         ArgminCheckpoint {
             mode: CheckpointMode::Never,
-            directory: "".to_string(),
-            prefix: "".to_string(),
+            directory: ".checkpoints".to_string(),
+            prefix: "default".to_string(),
         }
     }
 }
@@ -118,7 +113,15 @@ impl ArgminCheckpoint {
     }
 }
 
+// pub fn load_checkpoint<T: DeserializeOwned, P: AsRef<Path>>(path: P) -> Result<T, Error> {
 pub fn load_checkpoint<T: DeserializeOwned, P: AsRef<Path>>(path: P) -> Result<T, Error> {
+    let path = path.as_ref();
+    if !path.exists() {
+        return Err(ArgminError::CheckpointNotFound {
+            text: path.to_str().unwrap().to_string(),
+        }
+        .into());
+    }
     let file = File::open(path)?;
     let reader = BufReader::new(file);
     Ok(bincode::deserialize_from(reader)?)
