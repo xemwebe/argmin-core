@@ -30,7 +30,7 @@ impl Default for CheckpointMode {
 pub struct ArgminCheckpoint {
     mode: CheckpointMode,
     directory: String,
-    prefix: String,
+    name: String,
 }
 
 impl Default for ArgminCheckpoint {
@@ -38,7 +38,7 @@ impl Default for ArgminCheckpoint {
         ArgminCheckpoint {
             mode: CheckpointMode::Never,
             directory: ".checkpoints".to_string(),
-            prefix: "default".to_string(),
+            name: "default".to_string(),
         }
     }
 }
@@ -51,12 +51,12 @@ impl ArgminCheckpoint {
             }
             _ => {}
         }
-        let prefix = "solver".to_string();
+        let name = "solver".to_string();
         let directory = directory.to_string();
         Ok(ArgminCheckpoint {
             mode,
             directory,
-            prefix,
+            name,
         })
     }
 
@@ -71,13 +71,13 @@ impl ArgminCheckpoint {
     }
 
     #[inline]
-    pub fn set_prefix(&mut self, prefix: &str) {
-        self.prefix = prefix.to_string();
+    pub fn set_name(&mut self, name: &str) {
+        self.name = name.to_string();
     }
 
     #[inline]
-    pub fn prefix(&self) -> String {
-        self.prefix.clone()
+    pub fn name(&self) -> String {
+        self.name.clone()
     }
 
     #[inline]
@@ -100,9 +100,9 @@ impl ArgminCheckpoint {
 
     #[inline]
     pub fn store_cond<T: Serialize>(&self, solver: &T, iter: u64) -> Result<(), Error> {
-        let mut filename = self.prefix();
-        filename.push_str("_");
-        filename.push_str(&iter.to_string());
+        let mut filename = self.name();
+        // filename.push_str("_");
+        // filename.push_str(&iter.to_string());
         filename.push_str(".arg");
         match self.mode {
             CheckpointMode::Always => self.store(solver, filename)?,

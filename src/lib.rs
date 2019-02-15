@@ -83,12 +83,10 @@ pub trait ArgminSolver: ArgminIter {
         load_checkpoint(path)
     }
 
-    fn from_latest_checkpoint<P: AsRef<Path>>(directory: P, prefix: &str) -> Result<Self, Error>
+    fn from_latest_checkpoint<P: AsRef<Path>>(directory: P, name: &str) -> Result<Self, Error>
     where
         Self: Sized + DeserializeOwned,
     {
-        // This is likely the most bug-infested piece of code in the entire codebase.
-
         let directory = directory.as_ref();
         if !directory.exists() {
             return Err(ArgminError::CheckpointNotFound {
@@ -97,35 +95,9 @@ pub trait ArgminSolver: ArgminIter {
             .into());
         }
 
-        let mut pattern = directory.to_str().unwrap().to_string();
-        pattern.push_str("/");
-        pattern.push_str(prefix);
-        pattern.push_str("_*.arg");
-
-        let re = Regex::new(r".*_([0-9]+)\.arg$")?;
-
-        let mut nums = glob::glob(&pattern)?
-            .filter(|entry| entry.is_ok())
-            .map(|bla| bla)
-            .map(|entry| entry.unwrap().to_str().unwrap().to_string())
-            .filter(|path| re.is_match(path))
-            .map(|matches| {
-                re.captures(&matches)
-                    .unwrap()
-                    .get(1)
-                    .unwrap()
-                    .as_str()
-                    .parse::<u64>()
-                    .unwrap()
-            })
-            .collect::<Vec<u64>>();
-        nums.sort();
-        let last_iter = nums.last().unwrap();
         let mut path = directory.to_str().unwrap().to_string();
         path.push_str("/");
-        path.push_str(prefix);
-        path.push_str("_");
-        path.push_str(&last_iter.to_string());
+        path.push_str(name);
         path.push_str(".arg");
 
         load_checkpoint(path)
@@ -262,8 +234,8 @@ pub trait ArgminSolver: ArgminIter {
     /// Set checkpoint directory
     fn set_checkpoint_dir(&mut self, dir: &str);
 
-    /// Set checkpoint prefix
-    fn set_checkpoint_prefix(&mut self, dir: &str);
+    /// Set checkpoint name
+    fn set_checkpoint_name(&mut self, dir: &str);
 
     /// Set checkpoint mode
     fn set_checkpoint_mode(&mut self, mode: CheckpointMode);

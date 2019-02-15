@@ -424,9 +424,9 @@ where
         self.checkpoint.set_dir(dir);
     }
 
-    /// Set checkpoint prefix
-    pub fn set_checkpoint_prefix(&mut self, dir: &str) {
-        self.checkpoint.set_prefix(dir);
+    /// Set checkpoint name
+    pub fn set_checkpoint_name(&mut self, dir: &str) {
+        self.checkpoint.set_name(dir);
     }
 
     pub fn set_checkpoint_mode(&mut self, mode: CheckpointMode) {
