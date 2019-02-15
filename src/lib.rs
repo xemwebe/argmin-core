@@ -58,7 +58,6 @@ pub use crate::output::ArgminWriter;
 pub use crate::result::ArgminResult;
 pub use crate::termination::TerminationReason;
 pub use failure::Error;
-use regex::Regex;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 pub use serialization::*;
@@ -75,31 +74,10 @@ pub mod finitediff {
 /// the `argmin_derive` crate instead.
 pub trait ArgminSolver: ArgminIter {
     /// Load solver from checkpoint
-    // fn from_checkpoint<T: DeserializeOwned, P: AsRef<Path>>(path: P) -> Result<T, Error>
     fn from_checkpoint<P: AsRef<Path>>(path: P) -> Result<Self, Error>
     where
         Self: Sized + DeserializeOwned,
     {
-        load_checkpoint(path)
-    }
-
-    fn from_latest_checkpoint<P: AsRef<Path>>(directory: P, name: &str) -> Result<Self, Error>
-    where
-        Self: Sized + DeserializeOwned,
-    {
-        let directory = directory.as_ref();
-        if !directory.exists() {
-            return Err(ArgminError::CheckpointNotFound {
-                text: directory.to_str().unwrap().to_string(),
-            }
-            .into());
-        }
-
-        let mut path = directory.to_str().unwrap().to_string();
-        path.push_str("/");
-        path.push_str(name);
-        path.push_str(".arg");
-
         load_checkpoint(path)
     }
 
