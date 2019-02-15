@@ -101,8 +101,6 @@ impl ArgminCheckpoint {
     #[inline]
     pub fn store_cond<T: Serialize>(&self, solver: &T, iter: u64) -> Result<(), Error> {
         let mut filename = self.name();
-        // filename.push_str("_");
-        // filename.push_str(&iter.to_string());
         filename.push_str(".arg");
         match self.mode {
             CheckpointMode::Always => self.store(solver, filename)?,
