@@ -5,14 +5,18 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use crate::math::ArgminRandom;
+use crate::math::ArgminMinMax;
 
-macro_rules! make_random {
+macro_rules! make_minmax {
     ($t:ty) => {
-        impl ArgminRandom for $t {
+        impl ArgminMinMax for $t {
             #[inline]
-            fn random(min: &Self, max: &Self) -> $t {
-                rand::thread_rng().gen_range(min, max) as $t
+            fn min(x: &Self, y: &Self) -> $t {
+                std::cmp::min(x, y)
+            }
+
+            fn max(x: &Self, y: &Self) -> $t {
+                std::cmp::max(x, y)
             }
         }
     };
@@ -31,4 +35,4 @@ make_random!(u64);
 make_random!(isize);
 make_random!(usize);
 
-// TODO:  test
+// TODO: test

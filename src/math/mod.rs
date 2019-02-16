@@ -64,6 +64,9 @@ mod zero_vec;
 // #[cfg(feature = "ndarrayl")]
 // mod random_ndarray; // TODO
 mod random_vec;
+// #[cfg(feature = "ndarrayl")]
+// mod minmax_ndarray; // TODO
+mod minmax_vec;
 pub use crate::math::add::*;
 #[cfg(feature = "ndarrayl")]
 pub use crate::math::add_ndarray::*;
@@ -111,6 +114,9 @@ pub use crate::math::zero_vec::*;
 // #[cfg(feature = "ndarrayl")] // TODO
 // pub use crate::math::random_ndarray::*;
 pub use crate::math::random_vec::*;
+// #[cfg(feature = "ndarrayl")] // TODO
+// pub use crate::math::minmax_ndarray::*;
+pub use crate::math::minmax_vec::*;
 
 use crate::Error;
 
@@ -202,4 +208,10 @@ pub trait ArgminInv<T> {
 pub trait ArgminRandom {
     /// Get a random element between min and max,
     fn rand_from_range(min: &Self, max: &Self) -> Self;
+}
+
+pub trait ArgminMinMax {
+    /// Select piecewise minimum / maximum
+    fn min(x: &Self, y: &Self) -> Self;
+    fn max(x: &Self, y: &Self) -> Self;
 }
