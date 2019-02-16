@@ -61,6 +61,9 @@ mod zero;
 #[cfg(feature = "ndarrayl")]
 mod zero_ndarray;
 mod zero_vec;
+// #[cfg(feature = "ndarrayl")]
+// mod random_ndarray; // TODO
+mod random_vec;
 pub use crate::math::add::*;
 #[cfg(feature = "ndarrayl")]
 pub use crate::math::add_ndarray::*;
@@ -105,6 +108,9 @@ pub use crate::math::zero::*;
 #[cfg(feature = "ndarrayl")]
 pub use crate::math::zero_ndarray::*;
 pub use crate::math::zero_vec::*;
+// #[cfg(feature = "ndarrayl")] // TODO
+// pub use crate::math::random_ndarray::*;
+pub use crate::math::random_vec::*;
 
 use crate::Error;
 
@@ -191,4 +197,9 @@ pub trait ArgminTranspose {
 /// Compute the inverse (`T`) of `self`
 pub trait ArgminInv<T> {
     fn inv(&self) -> Result<T, Error>;
+}
+
+pub trait ArgminRandom {
+    /// Get a random element between min and max,
+    fn rand_from_range(min: &Self, max: &Self) -> Self;
 }
