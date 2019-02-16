@@ -9,7 +9,10 @@
 
 use crate::ArgminWrite;
 use crate::Error;
-use std;
+use serde::Serialize;
+use std::fs::File;
+use std::io::BufWriter;
+use std::path::Path;
 use std::sync::Arc;
 
 pub struct WriteToFile<T> {
@@ -24,10 +27,21 @@ impl<T> WriteToFile<T> {
     }
 }
 
-impl<T: Send + Sync> ArgminWrite for WriteToFile<T> {
+impl<T: Serialize + Send + Sync> ArgminWrite for WriteToFile<T> {
     type Param = T;
-    fn write(&self, _param: &T) -> Result<(), Error> {
+    fn write(&self, param: &T) -> Result<(), Error> {
         println!("Writing!");
+
+        // let dir = Path::new(&self.directory);
+        // if !dir.exists() {
+        //     std::fs::create_dir_all(&dir)?
+        // }
+        // let fname = dir.join(Path::new(&filename));
+        //
+        let fname = Path::new("blah.param");
+
+        let f = BufWriter::new(File::create(fname)?);
+        bincode::serialize_into(f, param)?;
         Ok(())
     }
 }
