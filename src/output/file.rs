@@ -16,12 +16,14 @@ use std::path::Path;
 use std::sync::Arc;
 
 pub struct WriteToFile<T> {
+    dir: String,
     _param: std::marker::PhantomData<T>,
 }
 
 impl<T> WriteToFile<T> {
-    pub fn new() -> Arc<Self> {
+    pub fn new(dir: &str) -> Arc<Self> {
         Arc::new(WriteToFile {
+            dir: dir.to_string(),
             _param: std::marker::PhantomData,
         })
     }
@@ -29,16 +31,20 @@ impl<T> WriteToFile<T> {
 
 impl<T: Serialize + Send + Sync> ArgminWrite for WriteToFile<T> {
     type Param = T;
-    fn write(&self, param: &T) -> Result<(), Error> {
+
+    fn write(&self, param: &T, iter: u64) -> Result<(), Error> {
         println!("Writing!");
 
-        // let dir = Path::new(&self.directory);
-        // if !dir.exists() {
-        //     std::fs::create_dir_all(&dir)?
-        // }
-        // let fname = dir.join(Path::new(&filename));
-        //
-        let fname = Path::new("blah.param");
+        let dir = Path::new(&self.dir);
+        if !dir.exists() {
+            std::fs::create_dir_all(&dir)?
+        }
+
+        let mut fname = "param_".to_string();
+        fname.push_str(&iter.to_string());
+        fname.push_str(".arp");
+        let fname = dir.join(fname);
+        println!("{:?}", fname);
 
         let f = BufWriter::new(File::create(fname)?);
         bincode::serialize_into(f, param)?;

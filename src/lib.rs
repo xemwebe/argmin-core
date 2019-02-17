@@ -259,7 +259,7 @@ pub trait ArgminWrite: Send + Sync {
     type Param;
 
     /// Writes the parameter vector somewhere
-    fn write(&self, param: &Self::Param) -> Result<(), Error>;
+    fn write(&self, param: &Self::Param, iter: u64) -> Result<(), Error>;
 }
 
 /// The datastructure which is returned by the `next_iter` method of the `ArgminIter` trait.

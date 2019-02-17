@@ -396,9 +396,9 @@ where
         self.logger.log_info(msg, kv)
     }
 
-    /// Write (TODO)
+    /// Write
     pub fn write(&self, param: &O::Param) -> Result<(), Error> {
-        self.writer.write(param)
+        self.writer.write(param, self.cur_iter())
     }
 
     /// Set checkpoint directory

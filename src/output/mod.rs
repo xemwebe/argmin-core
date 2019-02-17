@@ -38,9 +38,10 @@ impl<T> ArgminWriter<T> {
 
 impl<T: Clone> ArgminWrite for ArgminWriter<T> {
     type Param = T;
-    fn write(&self, param: &T) -> Result<(), Error> {
+
+    fn write(&self, param: &T, iter: u64) -> Result<(), Error> {
         for w in self.writers.iter() {
-            w.write(&param)?;
+            w.write(param, iter)?;
         }
         Ok(())
     }
