@@ -41,11 +41,11 @@ pub struct ArgminBase<O: ArgminOp> {
 
     /// Current parameter vector
     // #[serde(bound = "T: Default")]
-    cur_param: <O as ArgminOp>::Param,
+    cur_param: O::Param,
 
     /// Current best parameter vector
     // #[serde(bound = "T: Default")]
-    best_param: <O as ArgminOp>::Param,
+    best_param: O::Param,
 
     /// Current cost function value
     cur_cost: f64,
@@ -57,10 +57,10 @@ pub struct ArgminBase<O: ArgminOp> {
     target_cost: f64,
 
     /// Current gradient
-    cur_grad: <O as ArgminOp>::Param,
+    cur_grad: O::Param,
 
     /// Current hessian
-    cur_hessian: <O as ArgminOp>::Hessian,
+    cur_hessian: O::Hessian,
 
     /// Current iteration number
     cur_iter: u64,
@@ -89,7 +89,7 @@ pub struct ArgminBase<O: ArgminOp> {
 
     /// Storage for writers
     #[serde(skip)]
-    writer: ArgminWriter<<O as ArgminOp>::Param>,
+    writer: ArgminWriter<O::Param>,
 
     /// Checkpoint
     checkpoint: ArgminCheckpoint,
@@ -100,7 +100,7 @@ where
     O: ArgminOp,
 {
     /// Constructor
-    pub fn new(operator: O, param: <O as ArgminOp>::Param) -> Self {
+    pub fn new(operator: O, param: O::Param) -> Self {
         ArgminBase {
             operator,
             cur_param: param.clone(),
@@ -108,8 +108,8 @@ where
             cur_cost: std::f64::INFINITY,
             best_cost: std::f64::INFINITY,
             target_cost: std::f64::NEG_INFINITY,
-            cur_grad: <O as ArgminOp>::Param::default(),
-            cur_hessian: <O as ArgminOp>::Hessian::default(),
+            cur_grad: O::Param::default(),
+            cur_hessian: O::Hessian::default(),
             cur_iter: 0,
             max_iters: std::u64::MAX,
             cost_func_count: 0,
@@ -162,60 +162,47 @@ where
     }
 
     /// Apply the operator to `param`
-    pub fn apply(
-        &mut self,
-        param: &<O as ArgminOp>::Param,
-    ) -> Result<<O as ArgminOp>::Output, Error> {
+    pub fn apply(&mut self, param: &O::Param) -> Result<O::Output, Error> {
         self.increment_cost_func_count();
         self.operator.apply(param)
     }
 
     /// Compute the gradient at `param`
-    pub fn gradient(
-        &mut self,
-        param: &<O as ArgminOp>::Param,
-    ) -> Result<<O as ArgminOp>::Param, Error> {
+    pub fn gradient(&mut self, param: &O::Param) -> Result<O::Param, Error> {
         self.increment_grad_func_count();
         self.operator.gradient(param)
     }
 
     /// Compute the hessian at `param`
-    pub fn hessian(
-        &mut self,
-        param: &<O as ArgminOp>::Param,
-    ) -> Result<<O as ArgminOp>::Hessian, Error> {
+    pub fn hessian(&mut self, param: &O::Param) -> Result<O::Hessian, Error> {
         self.increment_hessian_func_count();
         self.operator.hessian(param)
     }
 
     /// Modify a `param` with the `modify` method of `operator`.
-    pub fn modify(
-        &self,
-        param: &<O as ArgminOp>::Param,
-        factor: f64,
-    ) -> Result<<O as ArgminOp>::Param, Error> {
+    pub fn modify(&self, param: &O::Param, factor: f64) -> Result<O::Param, Error> {
         self.operator.modify(&param, factor)
     }
 
     /// Set the current parameter vector
-    pub fn set_cur_param(&mut self, param: <O as ArgminOp>::Param) -> &mut Self {
+    pub fn set_cur_param(&mut self, param: O::Param) -> &mut Self {
         self.cur_param = param;
         self
     }
 
     /// Return the current parameter vector
-    pub fn cur_param(&self) -> <O as ArgminOp>::Param {
+    pub fn cur_param(&self) -> O::Param {
         self.cur_param.clone()
     }
 
     /// Set the new best parameter vector
-    pub fn set_best_param(&mut self, param: <O as ArgminOp>::Param) -> &mut Self {
+    pub fn set_best_param(&mut self, param: O::Param) -> &mut Self {
         self.best_param = param;
         self
     }
 
     /// Return the current best parameter vector
-    pub fn best_param(&self) -> <O as ArgminOp>::Param {
+    pub fn best_param(&self) -> O::Param {
         self.best_param.clone()
     }
 
@@ -242,24 +229,24 @@ where
     }
 
     /// Set the current gradient
-    pub fn set_cur_grad(&mut self, grad: <O as ArgminOp>::Param) -> &mut Self {
+    pub fn set_cur_grad(&mut self, grad: O::Param) -> &mut Self {
         self.cur_grad = grad;
         self
     }
 
     /// Return the current gradient
-    pub fn cur_grad(&self) -> <O as ArgminOp>::Param {
+    pub fn cur_grad(&self) -> O::Param {
         self.cur_grad.clone()
     }
 
     /// Set the current hessian
-    pub fn set_cur_hessian(&mut self, hessian: <O as ArgminOp>::Hessian) -> &mut Self {
+    pub fn set_cur_hessian(&mut self, hessian: O::Hessian) -> &mut Self {
         self.cur_hessian = hessian;
         self
     }
 
     /// Return the current hessian
-    pub fn cur_hessian(&self) -> <O as ArgminOp>::Hessian {
+    pub fn cur_hessian(&self) -> O::Hessian {
         self.cur_hessian.clone()
     }
 
@@ -369,7 +356,7 @@ where
     }
 
     /// Return the result.
-    pub fn result(&self) -> ArgminResult<<O as ArgminOp>::Param> {
+    pub fn result(&self) -> ArgminResult<O::Param> {
         ArgminResult::new(
             self.best_param.clone(),
             self.best_cost(),
@@ -396,10 +383,7 @@ where
     }
 
     /// Add a writer to the list of writers
-    pub fn add_writer(
-        &mut self,
-        writer: Arc<ArgminWrite<Param = <O as ArgminOp>::Param>>,
-    ) -> &mut Self {
+    pub fn add_writer(&mut self, writer: Arc<ArgminWrite<Param = O::Param>>) -> &mut Self {
         self.writer.push(writer);
         self
     }
@@ -415,7 +399,7 @@ where
     }
 
     /// Write (TODO)
-    pub fn write(&self, param: &<O as ArgminOp>::Param) -> Result<(), Error> {
+    pub fn write(&self, param: &O::Param) -> Result<(), Error> {
         self.writer.write(param)
     }
 
