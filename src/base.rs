@@ -40,11 +40,9 @@ pub struct ArgminBase<O: ArgminOp> {
     operator: O,
 
     /// Current parameter vector
-    // #[serde(bound = "T: Default")]
     cur_param: O::Param,
 
     /// Current best parameter vector
-    // #[serde(bound = "T: Default")]
     best_param: O::Param,
 
     /// Current cost function value
