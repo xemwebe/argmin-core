@@ -54,7 +54,7 @@ pub use crate::logging::ArgminLogger;
 pub use crate::math::*;
 pub use crate::nooperator::*;
 pub use crate::output::file::WriteToFile;
-pub use crate::output::ArgminWriter;
+pub use crate::output::*;
 pub use crate::result::ArgminResult;
 pub use crate::termination::TerminationReason;
 pub use failure::Error;
@@ -178,6 +178,9 @@ pub trait ArgminSolver: ArgminIter {
 
     /// Add a writer to the array of writers
     fn add_writer(&mut self, writer: std::sync::Arc<ArgminWrite<Param = Self::Param>>);
+
+    /// Set the writer mode
+    fn set_writer_mode(&mut self, mode: WriterMode);
 
     /// Reset the base of the algorithm to its initial state
     fn base_reset(&mut self);

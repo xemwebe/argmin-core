@@ -33,8 +33,6 @@ impl<T: Serialize + Send + Sync> ArgminWrite for WriteToFile<T> {
     type Param = T;
 
     fn write(&self, param: &T, iter: u64) -> Result<(), Error> {
-        println!("Writing!");
-
         let dir = Path::new(&self.dir);
         if !dir.exists() {
             std::fs::create_dir_all(&dir)?
@@ -44,7 +42,6 @@ impl<T: Serialize + Send + Sync> ArgminWrite for WriteToFile<T> {
         fname.push_str(&iter.to_string());
         fname.push_str(".arp");
         let fname = dir.join(fname);
-        println!("{:?}", fname);
 
         let f = BufWriter::new(File::create(fname)?);
         bincode::serialize_into(f, param)?;

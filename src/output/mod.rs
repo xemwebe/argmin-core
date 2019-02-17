@@ -18,7 +18,23 @@ pub mod file;
 
 use crate::ArgminWrite;
 use crate::Error;
+use serde::{Deserialize, Serialize};
+use std::default::Default;
 use std::sync::Arc;
+
+// naming is somewhat inconsistent... maybe ArgminWriteMode ?
+#[derive(Copy, Clone, Serialize, Deserialize, Debug)]
+pub enum WriterMode {
+    Never,
+    Always,
+    Every(u64),
+}
+
+impl Default for WriterMode {
+    fn default() -> WriterMode {
+        WriterMode::Never
+    }
+}
 
 #[derive(Clone, Default)]
 pub struct ArgminWriter<T> {

@@ -24,6 +24,7 @@ use crate::ArgminOp;
 use crate::ArgminResult;
 use crate::ArgminWrite;
 use crate::Error;
+use crate::WriterMode;
 use crate::{ArgminCheckpoint, CheckpointMode};
 use serde::{Deserialize, Serialize};
 use std;
@@ -89,6 +90,9 @@ pub struct ArgminBase<O: ArgminOp> {
     #[serde(skip)]
     writer: ArgminWriter<O::Param>,
 
+    /// WriterMode
+    writer_mode: WriterMode,
+
     /// Checkpoint
     checkpoint: ArgminCheckpoint,
 }
@@ -117,6 +121,7 @@ where
             total_time: std::time::Duration::new(0, 0),
             logger: ArgminLogger::new(),
             writer: ArgminWriter::new(),
+            writer_mode: WriterMode::default(),
             checkpoint: ArgminCheckpoint::default(),
         }
     }
@@ -386,6 +391,12 @@ where
         self
     }
 
+    /// Add a writer to the list of writers
+    pub fn set_writer_mode(&mut self, mode: WriterMode) -> &mut Self {
+        self.writer_mode = mode;
+        self
+    }
+
     /// Log a `kv`
     pub fn log_iter(&self, kv: &ArgminKV) -> Result<(), Error> {
         self.logger.log_iter(kv)
@@ -398,7 +409,13 @@ where
 
     /// Write
     pub fn write(&self, param: &O::Param) -> Result<(), Error> {
-        self.writer.write(param, self.cur_iter())
+        match self.writer_mode {
+            WriterMode::Always => self.writer.write(param, self.cur_iter()),
+            WriterMode::Every(i) if self.cur_iter() % i == 0 => {
+                self.writer.write(param, self.cur_iter())
+            }
+            WriterMode::Never | WriterMode::Every(_) => Ok(()),
+        }
     }
 
     /// Set checkpoint directory
