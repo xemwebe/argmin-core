@@ -13,19 +13,30 @@ use serde::Serialize;
 use std::fs::File;
 use std::io::BufWriter;
 use std::path::Path;
-use std::sync::Arc;
+
+pub enum WriteToFileSerializer {
+    Bincode,
+    JSON,
+}
 
 pub struct WriteToFile<T> {
     dir: String,
+    serializer: WriteToFileSerializer,
     _param: std::marker::PhantomData<T>,
 }
 
 impl<T> WriteToFile<T> {
-    pub fn new(dir: &str) -> Arc<Self> {
-        Arc::new(WriteToFile {
+    pub fn new(dir: &str) -> Self {
+        WriteToFile {
             dir: dir.to_string(),
+            serializer: WriteToFileSerializer::Bincode,
             _param: std::marker::PhantomData,
-        })
+        }
+    }
+
+    pub fn set_serializer(&mut self, serializer: WriteToFileSerializer) -> &mut Self {
+        self.serializer = serializer;
+        self
     }
 }
 
@@ -44,7 +55,14 @@ impl<T: Serialize + Send + Sync> ArgminWrite for WriteToFile<T> {
         let fname = dir.join(fname);
 
         let f = BufWriter::new(File::create(fname)?);
-        bincode::serialize_into(f, param)?;
+        match self.serializer {
+            WriteToFileSerializer::Bincode => {
+                bincode::serialize_into(f, param)?;
+            }
+            WriteToFileSerializer::JSON => {
+                serde_json::to_writer_pretty(f, param)?;
+            }
+        }
         Ok(())
     }
 }

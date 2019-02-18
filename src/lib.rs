@@ -53,7 +53,7 @@ pub use crate::logging::slog_logger::ArgminSlogLogger;
 pub use crate::logging::ArgminLogger;
 pub use crate::math::*;
 pub use crate::nooperator::*;
-pub use crate::output::file::WriteToFile;
+pub use crate::output::file::{WriteToFile, WriteToFileSerializer};
 pub use crate::output::*;
 pub use crate::result::ArgminResult;
 pub use crate::termination::TerminationReason;
