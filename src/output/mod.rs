@@ -23,16 +23,17 @@ use std::default::Default;
 use std::sync::Arc;
 
 // naming is somewhat inconsistent... maybe ArgminWriteMode ?
-#[derive(Copy, Clone, Serialize, Deserialize, Debug)]
+#[derive(Copy, Clone, Serialize, Deserialize, Debug, Eq, PartialEq, Ord, PartialOrd)]
 pub enum WriterMode {
     Never,
     Always,
     Every(u64),
+    NewBest,
 }
 
 impl Default for WriterMode {
     fn default() -> WriterMode {
-        WriterMode::Never
+        WriterMode::Always
     }
 }
 
@@ -55,9 +56,9 @@ impl<T> ArgminWriter<T> {
 impl<T: Clone> ArgminWrite for ArgminWriter<T> {
     type Param = T;
 
-    fn write(&self, param: &T, iter: u64) -> Result<(), Error> {
+    fn write(&self, param: &T, iter: u64, new_best: bool) -> Result<(), Error> {
         for w in self.writers.iter() {
-            w.write(param, iter)?;
+            w.write(param, iter, new_best)?;
         }
         Ok(())
     }

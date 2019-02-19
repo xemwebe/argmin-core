@@ -179,9 +179,6 @@ pub trait ArgminSolver: ArgminIter {
     /// Add a writer to the array of writers
     fn add_writer(&mut self, writer: std::sync::Arc<ArgminWrite<Param = Self::Param>>);
 
-    /// Set the writer mode
-    fn set_writer_mode(&mut self, mode: WriterMode);
-
     /// Reset the base of the algorithm to its initial state
     fn base_reset(&mut self);
 
@@ -262,7 +259,7 @@ pub trait ArgminWrite: Send + Sync {
     type Param;
 
     /// Writes the parameter vector somewhere
-    fn write(&self, param: &Self::Param, iter: u64) -> Result<(), Error>;
+    fn write(&self, param: &Self::Param, iter: u64, new_best: bool) -> Result<(), Error>;
 }
 
 /// The datastructure which is returned by the `next_iter` method of the `ArgminIter` trait.
