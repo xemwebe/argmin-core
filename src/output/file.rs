@@ -96,3 +96,10 @@ impl<T: Serialize + Send + Sync> ArgminWrite for WriteToFile<T> {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    send_sync_test!(write_to_file, WriteToFile<Vec<f64>>);
+}
