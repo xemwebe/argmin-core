@@ -10,11 +10,13 @@ use crate::math::ArgminZero;
 macro_rules! make_zero {
     ($t:ty) => {
         impl ArgminZero for $t {
+            #[allow(clippy::cast_lossless)]
             #[inline]
             fn zero_like(&self) -> $t {
                 0 as $t
             }
 
+            #[allow(clippy::cast_lossless)]
             #[inline]
             fn zero() -> $t {
                 0 as $t

@@ -52,11 +52,11 @@ impl<T> ArgminResult<T> {
 
 impl<T: std::fmt::Debug> std::fmt::Display for ArgminResult<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "ArgminResult:\n")?;
-        write!(f, "    param:       {:?}\n", self.param)?;
-        write!(f, "    cost:        {}\n", self.cost)?;
-        write!(f, "    iters:       {}\n", self.iters)?;
-        write!(f, "    termination: {}\n", self.termination_reason)?;
+        writeln!(f, "ArgminResult:")?;
+        writeln!(f, "    param:       {:?}", self.param)?;
+        writeln!(f, "    cost:        {}", self.cost)?;
+        writeln!(f, "    iters:       {}", self.iters)?;
+        writeln!(f, "    termination: {}", self.termination_reason)?;
         Ok(())
     }
 }

@@ -10,6 +10,7 @@ use crate::math::ArgminEye;
 macro_rules! make_eye {
     ($t:ty) => {
         impl ArgminEye for Vec<Vec<$t>> {
+            #[allow(clippy::cast_lossless)]
             #[inline]
             fn eye_like(&self) -> Vec<Vec<$t>> {
                 let n = self.len();
@@ -20,6 +21,7 @@ macro_rules! make_eye {
                 out
             }
 
+            #[allow(clippy::cast_lossless)]
             #[inline]
             fn eye(n: usize) -> Vec<Vec<$t>> {
                 let mut out = vec![vec![0 as $t; n]; n];

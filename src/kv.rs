@@ -26,10 +26,10 @@ pub struct ArgminKV {
 
 impl std::fmt::Display for ArgminKV {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "ArgminKV\n")?;
+        writeln!(f, "ArgminKV")?;
         self.kv
             .iter()
-            .map(|(key, val)| -> std::fmt::Result { write!(f, "   {}: {}\n", key, val) })
+            .map(|(key, val)| -> std::fmt::Result { writeln!(f, "   {}: {}", key, val) })
             .count();
         Ok(())
     }

@@ -13,7 +13,7 @@ where
 {
     #[inline]
     fn zero_like(&self) -> Vec<T> {
-        if self.len() > 0 {
+        if !self.is_empty() {
             vec![self[0].zero_like(); self.len()]
         } else {
             vec![T::zero(); self.len()]

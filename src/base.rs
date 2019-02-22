@@ -429,17 +429,17 @@ where
     O: ArgminOp,
 {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "ArgminBase:\n")?;
-        write!(f, "   cur_cost:           {}\n", self.cur_cost)?;
-        write!(f, "   best_cost:          {}\n", self.best_cost)?;
-        write!(f, "   target_cost:        {}\n", self.target_cost)?;
-        write!(f, "   cur_iter:           {}\n", self.cur_iter)?;
-        write!(f, "   max_iter:           {}\n", self.max_iters)?;
-        write!(f, "   cost_func_count:    {}\n", self.cost_func_count)?;
-        write!(f, "   grad_func_count:    {}\n", self.grad_func_count)?;
-        write!(f, "   hessian_func_count: {}\n", self.hessian_func_count)?;
-        write!(f, "   termination_reason: {}\n", self.termination_reason)?;
-        write!(f, "   total_time:         {:?}\n", self.total_time)?;
+        writeln!(f, "ArgminBase:")?;
+        writeln!(f, "   cur_cost:           {}", self.cur_cost)?;
+        writeln!(f, "   best_cost:          {}", self.best_cost)?;
+        writeln!(f, "   target_cost:        {}", self.target_cost)?;
+        writeln!(f, "   cur_iter:           {}", self.cur_iter)?;
+        writeln!(f, "   max_iter:           {}", self.max_iters)?;
+        writeln!(f, "   cost_func_count:    {}", self.cost_func_count)?;
+        writeln!(f, "   grad_func_count:    {}", self.grad_func_count)?;
+        writeln!(f, "   hessian_func_count: {}", self.hessian_func_count)?;
+        writeln!(f, "   termination_reason: {}", self.termination_reason)?;
+        writeln!(f, "   total_time:         {:?}", self.total_time)?;
         Ok(())
     }
 }
