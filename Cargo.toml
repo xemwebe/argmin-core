@@ -1,6 +1,6 @@
 [package]
 name = "argmin_core"
-version = "0.1.7"
+version = "0.1.8"
 authors = ["Stefan Kroboth <stefan.kroboth@gmail.com>"]
 edition = "2018"
 license = "MIT OR Apache-2.0"
@@ -41,9 +41,9 @@ default = []
 ndarrayl = ["ndarray", "ndarray-linalg", "finitediff/ndarray"]
 
 [dev-dependencies]
-argmin_codegen = { git = "https://github.com/argmin-rs/argmin-codegen.git", branch = "master"}
+# argmin_codegen = { git = "https://github.com/argmin-rs/argmin-codegen.git", branch = "master"}
 # argmin_codegen = { path = "../argmin-codegen"}
-# argmin_codegen = { version = "0.1.7"}
+argmin_codegen = { version = "0.1.8"}
 ndarray-linalg = { version = "0.10.0", features = ["openblas"] }
 paste = "0.1.4"
 
