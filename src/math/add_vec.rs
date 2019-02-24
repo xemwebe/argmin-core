@@ -54,6 +54,21 @@ macro_rules! make_add {
                     .collect()
             }
         }
+
+        impl ArgminAdd<$t, Vec<Vec<$t>>> for Vec<Vec<$t>> {
+            #[inline]
+            fn add(&self, other: &$t) -> Vec<Vec<$t>> {
+                let sr = self.len();
+                assert!(sr > 0);
+                let sc = self[0].len();
+                self.iter()
+                    .map(|a| {
+                        assert_eq!(a.len(), sc);
+                        <Vec<$t> as ArgminAdd<$t, Vec<$t>>>::add(&a, &other)
+                    })
+                    .collect()
+            }
+        }
     };
 }
 
@@ -162,6 +177,27 @@ mod tests {
                         vec![42 as $t, 42 as $t, 42 as $t]
                     ];
                     let res = <Vec<Vec<$t>> as ArgminAdd<Vec<Vec<$t>>, Vec<Vec<$t>>>>::add(&a, &b);
+                    for i in 0..3 {
+                        for j in 0..2 {
+                        assert!(((target[j][i] - res[j][i]) as f64).abs() < std::f64::EPSILON);
+                        }
+                    }
+                }
+            }
+
+            item! {
+                #[test]
+                fn [<test_add_mat_scalar_ $t>]() {
+                    let a = vec![
+                        vec![1 as $t, 4 as $t, 8 as $t],
+                        vec![2 as $t, 5 as $t, 9 as $t]
+                    ];
+                    let b = 2 as $t;
+                    let target = vec![
+                        vec![3 as $t, 6 as $t, 10 as $t],
+                        vec![4 as $t, 7 as $t, 11 as $t]
+                    ];
+                    let res = <Vec<Vec<$t>> as ArgminAdd<$t, Vec<Vec<$t>>>>::add(&a, &b);
                     for i in 0..3 {
                         for j in 0..2 {
                         assert!(((target[j][i] - res[j][i]) as f64).abs() < std::f64::EPSILON);
