@@ -37,6 +37,13 @@ macro_rules! make_add {
                 self + other
             }
         }
+
+        impl ArgminAdd<$t, Array2<$t>> for Array2<$t> {
+            #[inline]
+            fn add(&self, other: &$t) -> Array2<$t> {
+                self + *other
+            }
+        }
     };
 }
 
@@ -144,6 +151,27 @@ mod tests {
                         [42 as $t, 42 as $t, 42 as $t]
                     ];
                     let res = <Array2<$t> as ArgminAdd<Array2<$t>, Array2<$t>>>::add(&a, &b);
+                    for i in 0..3 {
+                        for j in 0..2 {
+                        assert!(((target[(j, i)] - res[(j, i)]) as f64).abs() < std::f64::EPSILON);
+                        }
+                    }
+                }
+            }
+
+            item! {
+                #[test]
+                fn [<test_add_mat_scalar_ $t>]() {
+                    let a = array![
+                        [1 as $t, 4 as $t, 8 as $t],
+                        [2 as $t, 5 as $t, 9 as $t]
+                    ];
+                    let b = 2 as $t;
+                    let target = array![
+                        [3 as $t, 6 as $t, 10 as $t],
+                        [4 as $t, 7 as $t, 11 as $t]
+                    ];
+                    let res = <Array2<$t> as ArgminAdd<$t, Array2<$t>>>::add(&a, &b);
                     for i in 0..3 {
                         for j in 0..2 {
                         assert!(((target[(j, i)] - res[(j, i)]) as f64).abs() < std::f64::EPSILON);
