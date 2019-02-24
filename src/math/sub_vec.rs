@@ -54,6 +54,21 @@ macro_rules! make_sub {
                     .collect()
             }
         }
+
+        impl ArgminSub<$t, Vec<Vec<$t>>> for Vec<Vec<$t>> {
+            #[inline]
+            fn sub(&self, other: &$t) -> Vec<Vec<$t>> {
+                let sr = self.len();
+                assert!(sr > 0);
+                let sc = self[0].len();
+                self.iter()
+                    .map(|a| {
+                        assert_eq!(a.len(), sc);
+                        <Vec<$t> as ArgminSub<$t, Vec<$t>>>::sub(&a, &other)
+                    })
+                    .collect()
+            }
+        }
     };
 }
 
@@ -162,6 +177,27 @@ mod tests {
                         vec![42 as $t, 42 as $t, 42 as $t]
                     ];
                     let res = <Vec<Vec<$t>> as ArgminSub<Vec<Vec<$t>>, Vec<Vec<$t>>>>::sub(&a, &b);
+                    for i in 0..3 {
+                        for j in 0..2 {
+                        assert!(((target[j][i] - res[j][i]) as f64).abs() < std::f64::EPSILON);
+                        }
+                    }
+                }
+            }
+
+            item! {
+                #[test]
+                fn [<test_sub_mat_scalar_ $t>]() {
+                    let a = vec![
+                        vec![43 as $t, 46 as $t, 50 as $t],
+                        vec![44 as $t, 47 as $t, 51 as $t]
+                    ];
+                    let b = 2 as $t;
+                    let target = vec![
+                        vec![41 as $t, 44 as $t, 48 as $t],
+                        vec![42 as $t, 45 as $t, 49 as $t]
+                    ];
+                    let res = <Vec<Vec<$t>> as ArgminSub<$t, Vec<Vec<$t>>>>::sub(&a, &b);
                     for i in 0..3 {
                         for j in 0..2 {
                         assert!(((target[j][i] - res[j][i]) as f64).abs() < std::f64::EPSILON);
