@@ -159,6 +159,9 @@ pub trait ArgminSolver: ArgminIter {
     /// Get current cost function value
     fn cur_cost(&self) -> f64;
 
+    /// Get previous cost function value
+    fn prev_cost(&self) -> f64;
+
     /// Get current cost function value
     fn set_cur_cost(&mut self, cost: f64);
 

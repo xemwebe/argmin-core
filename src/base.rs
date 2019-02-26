@@ -48,6 +48,9 @@ pub struct ArgminBase<O: ArgminOp> {
     /// Current cost function value
     cur_cost: f64,
 
+    /// Previous cost function value
+    prev_cost: f64,
+
     /// Cost function value of current best parameter vector
     best_cost: f64,
 
@@ -104,6 +107,7 @@ where
             cur_param: param.clone(),
             best_param: param,
             cur_cost: std::f64::INFINITY,
+            prev_cost: std::f64::INFINITY,
             best_cost: std::f64::INFINITY,
             target_cost: std::f64::NEG_INFINITY,
             cur_grad: O::Param::default(),
@@ -151,6 +155,7 @@ where
     pub fn reset(&mut self) {
         self.cur_iter = 0;
         self.cur_cost = std::f64::INFINITY;
+        self.prev_cost = std::f64::INFINITY;
         self.best_cost = std::f64::INFINITY;
         self.cost_func_count = 0;
         self.grad_func_count = 0;
@@ -210,6 +215,7 @@ where
 
     /// Set the current cost function value
     pub fn set_cur_cost(&mut self, cost: f64) -> &mut Self {
+        self.prev_cost = self.cur_cost;
         self.cur_cost = cost;
         self
     }
@@ -217,6 +223,11 @@ where
     /// Return the current cost function value
     pub fn cur_cost(&self) -> f64 {
         self.cur_cost
+    }
+
+    /// Return the previous cost function value
+    pub fn prev_cost(&self) -> f64 {
+        self.prev_cost
     }
 
     /// Set the cost function value of the current best parameter vector
