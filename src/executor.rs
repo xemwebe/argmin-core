@@ -48,7 +48,7 @@ impl<'a, O: ArgminOp> OpWrapper<'a, O> {
 
 pub trait ArgminOp: Send + Sync + erased_serde::Serialize {
     /// Type of the parameter vector
-    type Param;
+    type Param: Clone;
     /// Output of the operator. Most solvers expect `f64`.
     type Output;
     /// Type of Hessian
