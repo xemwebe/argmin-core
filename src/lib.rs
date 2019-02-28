@@ -321,7 +321,7 @@ impl<T: Clone> ArgminIterData<T> {
 /// implementation which is essentially returning an error which indicates that the method has not
 /// been implemented. Those methods (`gradient` and `modify`) only need to be implemented if the
 /// uses solver requires it.
-pub trait ArgminOp: Default + Send + Sync + erased_serde::Serialize {
+pub trait ArgminOp: Clone + Default + Send + Sync + Serialize {
     /// Type of the parameter vector
     type Param: Clone + Default + Send + Sync + serde::Serialize + serde::de::DeserializeOwned;
     /// Output of the operator. Most solvers expect `f64`.
