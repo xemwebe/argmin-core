@@ -23,12 +23,12 @@ pub extern crate ctrlc;
 /// Macros
 #[macro_use]
 pub mod macros;
-/// base struct
-mod base;
+// /// base struct
+// mod base;
 /// Error handling
 mod errors;
 /// Executor
-mod executor;
+pub mod executor;
 /// Key value datastructure
 mod kv;
 /// Logging
@@ -48,8 +48,9 @@ mod serialization;
 mod termination;
 
 // TODO: Maybe leave logging/output stuff in its namespace
-pub use crate::base::ArgminBase;
+// pub use crate::base::ArgminBase;
 pub use crate::errors::*;
+pub use crate::executor::*;
 pub use crate::kv::ArgminKV;
 pub use crate::logging::slog_logger::ArgminSlogLogger;
 pub use crate::logging::ArgminLogger;
@@ -321,47 +322,47 @@ impl<T: Clone> ArgminIterData<T> {
 /// implementation which is essentially returning an error which indicates that the method has not
 /// been implemented. Those methods (`gradient` and `modify`) only need to be implemented if the
 /// uses solver requires it.
-pub trait ArgminOp: Clone + Default + Send + Sync + Serialize {
-    /// Type of the parameter vector
-    type Param: Clone + Default + Send + Sync + serde::Serialize + serde::de::DeserializeOwned;
-    /// Output of the operator. Most solvers expect `f64`.
-    type Output;
-    /// Type of Hessian
-    type Hessian: Clone + Default + Send + Sync + serde::Serialize + serde::de::DeserializeOwned;
-
-    /// Applies the operator/cost function to parameters
-    fn apply(&self, _param: &Self::Param) -> Result<Self::Output, Error> {
-        Err(ArgminError::NotImplemented {
-            text: "Method `apply` of ArgminOp trait not implemented!".to_string(),
-        }
-        .into())
-    }
-
-    /// Computes the gradient at the given parameters
-    fn gradient(&self, _param: &Self::Param) -> Result<Self::Param, Error> {
-        Err(ArgminError::NotImplemented {
-            text: "Method `gradient` of ArgminOp trait not implemented!".to_string(),
-        }
-        .into())
-    }
-
-    /// Computes the hessian at the given parameters
-    fn hessian(&self, _param: &Self::Param) -> Result<Self::Hessian, Error> {
-        Err(ArgminError::NotImplemented {
-            text: "Method `hessian` of ArgminOp trait not implemented!".to_string(),
-        }
-        .into())
-    }
-
-    /// Modifies a parameter vector. Comes with a variable that indicates the "degree" of the
-    /// modification.
-    fn modify(&self, _param: &Self::Param, _extent: f64) -> Result<Self::Param, Error> {
-        Err(ArgminError::NotImplemented {
-            text: "Method `modify` of ArgminOp trait not implemented!".to_string(),
-        }
-        .into())
-    }
-}
+// pub trait ArgminOp: Clone + Default + Send + Sync + Serialize {
+//     /// Type of the parameter vector
+//     type Param: Clone + Default + Send + Sync + serde::Serialize + serde::de::DeserializeOwned;
+//     /// Output of the operator. Most solvers expect `f64`.
+//     type Output;
+//     /// Type of Hessian
+//     type Hessian: Clone + Default + Send + Sync + serde::Serialize + serde::de::DeserializeOwned;
+//
+//     /// Applies the operator/cost function to parameters
+//     fn apply(&self, _param: &Self::Param) -> Result<Self::Output, Error> {
+//         Err(ArgminError::NotImplemented {
+//             text: "Method `apply` of ArgminOp trait not implemented!".to_string(),
+//         }
+//         .into())
+//     }
+//
+//     /// Computes the gradient at the given parameters
+//     fn gradient(&self, _param: &Self::Param) -> Result<Self::Param, Error> {
+//         Err(ArgminError::NotImplemented {
+//             text: "Method `gradient` of ArgminOp trait not implemented!".to_string(),
+//         }
+//         .into())
+//     }
+//
+//     /// Computes the hessian at the given parameters
+//     fn hessian(&self, _param: &Self::Param) -> Result<Self::Hessian, Error> {
+//         Err(ArgminError::NotImplemented {
+//             text: "Method `hessian` of ArgminOp trait not implemented!".to_string(),
+//         }
+//         .into())
+//     }
+//
+//     /// Modifies a parameter vector. Comes with a variable that indicates the "degree" of the
+//     /// modification.
+//     fn modify(&self, _param: &Self::Param, _extent: f64) -> Result<Self::Param, Error> {
+//         Err(ArgminError::NotImplemented {
+//             text: "Method `modify` of ArgminOp trait not implemented!".to_string(),
+//         }
+//         .into())
+//     }
+// }
 
 /// Defines a common interface to line search methods. Requires that `ArgminSolver` is implemented
 /// for the line search method as well.

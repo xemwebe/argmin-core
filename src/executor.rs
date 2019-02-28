@@ -9,17 +9,50 @@ use crate::{
     ArgminCheckpoint, ArgminError, ArgminIterData, ArgminKV, ArgminLog, ArgminLogger, ArgminResult,
     ArgminWrite, ArgminWriter, Error, TerminationReason,
 };
-use serde::{Deserialize, Serialize};
+// use serde::{Deserialize, Serialize};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 
+pub struct OpWrapper<'a, O: ArgminOp> {
+    op: &'a O,
+    pub cost_func_count: u64,
+    pub grad_func_count: u64,
+    pub hessian_func_count: u64,
+}
+
+impl<'a, O: ArgminOp> OpWrapper<'a, O> {
+    pub fn new(op: &'a O) -> Self {
+        OpWrapper {
+            op: op,
+            cost_func_count: 0,
+            grad_func_count: 0,
+            hessian_func_count: 0,
+        }
+    }
+
+    pub fn apply(&mut self, param: &O::Param) -> Result<O::Output, Error> {
+        self.cost_func_count += 1;
+        self.op.apply(param)
+    }
+
+    pub fn gradient(&mut self, param: &O::Param) -> Result<O::Param, Error> {
+        self.grad_func_count += 1;
+        self.op.gradient(param)
+    }
+
+    pub fn hessian(&mut self, param: &O::Param) -> Result<O::Hessian, Error> {
+        self.hessian_func_count += 1;
+        self.op.hessian(param)
+    }
+}
+
 pub trait ArgminOp: Send + Sync + erased_serde::Serialize {
     /// Type of the parameter vector
-    type Param: Clone + Default + Send + Sync + serde::Serialize + serde::de::DeserializeOwned;
+    type Param;
     /// Output of the operator. Most solvers expect `f64`.
     type Output;
     /// Type of Hessian
-    type Hessian: Clone + Default + Send + Sync + serde::Serialize + serde::de::DeserializeOwned;
+    type Hessian;
 
     /// Applies the operator/cost function to parameters
     fn apply(&self, _param: &Self::Param) -> Result<Self::Output, Error> {
@@ -55,17 +88,13 @@ pub trait ArgminOp: Send + Sync + erased_serde::Serialize {
     }
 }
 
-pub trait Solver {
-    type Param;
-    type Output;
-    type Hessian;
-
+pub trait Solver<O: ArgminOp> {
     /// Computes one iteration of the algorithm.
-    fn next_iter(
+    fn next_iter<'a>(
         &mut self,
-        // cost: &FnMut(&Self::Param) -> Result<Self::Output, Error>,
-        operator: &ArgminOp<Param = Self::Param, Output = Self::Output, Hessian = Self::Hessian>,
-    ) -> Result<ArgminIterData<Self::Param>, Error>;
+        op: &mut OpWrapper<'a, O>,
+        cur_param: &O::Param,
+    ) -> Result<ArgminIterData<O::Param>, Error>;
 
     /// Initializes the algorithm
     ///
@@ -80,7 +109,7 @@ pub trait Solver {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+// #[derive(Serialize, Deserialize)]
 pub struct Executor<O: ArgminOp, S> {
     /// solver
     solver: S,
@@ -117,19 +146,23 @@ pub struct Executor<O: ArgminOp, S> {
     /// Total time the solver required.
     total_time: std::time::Duration,
     /// Storage for loggers
-    #[serde(skip)]
+    // #[serde(skip)]
     logger: ArgminLogger,
     /// Storage for writers
-    #[serde(skip)]
+    // #[serde(skip)]
     writer: ArgminWriter<O::Param>,
     /// Checkpoint
     checkpoint: ArgminCheckpoint,
 }
 
-impl<O: ArgminOp, S: Solver<Param = O::Param, Output = O::Output, Hessian = O::Hessian>>
-    Executor<O, S>
+impl<O, S> Executor<O, S>
+where
+    O: ArgminOp,
+    O::Param: Clone + Default,
+    O::Hessian: Default,
+    S: Solver<O>,
 {
-    pub fn new(op: O, solver: S, init_param: S::Param) -> Self {
+    pub fn new(op: O, solver: S, init_param: O::Param) -> Self {
         Executor {
             solver: solver,
             op: op,
@@ -212,8 +245,13 @@ impl<O: ArgminOp, S: Solver<Param = O::Param, Output = O::Output, Hessian = O::H
             // Start time measurement
             let start = std::time::Instant::now();
 
-            // execute iteration
-            let data = self.solver.next_iter(&self.op)?;
+            let mut op_wrapper = OpWrapper::new(&self.op);
+
+            let data = self.solver.next_iter(&mut op_wrapper, &self.cur_param)?;
+
+            self.cost_func_count += op_wrapper.cost_func_count;
+            self.grad_func_count += op_wrapper.grad_func_count;
+            self.hessian_func_count += op_wrapper.hessian_func_count;
 
             // End time measurement
             let duration = start.elapsed();
@@ -285,5 +323,16 @@ impl<O: ArgminOp, S: Solver<Param = O::Param, Output = O::Output, Hessian = O::H
             self.cur_iter,
             self.termination_reason,
         ))
+    }
+
+    /// Attaches a logger which implements `ArgminLog` to the solver.
+    pub fn add_logger(mut self, logger: std::sync::Arc<ArgminLog>) -> Self {
+        self.logger.push(logger);
+        self
+    }
+
+    pub fn set_max_iters(mut self, iters: u64) -> Self {
+        self.max_iters = iters;
+        self
     }
 }
