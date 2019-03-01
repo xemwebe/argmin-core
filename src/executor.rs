@@ -107,7 +107,7 @@ pub trait Solver<O: ArgminOp> {
     fn next_iter<'a>(
         &mut self,
         op: &mut OpWrapper<'a, O>,
-        status: IterState<O::Param, O::Hessian>,
+        state: IterState<O::Param, O::Hessian>,
     ) -> Result<ArgminIterData<O::Param>, Error>;
 
     /// Initializes the algorithm
@@ -118,7 +118,18 @@ pub trait Solver<O: ArgminOp> {
         Ok(())
     }
 
-    fn terminate(&mut self) -> TerminationReason {
+    fn terminate_internal(&mut self, state: &IterState<O::Param, O::Hessian>) -> TerminationReason {
+        self.terminate(state);
+        if state.cur_iter >= state.max_iters {
+            return TerminationReason::MaxItersReached;
+        }
+        if state.cur_cost <= state.target_cost {
+            return TerminationReason::TargetCostReached;
+        }
+        TerminationReason::NotTerminated
+    }
+
+    fn terminate(&mut self, state: &IterState<O::Param, O::Hessian>) -> TerminationReason {
         TerminationReason::NotTerminated
     }
 }
@@ -242,6 +253,8 @@ where
         self.solver.init()?;
 
         while running.load(Ordering::SeqCst) {
+            let state = self.to_state();
+
             // check first if it has already terminated
             // This should probably be solved better.
             // First, check if it isn't already terminated. If it isn't, evaluate the
@@ -249,7 +262,7 @@ where
             // whether it has terminated already, then it may overwrite a termination set
             // within `next_iter()`!
             if !self.termination_reason.terminated() {
-                self.solver.terminate();
+                self.termination_reason = self.solver.terminate_internal(&state);
             }
             // Now check once more if the algorithm has terminated. If yes, then break.
             if self.termination_reason.terminated() {
@@ -260,8 +273,6 @@ where
             let start = std::time::Instant::now();
 
             let mut op_wrapper = OpWrapper::new(&self.op);
-
-            let state = self.to_state();
 
             let data = self.solver.next_iter(&mut op_wrapper, state)?;
 
