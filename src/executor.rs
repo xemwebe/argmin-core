@@ -117,7 +117,7 @@ pub trait Solver<O: ArgminOp>: Serialize {
         &mut self,
         op: &mut OpWrapper<'a, O>,
         state: IterState<O::Param, O::Hessian>,
-    ) -> Result<ArgminIterData<O::Param>, Error>;
+    ) -> Result<ArgminIterData<O::Param, O::Param>, Error>;
 
     /// Initializes the algorithm
     ///

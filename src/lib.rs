@@ -249,28 +249,31 @@ pub trait ArgminWrite: Send + Sync {
 ///
 /// TODO: think about removing this or replacing it with something better. Actually, a tuple would
 /// be sufficient.
-pub struct ArgminIterData<T> {
+pub struct ArgminIterData<P, G> {
     /// Current parameter vector
-    param: T,
+    param: P,
     /// Current cost function value
     cost: f64,
+    /// Current gradient
+    grad: Option<G>,
     /// Key value pairs which are currently only used to provide additional information for the
     /// loggers
     kv: Option<ArgminKV>,
 }
 
-impl<T: Clone> ArgminIterData<T> {
+impl<P: Clone, G: Clone> ArgminIterData<P, G> {
     /// Constructor
-    pub fn new(param: T, cost: f64) -> Self {
+    pub fn new(param: P, cost: f64) -> Self {
         ArgminIterData {
             param,
             cost,
+            grad: None,
             kv: None,
         }
     }
 
     /// Returns the parameter vector
-    pub fn param(&self) -> T {
+    pub fn param(&self) -> P {
         self.param.clone()
     }
 
@@ -291,6 +294,15 @@ impl<T: Clone> ArgminIterData<T> {
     pub fn get_kv(&self) -> Option<ArgminKV> {
         self.kv.clone()
     }
+
+    pub fn set_grad(&mut self, grad: G) -> &mut Self {
+        self.grad = Some(grad);
+        self
+    }
+
+    pub fn grad(&mut self) -> Option<G> {
+        self.grad.clone()
+    }
 }
 
 /// Defines a common interface to line search methods. Requires that `ArgminSolver` is implemented
@@ -302,32 +314,24 @@ impl<T: Clone> ArgminIterData<T> {
 /// former is convenient if cost and gradient at the starting point are already known for some
 /// reason (i.e. the solver which uses the line search has already computed cost and gradient) and
 /// avoids unneccessary computation of those values.
-// pub trait ArgminLineSearch: ArgminSolver + Serialize {
-//     /// Set the initial parameter (starting point)
-//     fn set_initial_parameter(&mut self, param: <Self as ArgminIter>::Param);
-//
-//     /// Set the search direction
-//     fn set_search_direction(&mut self, direction: <Self as ArgminIter>::Param);
-//
-//     /// Set the initial step length
-//     fn set_initial_alpha(&mut self, step_length: f64) -> Result<(), Error>;
-//
-//     /// Set the cost function value at the starting point as opposed to computing it (see
-//     /// `calc_initial_cost`)
-//     fn set_initial_cost(&mut self, cost: f64);
-//
-//     /// Set the gradient at the starting point as opposed to computing it (see
-//     /// `calc_initial_gradient`)
-//     fn set_initial_gradient(&mut self, grad: <Self as ArgminIter>::Param);
-//
-//     /// calculate the initial cost function value using an operator as opposed to setting it
-//     /// manually (see `set_initial_cost`)
-//     fn calc_initial_cost(&mut self) -> Result<(), Error>;
-//
-//     /// calculate the initial gradient using an operator as opposed to setting it manually (see
-//     /// `set_initial_gradient`)
-//     fn calc_initial_gradient(&mut self) -> Result<(), Error>;
-// }
+pub trait ArgminLineSearch<P> {
+    /// Set the initial parameter (starting point)
+    fn set_init_param(&mut self, param: P);
+
+    /// Set the search direction
+    fn set_search_direction(&mut self, direction: P);
+
+    /// Set the initial step length
+    fn set_init_alpha(&mut self, step_length: f64) -> Result<(), Error>;
+
+    /// Set the cost function value at the starting point as opposed to computing it (see
+    /// `calc_initial_cost`)
+    fn set_init_cost(&mut self, cost: f64);
+
+    /// Set the gradient at the starting point as opposed to computing it (see
+    /// `calc_initial_gradient`)
+    fn set_init_grad(&mut self, grad: P);
+}
 
 /// Defines a common interface to methods which calculate approximate steps for trust region
 /// methods. Requires that `ArgminSolver` is implemented as well.
