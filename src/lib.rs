@@ -75,178 +75,155 @@ pub mod finitediff {
 
 /// Defines the interface to a solver. Usually, there is no need to implement this manually, use
 /// the `argmin_derive` crate instead.
-pub trait ArgminSolver: ArgminIter {
-    /// Load solver from checkpoint
-    fn from_checkpoint<P: AsRef<Path>>(path: P) -> Result<Self, Error>
-    where
-        Self: Sized + DeserializeOwned,
-    {
-        load_checkpoint(path)
-    }
-
-    /// apply cost function or operator to a parameter vector
-    fn apply(
-        &mut self,
-        param: &<Self as ArgminIter>::Param,
-    ) -> Result<<Self as ArgminIter>::Output, Error>;
-
-    /// compute the gradient for a parameter vector
-    fn gradient(
-        &mut self,
-        param: &<Self as ArgminIter>::Param,
-    ) -> Result<<Self as ArgminIter>::Param, Error>;
-
-    /// compute the hessian for a parameter vector
-    fn hessian(
-        &mut self,
-        param: &<Self as ArgminIter>::Param,
-    ) -> Result<<Self as ArgminIter>::Hessian, Error>;
-
-    /// modify the parameter vector
-    fn modify(
-        &self,
-        param: &<Self as ArgminIter>::Param,
-        extent: f64,
-    ) -> Result<<Self as ArgminIter>::Param, Error>;
-
-    /// return current parameter vector
-    fn cur_param(&self) -> <Self as ArgminIter>::Param;
-
-    /// return current gradient
-    fn cur_grad(&self) -> <Self as ArgminIter>::Param;
-
-    /// return current gradient
-    fn cur_hessian(&self) -> <Self as ArgminIter>::Hessian;
-
-    /// set current parameter vector
-    fn set_cur_param(&mut self, param: <Self as ArgminIter>::Param);
-
-    /// set current gradient
-    fn set_cur_grad(&mut self, grad: <Self as ArgminIter>::Param);
-
-    /// set current gradient
-    fn set_cur_hessian(&mut self, hessian: <Self as ArgminIter>::Hessian);
-
-    /// set current parameter vector
-    fn set_best_param(&mut self, param: <Self as ArgminIter>::Param);
-
-    /// Execute the optimization algorithm.
-    fn run(&mut self) -> Result<ArgminResult<<Self as ArgminIter>::Param>, Error>;
-
-    /// Execute the optimization algorithm without Ctrl-C handling, logging, writing and anything
-    /// else which may cost unnecessary time.
-    fn run_fast(&mut self) -> Result<ArgminResult<<Self as ArgminIter>::Param>, Error>;
-
-    /// Returns the best solution found during optimization.
-    fn result(&self) -> ArgminResult<<Self as ArgminIter>::Param>;
-
-    /// Set termination reason (doesn't terminate yet! -- this is helpful for terminating within
-    /// the iterations)
-    fn set_termination_reason(&mut self, reason: TerminationReason);
-
-    /// Evaluate all stopping criterions and return the `TerminationReason`
-    fn terminate(&mut self) -> TerminationReason;
-
-    /// Set max number of iterations.
-    fn set_max_iters(&mut self, iters: u64);
-
-    /// Get max number of iterations.
-    fn max_iters(&self) -> u64;
-
-    /// Get current iteration number.
-    fn cur_iter(&self) -> u64;
-
-    /// Increment the iteration number by one
-    fn increment_iter(&mut self);
-
-    /// Get current cost function value
-    fn cur_cost(&self) -> f64;
-
-    /// Get previous cost function value
-    fn prev_cost(&self) -> f64;
-
-    /// Get current cost function value
-    fn set_cur_cost(&mut self, cost: f64);
-
-    /// Get best cost function value
-    // fn best_cost(&self) -> <Self as ArgminIter>::Output;
-    fn best_cost(&self) -> f64;
-
-    /// set best cost value
-    // fn set_best_cost(&mut self, <Self as ArgminIter>::Output);
-    fn set_best_cost(&mut self, cost: f64);
-
-    /// Set the target cost function value which is used as a stopping criterion
-    fn set_target_cost(&mut self, cost: f64);
-
-    /// Add a logger to the array of loggers
-    fn add_logger(&mut self, logger: std::sync::Arc<ArgminLog>);
-
-    /// Add a writer to the array of writers
-    fn add_writer(&mut self, writer: std::sync::Arc<ArgminWrite<Param = Self::Param>>);
-
-    /// Reset the base of the algorithm to its initial state
-    fn base_reset(&mut self);
-
-    /// Increment the cost function evaluation count
-    fn increment_cost_func_count(&mut self);
-
-    /// Increaese the cost function evaluation count by a given value
-    fn increase_cost_func_count(&mut self, count: u64);
-
-    /// Return the cost function evaluation count
-    fn cost_func_count(&self) -> u64;
-
-    /// Increment the gradient evaluation count
-    fn increment_grad_func_count(&mut self);
-
-    /// Increase the gradient evaluation count by a given value
-    fn increase_grad_func_count(&mut self, count: u64);
-
-    /// Return the gradient evaluation count
-    fn grad_func_count(&self) -> u64;
-
-    /// Increment the hessian evaluation count
-    fn increment_hessian_func_count(&mut self);
-
-    /// Increase the hessian evaluation count by a given value
-    fn increase_hessian_func_count(&mut self, count: u64);
-
-    /// Return the gradient evaluation count
-    fn hessian_func_count(&self) -> u64;
-
-    /// Set checkpoint directory
-    fn set_checkpoint_dir(&mut self, dir: &str);
-
-    /// Set checkpoint name
-    fn set_checkpoint_name(&mut self, dir: &str);
-
-    /// Set checkpoint mode
-    fn set_checkpoint_mode(&mut self, mode: CheckpointMode);
-}
-
-/// Main part of every solver: `next_iter` computes one iteration of the algorithm and `init` is
-/// executed before these iterations. The `init` method comes with a default implementation which
-/// corresponds to doing nothing.
-pub trait ArgminIter {
-    /// Parameter vectors
-    type Param;
-    /// Output of the operator
-    type Output;
-    /// Hessian
-    type Hessian;
-
-    /// Computes one iteration of the algorithm.
-    fn next_iter(&mut self) -> Result<ArgminIterData<Self::Param>, Error>;
-
-    /// Initializes the algorithm
-    ///
-    /// This is executed before any iterations are performed. It can be used to perform
-    /// precomputations. The default implementation corresponds to doing nothing.
-    fn init(&mut self) -> Result<(), Error> {
-        Ok(())
-    }
-}
+// pub trait ArgminSolver: ArgminIter {
+//     /// Load solver from checkpoint
+//     fn from_checkpoint<P: AsRef<Path>>(path: P) -> Result<Self, Error>
+//     where
+//         Self: Sized + DeserializeOwned,
+//     {
+//         load_checkpoint(path)
+//     }
+//
+//     /// apply cost function or operator to a parameter vector
+//     fn apply(
+//         &mut self,
+//         param: &<Self as ArgminIter>::Param,
+//     ) -> Result<<Self as ArgminIter>::Output, Error>;
+//
+//     /// compute the gradient for a parameter vector
+//     fn gradient(
+//         &mut self,
+//         param: &<Self as ArgminIter>::Param,
+//     ) -> Result<<Self as ArgminIter>::Param, Error>;
+//
+//     /// compute the hessian for a parameter vector
+//     fn hessian(
+//         &mut self,
+//         param: &<Self as ArgminIter>::Param,
+//     ) -> Result<<Self as ArgminIter>::Hessian, Error>;
+//
+//     /// modify the parameter vector
+//     fn modify(
+//         &self,
+//         param: &<Self as ArgminIter>::Param,
+//         extent: f64,
+//     ) -> Result<<Self as ArgminIter>::Param, Error>;
+//
+//     /// return current parameter vector
+//     fn cur_param(&self) -> <Self as ArgminIter>::Param;
+//
+//     /// return current gradient
+//     fn cur_grad(&self) -> <Self as ArgminIter>::Param;
+//
+//     /// return current gradient
+//     fn cur_hessian(&self) -> <Self as ArgminIter>::Hessian;
+//
+//     /// set current parameter vector
+//     fn set_cur_param(&mut self, param: <Self as ArgminIter>::Param);
+//
+//     /// set current gradient
+//     fn set_cur_grad(&mut self, grad: <Self as ArgminIter>::Param);
+//
+//     /// set current gradient
+//     fn set_cur_hessian(&mut self, hessian: <Self as ArgminIter>::Hessian);
+//
+//     /// set current parameter vector
+//     fn set_best_param(&mut self, param: <Self as ArgminIter>::Param);
+//
+//     /// Execute the optimization algorithm.
+//     fn run(&mut self) -> Result<ArgminResult<<Self as ArgminIter>::Param>, Error>;
+//
+//     /// Execute the optimization algorithm without Ctrl-C handling, logging, writing and anything
+//     /// else which may cost unnecessary time.
+//     fn run_fast(&mut self) -> Result<ArgminResult<<Self as ArgminIter>::Param>, Error>;
+//
+//     /// Returns the best solution found during optimization.
+//     fn result(&self) -> ArgminResult<<Self as ArgminIter>::Param>;
+//
+//     /// Set termination reason (doesn't terminate yet! -- this is helpful for terminating within
+//     /// the iterations)
+//     fn set_termination_reason(&mut self, reason: TerminationReason);
+//
+//     /// Evaluate all stopping criterions and return the `TerminationReason`
+//     fn terminate(&mut self) -> TerminationReason;
+//
+//     /// Set max number of iterations.
+//     fn set_max_iters(&mut self, iters: u64);
+//
+//     /// Get max number of iterations.
+//     fn max_iters(&self) -> u64;
+//
+//     /// Get current iteration number.
+//     fn cur_iter(&self) -> u64;
+//
+//     /// Increment the iteration number by one
+//     fn increment_iter(&mut self);
+//
+//     /// Get current cost function value
+//     fn cur_cost(&self) -> f64;
+//
+//     /// Get previous cost function value
+//     fn prev_cost(&self) -> f64;
+//
+//     /// Get current cost function value
+//     fn set_cur_cost(&mut self, cost: f64);
+//
+//     /// Get best cost function value
+//     // fn best_cost(&self) -> <Self as ArgminIter>::Output;
+//     fn best_cost(&self) -> f64;
+//
+//     /// set best cost value
+//     // fn set_best_cost(&mut self, <Self as ArgminIter>::Output);
+//     fn set_best_cost(&mut self, cost: f64);
+//
+//     /// Set the target cost function value which is used as a stopping criterion
+//     fn set_target_cost(&mut self, cost: f64);
+//
+//     /// Add a logger to the array of loggers
+//     fn add_logger(&mut self, logger: std::sync::Arc<ArgminLog>);
+//
+//     /// Add a writer to the array of writers
+//     fn add_writer(&mut self, writer: std::sync::Arc<ArgminWrite<Param = Self::Param>>);
+//
+//     /// Reset the base of the algorithm to its initial state
+//     fn base_reset(&mut self);
+//
+//     /// Increment the cost function evaluation count
+//     fn increment_cost_func_count(&mut self);
+//
+//     /// Increaese the cost function evaluation count by a given value
+//     fn increase_cost_func_count(&mut self, count: u64);
+//
+//     /// Return the cost function evaluation count
+//     fn cost_func_count(&self) -> u64;
+//
+//     /// Increment the gradient evaluation count
+//     fn increment_grad_func_count(&mut self);
+//
+//     /// Increase the gradient evaluation count by a given value
+//     fn increase_grad_func_count(&mut self, count: u64);
+//
+//     /// Return the gradient evaluation count
+//     fn grad_func_count(&self) -> u64;
+//
+//     /// Increment the hessian evaluation count
+//     fn increment_hessian_func_count(&mut self);
+//
+//     /// Increase the hessian evaluation count by a given value
+//     fn increase_hessian_func_count(&mut self, count: u64);
+//
+//     /// Return the gradient evaluation count
+//     fn hessian_func_count(&self) -> u64;
+//
+//     /// Set checkpoint directory
+//     fn set_checkpoint_dir(&mut self, dir: &str);
+//
+//     /// Set checkpoint name
+//     fn set_checkpoint_name(&mut self, dir: &str);
+//
+//     /// Set checkpoint mode
+//     fn set_checkpoint_mode(&mut self, mode: CheckpointMode);
+// }
 
 /// Defince the interface every logger needs to expose
 pub trait ArgminLog: Send + Sync {
@@ -316,54 +293,6 @@ impl<T: Clone> ArgminIterData<T> {
     }
 }
 
-/// This trait needs to be implemented for every operator/cost function.
-///
-/// It is required to implement the `apply` method, all others are optional and provide a default
-/// implementation which is essentially returning an error which indicates that the method has not
-/// been implemented. Those methods (`gradient` and `modify`) only need to be implemented if the
-/// uses solver requires it.
-// pub trait ArgminOp: Clone + Default + Send + Sync + Serialize {
-//     /// Type of the parameter vector
-//     type Param: Clone + Default + Send + Sync + serde::Serialize + serde::de::DeserializeOwned;
-//     /// Output of the operator. Most solvers expect `f64`.
-//     type Output;
-//     /// Type of Hessian
-//     type Hessian: Clone + Default + Send + Sync + serde::Serialize + serde::de::DeserializeOwned;
-//
-//     /// Applies the operator/cost function to parameters
-//     fn apply(&self, _param: &Self::Param) -> Result<Self::Output, Error> {
-//         Err(ArgminError::NotImplemented {
-//             text: "Method `apply` of ArgminOp trait not implemented!".to_string(),
-//         }
-//         .into())
-//     }
-//
-//     /// Computes the gradient at the given parameters
-//     fn gradient(&self, _param: &Self::Param) -> Result<Self::Param, Error> {
-//         Err(ArgminError::NotImplemented {
-//             text: "Method `gradient` of ArgminOp trait not implemented!".to_string(),
-//         }
-//         .into())
-//     }
-//
-//     /// Computes the hessian at the given parameters
-//     fn hessian(&self, _param: &Self::Param) -> Result<Self::Hessian, Error> {
-//         Err(ArgminError::NotImplemented {
-//             text: "Method `hessian` of ArgminOp trait not implemented!".to_string(),
-//         }
-//         .into())
-//     }
-//
-//     /// Modifies a parameter vector. Comes with a variable that indicates the "degree" of the
-//     /// modification.
-//     fn modify(&self, _param: &Self::Param, _extent: f64) -> Result<Self::Param, Error> {
-//         Err(ArgminError::NotImplemented {
-//             text: "Method `modify` of ArgminOp trait not implemented!".to_string(),
-//         }
-//         .into())
-//     }
-// }
-
 /// Defines a common interface to line search methods. Requires that `ArgminSolver` is implemented
 /// for the line search method as well.
 ///
@@ -373,49 +302,49 @@ impl<T: Clone> ArgminIterData<T> {
 /// former is convenient if cost and gradient at the starting point are already known for some
 /// reason (i.e. the solver which uses the line search has already computed cost and gradient) and
 /// avoids unneccessary computation of those values.
-pub trait ArgminLineSearch: ArgminSolver + Serialize {
-    /// Set the initial parameter (starting point)
-    fn set_initial_parameter(&mut self, param: <Self as ArgminIter>::Param);
-
-    /// Set the search direction
-    fn set_search_direction(&mut self, direction: <Self as ArgminIter>::Param);
-
-    /// Set the initial step length
-    fn set_initial_alpha(&mut self, step_length: f64) -> Result<(), Error>;
-
-    /// Set the cost function value at the starting point as opposed to computing it (see
-    /// `calc_initial_cost`)
-    fn set_initial_cost(&mut self, cost: f64);
-
-    /// Set the gradient at the starting point as opposed to computing it (see
-    /// `calc_initial_gradient`)
-    fn set_initial_gradient(&mut self, grad: <Self as ArgminIter>::Param);
-
-    /// calculate the initial cost function value using an operator as opposed to setting it
-    /// manually (see `set_initial_cost`)
-    fn calc_initial_cost(&mut self) -> Result<(), Error>;
-
-    /// calculate the initial gradient using an operator as opposed to setting it manually (see
-    /// `set_initial_gradient`)
-    fn calc_initial_gradient(&mut self) -> Result<(), Error>;
-}
+// pub trait ArgminLineSearch: ArgminSolver + Serialize {
+//     /// Set the initial parameter (starting point)
+//     fn set_initial_parameter(&mut self, param: <Self as ArgminIter>::Param);
+//
+//     /// Set the search direction
+//     fn set_search_direction(&mut self, direction: <Self as ArgminIter>::Param);
+//
+//     /// Set the initial step length
+//     fn set_initial_alpha(&mut self, step_length: f64) -> Result<(), Error>;
+//
+//     /// Set the cost function value at the starting point as opposed to computing it (see
+//     /// `calc_initial_cost`)
+//     fn set_initial_cost(&mut self, cost: f64);
+//
+//     /// Set the gradient at the starting point as opposed to computing it (see
+//     /// `calc_initial_gradient`)
+//     fn set_initial_gradient(&mut self, grad: <Self as ArgminIter>::Param);
+//
+//     /// calculate the initial cost function value using an operator as opposed to setting it
+//     /// manually (see `set_initial_cost`)
+//     fn calc_initial_cost(&mut self) -> Result<(), Error>;
+//
+//     /// calculate the initial gradient using an operator as opposed to setting it manually (see
+//     /// `set_initial_gradient`)
+//     fn calc_initial_gradient(&mut self) -> Result<(), Error>;
+// }
 
 /// Defines a common interface to methods which calculate approximate steps for trust region
 /// methods. Requires that `ArgminSolver` is implemented as well.
-pub trait ArgminTrustRegion: ArgminSolver + Serialize {
-    // /// Set the initial parameter (starting point)
-    // fn set_initial_parameter(&mut self, <Self as ArgminIter>::Parameters);
-
-    /// Set the initial step length
-    fn set_radius(&mut self, radius: f64);
-
-    /// Set the gradient at the starting point
-    fn set_grad(&mut self, grad: <Self as ArgminIter>::Param);
-
-    /// Set the gradient at the starting point
-    fn set_hessian(&mut self, hessian: <Self as ArgminIter>::Hessian);
-}
-
+// pub trait ArgminTrustRegion: ArgminSolver + Serialize {
+//     // /// Set the initial parameter (starting point)
+//     // fn set_initial_parameter(&mut self, <Self as ArgminIter>::Parameters);
+//
+//     /// Set the initial step length
+//     fn set_radius(&mut self, radius: f64);
+//
+//     /// Set the gradient at the starting point
+//     fn set_grad(&mut self, grad: <Self as ArgminIter>::Param);
+//
+//     /// Set the gradient at the starting point
+//     fn set_hessian(&mut self, hessian: <Self as ArgminIter>::Hessian);
+// }
+//
 /// Every method for the update of beta needs to implement this trait.
 pub trait ArgminNLCGBetaUpdate<T>: Serialize {
     /// Update beta

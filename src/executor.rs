@@ -46,6 +46,12 @@ impl<'a, O: ArgminOp> OpWrapper<'a, O> {
     }
 }
 
+/// This trait needs to be implemented for every operator/cost function.
+///
+/// It is required to implement the `apply` method, all others are optional and provide a default
+/// implementation which is essentially returning an error which indicates that the method has not
+/// been implemented. Those methods (`gradient` and `modify`) only need to be implemented if the
+/// uses solver requires it.
 pub trait ArgminOp: Send + Sync + erased_serde::Serialize {
     /// Type of the parameter vector
     type Param: Clone;
@@ -129,7 +135,7 @@ pub trait Solver<O: ArgminOp> {
         TerminationReason::NotTerminated
     }
 
-    fn terminate(&mut self, state: &IterState<O::Param, O::Hessian>) -> TerminationReason {
+    fn terminate(&mut self, _state: &IterState<O::Param, O::Hessian>) -> TerminationReason {
         TerminationReason::NotTerminated
     }
 }
@@ -210,11 +216,6 @@ where
             writer: ArgminWriter::new(),
             checkpoint: ArgminCheckpoint::default(),
         }
-    }
-
-    fn apply(&mut self, param: &O::Param) -> Result<O::Output, Error> {
-        self.cost_func_count += 1;
-        self.op.apply(param)
     }
 
     pub fn run(&mut self) -> Result<ArgminResult<O::Param>, Error> {
