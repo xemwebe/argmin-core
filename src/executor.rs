@@ -52,7 +52,7 @@ pub trait ArgminOp: Send + Sync + erased_serde::Serialize {
     /// Output of the operator. Most solvers expect `f64`.
     type Output;
     /// Type of Hessian
-    type Hessian;
+    type Hessian: Clone;
 
     /// Applies the operator/cost function to parameters
     fn apply(&self, _param: &Self::Param) -> Result<Self::Output, Error> {
@@ -88,12 +88,26 @@ pub trait ArgminOp: Send + Sync + erased_serde::Serialize {
     }
 }
 
+// currently this uses owned values, ideally this would only be references, but I don't want to
+// fight the borrow checker right now.
+pub struct IterState<P, H> {
+    pub cur_param: P,
+    pub best_param: P,
+    pub cur_cost: f64,
+    pub best_cost: f64,
+    pub target_cost: f64,
+    pub cur_grad: P,
+    pub cur_hessian: H,
+    pub cur_iter: u64,
+    pub max_iters: u64,
+}
+
 pub trait Solver<O: ArgminOp> {
     /// Computes one iteration of the algorithm.
     fn next_iter<'a>(
         &mut self,
         op: &mut OpWrapper<'a, O>,
-        cur_param: &O::Param,
+        status: IterState<O::Param, O::Hessian>,
     ) -> Result<ArgminIterData<O::Param>, Error>;
 
     /// Initializes the algorithm
@@ -247,7 +261,9 @@ where
 
             let mut op_wrapper = OpWrapper::new(&self.op);
 
-            let data = self.solver.next_iter(&mut op_wrapper, &self.cur_param)?;
+            let state = self.to_state();
+
+            let data = self.solver.next_iter(&mut op_wrapper, state)?;
 
             self.cost_func_count += op_wrapper.cost_func_count;
             self.grad_func_count += op_wrapper.grad_func_count;
@@ -334,5 +350,19 @@ where
     pub fn set_max_iters(mut self, iters: u64) -> Self {
         self.max_iters = iters;
         self
+    }
+
+    pub fn to_state(&self) -> IterState<O::Param, O::Hessian> {
+        IterState {
+            cur_param: self.cur_param.clone(),
+            best_param: self.best_param.clone(),
+            cur_cost: self.cur_cost,
+            best_cost: self.best_cost,
+            target_cost: self.target_cost,
+            cur_grad: self.cur_grad.clone(),
+            cur_hessian: self.cur_hessian.clone(),
+            cur_iter: self.cur_iter,
+            max_iters: self.max_iters,
+        }
     }
 }
