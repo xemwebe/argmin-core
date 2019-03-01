@@ -388,20 +388,19 @@ where
     }
 
     /// Set checkpoint directory
-    pub fn checkpoint_dir(&mut self, dir: &str) {
+    pub fn checkpoint_dir(mut self, dir: &str) -> Self {
         self.checkpoint.set_dir(dir);
+        self
     }
 
     /// Set checkpoint name
-    pub fn checkpoint_name(&mut self, dir: &str) {
+    pub fn checkpoint_name(mut self, dir: &str) -> Self {
         self.checkpoint.set_name(dir);
+        self
     }
 
-    pub fn checkpoint_mode(&mut self, mode: CheckpointMode) {
+    pub fn checkpoint_mode(mut self, mode: CheckpointMode) -> Self {
         self.checkpoint.set_mode(mode);
-    }
-
-    pub fn store_checkpoint<T: Serialize>(&self, solver: &T) -> Result<(), Error> {
-        self.checkpoint.store_cond(solver, self.cur_iter)
+        self
     }
 }
