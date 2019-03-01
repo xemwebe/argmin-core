@@ -37,9 +37,15 @@ impl Default for WriterMode {
     }
 }
 
-#[derive(Clone, Default)]
+#[derive(Clone)]
 pub struct ArgminWriter<T> {
     writers: Vec<Arc<ArgminWrite<Param = T>>>,
+}
+
+impl<T> Default for ArgminWriter<T> {
+    fn default() -> Self {
+        ArgminWriter { writers: vec![] }
+    }
 }
 
 impl<T> ArgminWriter<T> {

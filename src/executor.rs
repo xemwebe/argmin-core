@@ -5,11 +5,14 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
+use crate::serialization::*;
 use crate::{
     ArgminCheckpoint, ArgminError, ArgminIterData, ArgminKV, ArgminLog, ArgminLogger, ArgminResult,
     ArgminWrite, ArgminWriter, Error, TerminationReason,
 };
-// use serde::{Deserialize, Serialize};
+use serde::de::DeserializeOwned;
+use serde::{Deserialize, Serialize};
+use std::path::Path;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 
@@ -52,13 +55,13 @@ impl<'a, O: ArgminOp> OpWrapper<'a, O> {
 /// implementation which is essentially returning an error which indicates that the method has not
 /// been implemented. Those methods (`gradient` and `modify`) only need to be implemented if the
 /// uses solver requires it.
-pub trait ArgminOp: Send + Sync + erased_serde::Serialize {
+pub trait ArgminOp: Send + Sync + Serialize {
     /// Type of the parameter vector
-    type Param: Clone;
+    type Param: Clone + Serialize;
     /// Output of the operator. Most solvers expect `f64`.
     type Output;
     /// Type of Hessian
-    type Hessian: Clone;
+    type Hessian: Clone + Serialize;
 
     /// Applies the operator/cost function to parameters
     fn apply(&self, _param: &Self::Param) -> Result<Self::Output, Error> {
@@ -108,7 +111,7 @@ pub struct IterState<P, H> {
     pub max_iters: u64,
 }
 
-pub trait Solver<O: ArgminOp> {
+pub trait Solver<O: ArgminOp>: Serialize {
     /// Computes one iteration of the algorithm.
     fn next_iter<'a>(
         &mut self,
@@ -140,7 +143,7 @@ pub trait Solver<O: ArgminOp> {
     }
 }
 
-// #[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize)]
 pub struct Executor<O: ArgminOp, S> {
     /// solver
     solver: S,
@@ -177,10 +180,10 @@ pub struct Executor<O: ArgminOp, S> {
     /// Total time the solver required.
     total_time: std::time::Duration,
     /// Storage for loggers
-    // #[serde(skip)]
+    #[serde(skip)]
     logger: ArgminLogger,
     /// Storage for writers
-    // #[serde(skip)]
+    #[serde(skip)]
     writer: ArgminWriter<O::Param>,
     /// Checkpoint
     checkpoint: ArgminCheckpoint,
@@ -216,6 +219,13 @@ where
             writer: ArgminWriter::new(),
             checkpoint: ArgminCheckpoint::default(),
         }
+    }
+
+    pub fn from_checkpoint<P: AsRef<Path>>(path: P) -> Result<Self, Error>
+    where
+        Self: Sized + DeserializeOwned,
+    {
+        load_checkpoint(path)
     }
 
     pub fn run(&mut self) -> Result<ArgminResult<O::Param>, Error> {
@@ -319,8 +329,7 @@ where
             // increment iteration number
             self.cur_iter += 1;
 
-            // TODO TODO TODO
-            // self.base.store_checkpoint(&self)?;
+            self.checkpoint.store_cond(self, self.cur_iter)?;
         }
 
         // in case it stopped prematurely and `termination_reason` is still `NotTerminated`,
@@ -376,5 +385,23 @@ where
             cur_iter: self.cur_iter,
             max_iters: self.max_iters,
         }
+    }
+
+    /// Set checkpoint directory
+    pub fn checkpoint_dir(&mut self, dir: &str) {
+        self.checkpoint.set_dir(dir);
+    }
+
+    /// Set checkpoint name
+    pub fn checkpoint_name(&mut self, dir: &str) {
+        self.checkpoint.set_name(dir);
+    }
+
+    pub fn checkpoint_mode(&mut self, mode: CheckpointMode) {
+        self.checkpoint.set_mode(mode);
+    }
+
+    pub fn store_checkpoint<T: Serialize>(&self, solver: &T) -> Result<(), Error> {
+        self.checkpoint.store_cond(solver, self.cur_iter)
     }
 }
