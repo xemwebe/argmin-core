@@ -130,8 +130,11 @@ pub trait Solver<O: ArgminOp>: Serialize {
     ///
     /// This is executed before any iterations are performed. It can be used to perform
     /// precomputations. The default implementation corresponds to doing nothing.
-    fn init<'a>(&mut self, _op: &mut OpWrapper<'a, O>) -> Result<(), Error> {
-        Ok(())
+    fn init<'a>(
+        &mut self,
+        _op: &mut OpWrapper<'a, O>,
+    ) -> Result<Option<ArgminIterData<O::Param, O::Param>>, Error> {
+        Ok(None)
     }
 
     fn terminate_internal(&mut self, state: &IterState<O::Param, O::Hessian>) -> TerminationReason {
@@ -272,7 +275,19 @@ where
         }
 
         let mut op_wrapper = OpWrapper::new(&self.op);
-        self.solver.init(&mut op_wrapper)?;
+        let init_data = self.solver.init(&mut op_wrapper)?;
+
+        // If init() returned something, deal with it
+        if let Some(data) = init_data {
+            // Set new current parameter
+            self.cur_param = data.param();
+            self.cur_cost = data.cost();
+            // check if parameters are the best so far
+            if self.cur_cost <= self.best_cost {
+                self.best_param = self.cur_param.clone();
+                self.best_cost = self.cur_cost;
+            }
+        }
 
         // TODO: write a method for this?
         self.cost_func_count = op_wrapper.cost_func_count;
