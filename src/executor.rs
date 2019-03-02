@@ -47,6 +47,13 @@ impl<'a, O: ArgminOp> OpWrapper<'a, O> {
         self.hessian_func_count += 1;
         self.op.hessian(param)
     }
+
+    // /// Set the counts to zero
+    // pub fn reset(&mut self) {
+    //     self.cost_func_count = 0;
+    //     self.grad_func_count = 0;
+    //     self.hessian_func_count = 0;
+    // }
 }
 
 /// This trait needs to be implemented for every operator/cost function.
@@ -123,7 +130,7 @@ pub trait Solver<O: ArgminOp>: Serialize {
     ///
     /// This is executed before any iterations are performed. It can be used to perform
     /// precomputations. The default implementation corresponds to doing nothing.
-    fn init(&mut self) -> Result<(), Error> {
+    fn init<'a>(&mut self, _op: &mut OpWrapper<'a, O>) -> Result<(), Error> {
         Ok(())
     }
 
@@ -264,7 +271,13 @@ where
             }?;
         }
 
-        self.solver.init()?;
+        let mut op_wrapper = OpWrapper::new(&self.op);
+        self.solver.init(&mut op_wrapper)?;
+
+        // TODO: write a method for this?
+        self.cost_func_count = op_wrapper.cost_func_count;
+        self.grad_func_count = op_wrapper.grad_func_count;
+        self.hessian_func_count = op_wrapper.hessian_func_count;
 
         while running.load(Ordering::SeqCst) {
             let state = self.to_state();
@@ -286,13 +299,11 @@ where
             // Start time measurement
             let start = std::time::Instant::now();
 
-            let mut op_wrapper = OpWrapper::new(&self.op);
-
             let data = self.solver.next_iter(&mut op_wrapper, state)?;
 
-            self.cost_func_count += op_wrapper.cost_func_count;
-            self.grad_func_count += op_wrapper.grad_func_count;
-            self.hessian_func_count += op_wrapper.hessian_func_count;
+            self.cost_func_count = op_wrapper.cost_func_count;
+            self.grad_func_count = op_wrapper.grad_func_count;
+            self.hessian_func_count = op_wrapper.hessian_func_count;
 
             // End time measurement
             let duration = start.elapsed();
