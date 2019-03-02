@@ -128,7 +128,10 @@ pub trait Solver<O: ArgminOp>: Serialize {
     }
 
     fn terminate_internal(&mut self, state: &IterState<O::Param, O::Hessian>) -> TerminationReason {
-        self.terminate(state);
+        let solver_terminate = self.terminate(state);
+        if solver_terminate.terminated() {
+            return solver_terminate;
+        }
         if state.cur_iter >= state.max_iters {
             return TerminationReason::MaxItersReached;
         }
