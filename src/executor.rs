@@ -299,9 +299,9 @@ where
             self.cur_cost = data.cost();
 
             // check if parameters are the best so far
-            if data.cost() <= self.best_cost {
-                self.best_param = data.param();
-                self.cur_cost = data.cost();
+            if self.cur_cost <= self.best_cost {
+                self.best_param = self.cur_param.clone();
+                self.best_cost = self.cur_cost;
                 self.writer.write(&self.best_param, self.cur_iter, true)?;
             }
 
