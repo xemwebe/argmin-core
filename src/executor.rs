@@ -16,17 +16,40 @@ use std::path::Path;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 
-pub struct OpWrapper<'a, O: ArgminOp> {
-    op: &'a O,
+#[derive(Serialize, Deserialize, Clone)]
+pub struct OpWrapper<O: ArgminOp> {
+    op: O,
     pub cost_func_count: u64,
     pub grad_func_count: u64,
     pub hessian_func_count: u64,
 }
 
-impl<'a, O: ArgminOp> OpWrapper<'a, O> {
-    pub fn new(op: &'a O) -> Self {
+impl<O: ArgminOp> ArgminOp for OpWrapper<O> {
+    type Param = O::Param;
+    type Output = O::Output;
+    type Hessian = O::Hessian;
+
+    fn apply(&self, param: &Self::Param) -> Result<Self::Output, Error> {
+        self.op.apply(param)
+    }
+
+    fn gradient(&self, param: &Self::Param) -> Result<Self::Param, Error> {
+        self.op.gradient(param)
+    }
+
+    fn hessian(&self, param: &Self::Param) -> Result<Self::Hessian, Error> {
+        self.op.hessian(param)
+    }
+
+    fn modify(&self, param: &Self::Param, extent: f64) -> Result<Self::Param, Error> {
+        self.op.modify(param, extent)
+    }
+}
+
+impl<O: ArgminOp> OpWrapper<O> {
+    pub fn new(op: &O) -> Self {
         OpWrapper {
-            op: op,
+            op: op.clone(),
             cost_func_count: 0,
             grad_func_count: 0,
             hessian_func_count: 0,
@@ -62,10 +85,10 @@ impl<'a, O: ArgminOp> OpWrapper<'a, O> {
 /// implementation which is essentially returning an error which indicates that the method has not
 /// been implemented. Those methods (`gradient` and `modify`) only need to be implemented if the
 /// uses solver requires it.
-pub trait ArgminOp: Send + Sync + Serialize {
+pub trait ArgminOp: Clone + Send + Sync + Serialize {
     /// Type of the parameter vector
     type Param: Clone + Serialize;
-    /// Output of the operator. Most solvers expect `f64`.
+    /// Output of the operator
     type Output;
     /// Type of Hessian
     type Hessian: Clone + Serialize;
@@ -120,9 +143,9 @@ pub struct IterState<P, H> {
 
 pub trait Solver<O: ArgminOp>: Serialize {
     /// Computes one iteration of the algorithm.
-    fn next_iter<'a>(
+    fn next_iter(
         &mut self,
-        op: &mut OpWrapper<'a, O>,
+        op: &mut OpWrapper<O>,
         state: IterState<O::Param, O::Hessian>,
     ) -> Result<ArgminIterData<O::Param, O::Param>, Error>;
 
@@ -130,9 +153,9 @@ pub trait Solver<O: ArgminOp>: Serialize {
     ///
     /// This is executed before any iterations are performed. It can be used to perform
     /// precomputations. The default implementation corresponds to doing nothing.
-    fn init<'a>(
+    fn init(
         &mut self,
-        _op: &mut OpWrapper<'a, O>,
+        _op: &mut OpWrapper<O>,
     ) -> Result<Option<ArgminIterData<O::Param, O::Param>>, Error> {
         Ok(None)
     }
@@ -182,12 +205,13 @@ pub struct Executor<O: ArgminOp, S> {
     cur_iter: u64,
     /// Maximum number of iterations
     max_iters: u64,
+    // TODO: make getters for these values
     /// Number of cost function evaluations so far
-    cost_func_count: u64,
+    pub cost_func_count: u64,
     /// Number of gradient evaluations so far
-    grad_func_count: u64,
+    pub grad_func_count: u64,
     /// Number of gradient evaluations so far
-    hessian_func_count: u64,
+    pub hessian_func_count: u64,
     /// Reason of termination
     termination_reason: TerminationReason,
     /// Total time the solver required.
@@ -389,6 +413,82 @@ where
             ),
             &kv,
         )?;
+
+        Ok(ArgminResult::new(
+            self.best_param.clone(),
+            self.best_cost,
+            self.cur_iter,
+            self.termination_reason,
+        ))
+    }
+
+    pub fn run_fast(&mut self) -> Result<ArgminResult<O::Param>, Error> {
+        let mut op_wrapper = OpWrapper::new(&self.op);
+        let init_data = self.solver.init(&mut op_wrapper)?;
+
+        // If init() returned something, deal with it
+        if let Some(data) = init_data {
+            // Set new current parameter
+            self.cur_param = data.param();
+            self.cur_cost = data.cost();
+            // check if parameters are the best so far
+            if self.cur_cost <= self.best_cost {
+                self.best_param = self.cur_param.clone();
+                self.best_cost = self.cur_cost;
+            }
+        }
+
+        // TODO: write a method for this?
+        self.cost_func_count = op_wrapper.cost_func_count;
+        self.grad_func_count = op_wrapper.grad_func_count;
+        self.hessian_func_count = op_wrapper.hessian_func_count;
+
+        loop {
+            let state = self.to_state();
+
+            // check first if it has already terminated
+            // This should probably be solved better.
+            // First, check if it isn't already terminated. If it isn't, evaluate the
+            // stopping criteria. If `self.terminate()` is called without the checking
+            // whether it has terminated already, then it may overwrite a termination set
+            // within `next_iter()`!
+            if !self.termination_reason.terminated() {
+                self.termination_reason = self.solver.terminate_internal(&state);
+            }
+            // Now check once more if the algorithm has terminated. If yes, then break.
+            if self.termination_reason.terminated() {
+                break;
+            }
+
+            let data = self.solver.next_iter(&mut op_wrapper, state)?;
+
+            self.cost_func_count = op_wrapper.cost_func_count;
+            self.grad_func_count = op_wrapper.grad_func_count;
+            self.hessian_func_count = op_wrapper.hessian_func_count;
+
+            // Set new current parameter
+            self.cur_param = data.param();
+            self.cur_cost = data.cost();
+
+            // check if parameters are the best so far
+            if self.cur_cost <= self.best_cost {
+                self.best_param = self.cur_param.clone();
+                self.best_cost = self.cur_cost;
+                self.writer.write(&self.best_param, self.cur_iter, true)?;
+            }
+
+            // increment iteration number
+            self.cur_iter += 1;
+
+            self.checkpoint.store_cond(self, self.cur_iter)?;
+
+            // Check if termination occured inside next_iter()
+            let iter_term = data.termination_reason();
+            if iter_term.terminated() {
+                self.termination_reason = iter_term;
+                break;
+            }
+        }
 
         Ok(ArgminResult::new(
             self.best_param.clone(),
