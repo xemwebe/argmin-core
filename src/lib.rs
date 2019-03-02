@@ -256,6 +256,8 @@ pub struct ArgminIterData<P, G> {
     cost: f64,
     /// Current gradient
     grad: Option<G>,
+    /// terminationreason
+    termination_reason: TerminationReason,
     /// Key value pairs which are currently only used to provide additional information for the
     /// loggers
     kv: Option<ArgminKV>,
@@ -268,6 +270,7 @@ impl<P: Clone, G: Clone> ArgminIterData<P, G> {
             param,
             cost,
             grad: None,
+            termination_reason: TerminationReason::NotTerminated,
             kv: None,
         }
     }
@@ -283,7 +286,7 @@ impl<P: Clone, G: Clone> ArgminIterData<P, G> {
     }
 
     /// Adds an `ArgminKV`
-    pub fn add_kv(&mut self, kv: ArgminKV) -> &mut Self {
+    pub fn add_kv(mut self, kv: ArgminKV) -> Self {
         self.kv = Some(kv);
         self
     }
@@ -295,13 +298,22 @@ impl<P: Clone, G: Clone> ArgminIterData<P, G> {
         self.kv.clone()
     }
 
-    pub fn set_grad(&mut self, grad: G) -> &mut Self {
+    pub fn set_grad(mut self, grad: G) -> Self {
         self.grad = Some(grad);
         self
     }
 
     pub fn grad(&mut self) -> Option<G> {
         self.grad.clone()
+    }
+
+    pub fn set_termination_reason(mut self, term: TerminationReason) -> Self {
+        self.termination_reason = term;
+        self
+    }
+
+    pub fn termination_reason(&self) -> TerminationReason {
+        self.termination_reason
     }
 }
 

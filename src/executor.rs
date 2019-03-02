@@ -290,6 +290,13 @@ where
 
             let data = self.solver.next_iter(&mut op_wrapper, state)?;
 
+            // Check if termination occured inside next_iter()
+            let iter_term = data.termination_reason();
+            if iter_term.terminated() {
+                self.termination_reason = iter_term;
+                break;
+            }
+
             self.cost_func_count += op_wrapper.cost_func_count;
             self.grad_func_count += op_wrapper.grad_func_count;
             self.hessian_func_count += op_wrapper.hessian_func_count;
