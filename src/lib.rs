@@ -326,12 +326,13 @@ impl<P: Clone, G: Clone> ArgminIterData<P, G> {
 /// former is convenient if cost and gradient at the starting point are already known for some
 /// reason (i.e. the solver which uses the line search has already computed cost and gradient) and
 /// avoids unneccessary computation of those values.
-pub trait ArgminLineSearch<O: ArgminOp>: Solver<O> + Serialize {
+// pub trait ArgminLineSearch<O: ArgminOp>: Solver<O> + Serialize {
+pub trait ArgminLineSearch<P>: Serialize {
     /// Set the initial parameter (starting point)
-    fn set_init_param(&mut self, param: O::Param);
+    fn set_init_param(&mut self, param: P);
 
     /// Set the search direction
-    fn set_search_direction(&mut self, direction: O::Param);
+    fn set_search_direction(&mut self, direction: P);
 
     /// Set the initial step length
     fn set_init_alpha(&mut self, step_length: f64) -> Result<(), Error>;
@@ -342,7 +343,7 @@ pub trait ArgminLineSearch<O: ArgminOp>: Solver<O> + Serialize {
 
     /// Set the gradient at the starting point as opposed to computing it (see
     /// `calc_initial_gradient`)
-    fn set_init_grad(&mut self, grad: O::Param);
+    fn set_init_grad(&mut self, grad: P);
 }
 
 /// Defines a common interface to methods which calculate approximate steps for trust region
