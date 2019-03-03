@@ -488,6 +488,10 @@ where
                 self.writer.write(&self.best_param, self.cur_iter, true)?;
             }
 
+            if let Some(grad) = data.grad() {
+                self.cur_grad = grad;
+            }
+
             // increment iteration number
             self.cur_iter += 1;
 
