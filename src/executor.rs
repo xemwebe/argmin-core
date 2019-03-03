@@ -516,6 +516,11 @@ where
         self
     }
 
+    pub fn set_target_cost(mut self, cost: f64) -> Self {
+        self.target_cost = cost;
+        self
+    }
+
     pub fn to_state(&self) -> IterState<O::Param, O::Hessian> {
         IterState {
             cur_param: self.cur_param.clone(),
