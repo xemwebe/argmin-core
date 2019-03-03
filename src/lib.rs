@@ -304,6 +304,11 @@ impl<O: ArgminOp> ArgminIterData<O> {
         self
     }
 
+    pub fn termination_reason(mut self, reason: TerminationReason) -> Self {
+        self.termination_reason = Some(reason);
+        self
+    }
+
     pub fn get_param(&self) -> Option<O::Param> {
         self.param.clone()
     }
