@@ -22,6 +22,7 @@ pub struct OpWrapper<O: ArgminOp> {
     pub cost_func_count: u64,
     pub grad_func_count: u64,
     pub hessian_func_count: u64,
+    pub modify_func_count: u64,
 }
 
 impl<O: ArgminOp> ArgminOp for OpWrapper<O> {
@@ -53,6 +54,7 @@ impl<O: ArgminOp> OpWrapper<O> {
             cost_func_count: 0,
             grad_func_count: 0,
             hessian_func_count: 0,
+            modify_func_count: 0,
         }
     }
 
@@ -69,6 +71,11 @@ impl<O: ArgminOp> OpWrapper<O> {
     pub fn hessian(&mut self, param: &O::Param) -> Result<O::Hessian, Error> {
         self.hessian_func_count += 1;
         self.op.hessian(param)
+    }
+
+    pub fn modify(&mut self, param: &O::Param, extent: f64) -> Result<O::Param, Error> {
+        self.modify_func_count += 1;
+        self.op.modify(param, extent)
     }
 
     // /// Set the counts to zero
@@ -132,8 +139,10 @@ pub trait ArgminOp: Clone + Send + Sync + Serialize {
 pub struct IterState<P, H> {
     pub cur_param: P,
     pub best_param: P,
+    pub prev_param: P,
     pub cur_cost: f64,
     pub best_cost: f64,
+    pub prev_cost: f64,
     pub target_cost: f64,
     pub cur_grad: P,
     pub cur_hessian: H,
@@ -190,12 +199,14 @@ pub struct Executor<O: ArgminOp, S> {
     cur_param: O::Param,
     /// Current best parameter vector
     best_param: O::Param,
+    /// Previous parameter vector
+    prev_param: O::Param,
     /// Current cost function value
     cur_cost: f64,
-    /// Previous cost function value
-    prev_cost: f64,
     /// Cost function value of current best parameter vector
     best_cost: f64,
+    /// Previous cost function value
+    prev_cost: f64,
     /// Target cost function value
     target_cost: f64,
     /// Current gradient
@@ -213,6 +224,8 @@ pub struct Executor<O: ArgminOp, S> {
     pub grad_func_count: u64,
     /// Number of gradient evaluations so far
     pub hessian_func_count: u64,
+    /// Number of modify evaluations so far
+    pub modify_func_count: u64,
     /// Reason of termination
     termination_reason: TerminationReason,
     /// Total time the solver required.
@@ -239,10 +252,11 @@ where
             solver: solver,
             op: op,
             cur_param: init_param.clone(),
-            best_param: init_param,
+            best_param: init_param.clone(),
+            prev_param: init_param,
             cur_cost: std::f64::INFINITY,
-            prev_cost: std::f64::INFINITY,
             best_cost: std::f64::INFINITY,
+            prev_cost: std::f64::INFINITY,
             target_cost: std::f64::NEG_INFINITY,
             cur_grad: O::Param::default(),
             cur_hessian: O::Hessian::default(),
@@ -251,6 +265,7 @@ where
             cost_func_count: 0,
             grad_func_count: 0,
             hessian_func_count: 0,
+            modify_func_count: 0,
             termination_reason: TerminationReason::NotTerminated,
             total_time: std::time::Duration::new(0, 0),
             logger: ArgminLogger::new(),
@@ -321,6 +336,7 @@ where
         self.cost_func_count = op_wrapper.cost_func_count;
         self.grad_func_count = op_wrapper.grad_func_count;
         self.hessian_func_count = op_wrapper.hessian_func_count;
+        self.modify_func_count = op_wrapper.modify_func_count;
 
         while running.load(Ordering::SeqCst) {
             let state = self.to_state();
@@ -347,6 +363,7 @@ where
             self.cost_func_count = op_wrapper.cost_func_count;
             self.grad_func_count = op_wrapper.grad_func_count;
             self.hessian_func_count = op_wrapper.hessian_func_count;
+            self.modify_func_count = op_wrapper.modify_func_count;
 
             // End time measurement
             let duration = start.elapsed();
@@ -374,6 +391,7 @@ where
                 "cost_func_count" => self.cost_func_count;
                 "grad_func_count" => self.grad_func_count;
                 "hessian_func_count" => self.hessian_func_count;
+                "modify_func_count" => self.modify_func_count;
             );
             if let Some(ref mut iter_log) = data.get_kv() {
                 iter_log.push(
@@ -453,6 +471,7 @@ where
         self.cost_func_count = op_wrapper.cost_func_count;
         self.grad_func_count = op_wrapper.grad_func_count;
         self.hessian_func_count = op_wrapper.hessian_func_count;
+        self.modify_func_count = op_wrapper.modify_func_count;
 
         loop {
             let state = self.to_state();
@@ -476,6 +495,7 @@ where
             self.cost_func_count = op_wrapper.cost_func_count;
             self.grad_func_count = op_wrapper.grad_func_count;
             self.hessian_func_count = op_wrapper.hessian_func_count;
+            self.modify_func_count = op_wrapper.modify_func_count;
 
             // Set new current parameter
             self.cur_param = data.param();
@@ -532,8 +552,10 @@ where
     pub fn to_state(&self) -> IterState<O::Param, O::Hessian> {
         IterState {
             cur_param: self.cur_param.clone(),
+            prev_param: self.prev_param.clone(),
             best_param: self.best_param.clone(),
             cur_cost: self.cur_cost,
+            prev_cost: self.prev_cost,
             best_cost: self.best_cost,
             target_cost: self.target_cost,
             cur_grad: self.cur_grad.clone(),
