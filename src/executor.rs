@@ -156,6 +156,7 @@ pub trait Solver<O: ArgminOp>: Serialize {
     fn init(
         &mut self,
         _op: &mut OpWrapper<O>,
+        _state: IterState<O::Param, O::Hessian>,
     ) -> Result<Option<ArgminIterData<O::Param, O::Param>>, Error> {
         Ok(None)
     }
@@ -299,7 +300,7 @@ where
         }
 
         let mut op_wrapper = OpWrapper::new(&self.op);
-        let init_data = self.solver.init(&mut op_wrapper)?;
+        let init_data = self.solver.init(&mut op_wrapper, self.to_state())?;
 
         // If init() returned something, deal with it
         if let Some(data) = init_data {
@@ -424,7 +425,7 @@ where
 
     pub fn run_fast(&mut self) -> Result<ArgminResult<O::Param>, Error> {
         let mut op_wrapper = OpWrapper::new(&self.op);
-        let init_data = self.solver.init(&mut op_wrapper)?;
+        let init_data = self.solver.init(&mut op_wrapper, self.to_state())?;
 
         // If init() returned something, deal with it
         if let Some(data) = init_data {
