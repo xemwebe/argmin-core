@@ -312,6 +312,9 @@ where
                 self.best_param = self.cur_param.clone();
                 self.best_cost = self.cur_cost;
             }
+            if let Some(grad) = data.grad() {
+                self.cur_grad = grad;
+            }
         }
 
         // TODO: write a method for this?
@@ -436,6 +439,9 @@ where
             if self.cur_cost <= self.best_cost {
                 self.best_param = self.cur_param.clone();
                 self.best_cost = self.cur_cost;
+            }
+            if let Some(grad) = data.grad() {
+                self.cur_grad = grad;
             }
         }
 

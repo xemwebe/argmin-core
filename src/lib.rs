@@ -303,7 +303,7 @@ impl<P: Clone, G: Clone> ArgminIterData<P, G> {
         self
     }
 
-    pub fn grad(&mut self) -> Option<G> {
+    pub fn grad(&self) -> Option<G> {
         self.grad.clone()
     }
 
