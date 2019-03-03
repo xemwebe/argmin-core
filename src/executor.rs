@@ -362,6 +362,10 @@ where
                 self.writer.write(&self.best_param, self.cur_iter, true)?;
             }
 
+            if let Some(grad) = data.grad() {
+                self.cur_grad = grad;
+            }
+
             // logging
             let mut log = make_kv!(
                 "iter" => self.cur_iter;
@@ -511,12 +515,12 @@ where
         self
     }
 
-    pub fn set_max_iters(mut self, iters: u64) -> Self {
+    pub fn max_iters(mut self, iters: u64) -> Self {
         self.max_iters = iters;
         self
     }
 
-    pub fn set_target_cost(mut self, cost: f64) -> Self {
+    pub fn target_cost(mut self, cost: f64) -> Self {
         self.target_cost = cost;
         self
     }
