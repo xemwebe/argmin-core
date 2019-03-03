@@ -5,6 +5,8 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
+// TODO: Logging of "initial info"
+
 use crate::serialization::*;
 use crate::{
     ArgminCheckpoint, ArgminError, ArgminIterData, ArgminKV, ArgminLog, ArgminLogger, ArgminResult,
@@ -77,13 +79,6 @@ impl<O: ArgminOp> OpWrapper<O> {
         self.modify_func_count += 1;
         self.op.modify(param, extent)
     }
-
-    // /// Set the counts to zero
-    // pub fn reset(&mut self) {
-    //     self.cost_func_count = 0;
-    //     self.grad_func_count = 0;
-    //     self.hessian_func_count = 0;
-    // }
 }
 
 /// This trait needs to be implemented for every operator/cost function.
@@ -156,7 +151,7 @@ pub trait Solver<O: ArgminOp>: Serialize {
         &mut self,
         op: &mut OpWrapper<O>,
         state: IterState<O::Param, O::Hessian>,
-    ) -> Result<ArgminIterData<O::Param, O::Param>, Error>;
+    ) -> Result<ArgminIterData<O>, Error>;
 
     /// Initializes the algorithm
     ///
@@ -166,7 +161,7 @@ pub trait Solver<O: ArgminOp>: Serialize {
         &mut self,
         _op: &mut OpWrapper<O>,
         _state: IterState<O::Param, O::Hessian>,
-    ) -> Result<Option<ArgminIterData<O::Param, O::Param>>, Error> {
+    ) -> Result<Option<ArgminIterData<O>>, Error> {
         Ok(None)
     }
 
@@ -281,6 +276,32 @@ where
         load_checkpoint(path)
     }
 
+    fn update(&mut self, data: &ArgminIterData<O>) -> Result<(), Error> {
+        if let Some(cur_param) = data.get_param() {
+            self.cur_param = cur_param;
+        }
+        if let Some(cur_cost) = data.get_cost() {
+            self.cur_cost = cur_cost;
+        }
+        // check if parameters are the best so far
+        if self.cur_cost <= self.best_cost {
+            self.best_param = self.cur_param.clone();
+            self.best_cost = self.cur_cost;
+            // Tell everyone!
+            self.writer.write(&self.best_param, self.cur_iter, true)?;
+        }
+        if let Some(grad) = data.get_grad() {
+            self.cur_grad = grad;
+        }
+        if let Some(hessian) = data.get_hessian() {
+            self.cur_hessian = hessian;
+        }
+        if let Some(termination_reason) = data.get_termination_reason() {
+            self.termination_reason = termination_reason;
+        }
+        Ok(())
+    }
+
     pub fn run(&mut self) -> Result<ArgminResult<O::Param>, Error> {
         let total_time = std::time::Instant::now();
 
@@ -319,17 +340,7 @@ where
 
         // If init() returned something, deal with it
         if let Some(data) = init_data {
-            // Set new current parameter
-            self.cur_param = data.param();
-            self.cur_cost = data.cost();
-            // check if parameters are the best so far
-            if self.cur_cost <= self.best_cost {
-                self.best_param = self.cur_param.clone();
-                self.best_cost = self.cur_cost;
-            }
-            if let Some(grad) = data.grad() {
-                self.cur_grad = grad;
-            }
+            self.update(&data)?;
         }
 
         // TODO: write a method for this?
@@ -368,20 +379,7 @@ where
             // End time measurement
             let duration = start.elapsed();
 
-            // Set new current parameter
-            self.cur_param = data.param();
-            self.cur_cost = data.cost();
-
-            // check if parameters are the best so far
-            if self.cur_cost <= self.best_cost {
-                self.best_param = self.cur_param.clone();
-                self.best_cost = self.cur_cost;
-                self.writer.write(&self.best_param, self.cur_iter, true)?;
-            }
-
-            if let Some(grad) = data.grad() {
-                self.cur_grad = grad;
-            }
+            self.update(&data)?;
 
             // logging
             let mut log = make_kv!(
@@ -411,9 +409,7 @@ where
             self.checkpoint.store_cond(self, self.cur_iter)?;
 
             // Check if termination occured inside next_iter()
-            let iter_term = data.termination_reason();
-            if iter_term.terminated() {
-                self.termination_reason = iter_term;
+            if self.termination_reason.terminated() {
                 break;
             }
         }
@@ -454,17 +450,7 @@ where
 
         // If init() returned something, deal with it
         if let Some(data) = init_data {
-            // Set new current parameter
-            self.cur_param = data.param();
-            self.cur_cost = data.cost();
-            // check if parameters are the best so far
-            if self.cur_cost <= self.best_cost {
-                self.best_param = self.cur_param.clone();
-                self.best_cost = self.cur_cost;
-            }
-            if let Some(grad) = data.grad() {
-                self.cur_grad = grad;
-            }
+            self.update(&data)?;
         }
 
         // TODO: write a method for this?
@@ -497,20 +483,7 @@ where
             self.hessian_func_count = op_wrapper.hessian_func_count;
             self.modify_func_count = op_wrapper.modify_func_count;
 
-            // Set new current parameter
-            self.cur_param = data.param();
-            self.cur_cost = data.cost();
-
-            // check if parameters are the best so far
-            if self.cur_cost <= self.best_cost {
-                self.best_param = self.cur_param.clone();
-                self.best_cost = self.cur_cost;
-                self.writer.write(&self.best_param, self.cur_iter, true)?;
-            }
-
-            if let Some(grad) = data.grad() {
-                self.cur_grad = grad;
-            }
+            self.update(&data)?;
 
             // increment iteration number
             self.cur_iter += 1;
@@ -518,9 +491,7 @@ where
             self.checkpoint.store_cond(self, self.cur_iter)?;
 
             // Check if termination occured inside next_iter()
-            let iter_term = data.termination_reason();
-            if iter_term.terminated() {
-                self.termination_reason = iter_term;
+            if self.termination_reason.terminated() {
                 break;
             }
         }
@@ -546,6 +517,16 @@ where
 
     pub fn target_cost(mut self, cost: f64) -> Self {
         self.target_cost = cost;
+        self
+    }
+
+    pub fn cur_grad(mut self, grad: O::Param) -> Self {
+        self.cur_grad = grad;
+        self
+    }
+
+    pub fn cur_hessian(mut self, hessian: O::Hessian) -> Self {
+        self.cur_hessian = hessian;
         self
     }
 

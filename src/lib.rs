@@ -249,71 +249,84 @@ pub trait ArgminWrite: Send + Sync {
 ///
 /// TODO: think about removing this or replacing it with something better. Actually, a tuple would
 /// be sufficient.
-pub struct ArgminIterData<P, G> {
+pub struct ArgminIterData<O: ArgminOp> {
     /// Current parameter vector
-    param: P,
+    param: Option<O::Param>,
     /// Current cost function value
-    cost: f64,
+    cost: Option<f64>,
     /// Current gradient
-    grad: Option<G>,
+    grad: Option<O::Param>,
+    /// Current gradient
+    hessian: Option<O::Hessian>,
     /// terminationreason
-    termination_reason: TerminationReason,
+    termination_reason: Option<TerminationReason>,
     /// Key value pairs which are currently only used to provide additional information for the
     /// loggers
     kv: Option<ArgminKV>,
 }
 
-impl<P: Clone, G: Clone> ArgminIterData<P, G> {
+impl<O: ArgminOp> ArgminIterData<O> {
     /// Constructor
-    pub fn new(param: P, cost: f64) -> Self {
+    pub fn new() -> Self {
         ArgminIterData {
-            param,
-            cost,
+            param: None,
+            cost: None,
             grad: None,
-            termination_reason: TerminationReason::NotTerminated,
+            hessian: None,
+            termination_reason: None,
             kv: None,
         }
     }
 
-    /// Returns the parameter vector
-    pub fn param(&self) -> P {
-        self.param.clone()
-    }
-
-    /// Returns the cost function value
-    pub fn cost(&self) -> f64 {
-        self.cost
-    }
-
-    /// Adds an `ArgminKV`
-    pub fn add_kv(mut self, kv: ArgminKV) -> Self {
-        self.kv = Some(kv);
+    pub fn param(mut self, param: O::Param) -> Self {
+        self.param = Some(param);
         self
     }
 
-    /// Returns an `ArgminKV`
-    ///
-    /// TODO: Keep it consistent, remove the `get_`.
-    pub fn get_kv(&self) -> Option<ArgminKV> {
-        self.kv.clone()
+    pub fn cost(mut self, cost: f64) -> Self {
+        self.cost = Some(cost);
+        self
     }
 
-    pub fn set_grad(mut self, grad: G) -> Self {
+    pub fn grad(mut self, grad: O::Param) -> Self {
         self.grad = Some(grad);
         self
     }
 
-    pub fn grad(&self) -> Option<G> {
-        self.grad.clone()
-    }
-
-    pub fn set_termination_reason(mut self, term: TerminationReason) -> Self {
-        self.termination_reason = term;
+    pub fn hessian(mut self, hessian: O::Hessian) -> Self {
+        self.hessian = Some(hessian);
         self
     }
 
-    pub fn termination_reason(&self) -> TerminationReason {
+    /// Adds an `ArgminKV`
+    pub fn kv(mut self, kv: ArgminKV) -> Self {
+        self.kv = Some(kv);
+        self
+    }
+
+    pub fn get_param(&self) -> Option<O::Param> {
+        self.param.clone()
+    }
+
+    pub fn get_cost(&self) -> Option<f64> {
+        self.cost
+    }
+
+    pub fn get_grad(&self) -> Option<O::Param> {
+        self.grad.clone()
+    }
+
+    pub fn get_hessian(&self) -> Option<O::Hessian> {
+        self.hessian.clone()
+    }
+
+    pub fn get_termination_reason(&self) -> Option<TerminationReason> {
         self.termination_reason
+    }
+
+    /// Returns an `ArgminKV`
+    pub fn get_kv(&self) -> Option<ArgminKV> {
+        self.kv.clone()
     }
 }
 
@@ -348,19 +361,16 @@ pub trait ArgminLineSearch<P>: Serialize {
 
 /// Defines a common interface to methods which calculate approximate steps for trust region
 /// methods. Requires that `ArgminSolver` is implemented as well.
-// pub trait ArgminTrustRegion: ArgminSolver + Serialize {
-//     // /// Set the initial parameter (starting point)
-//     // fn set_initial_parameter(&mut self, <Self as ArgminIter>::Parameters);
-//
-//     /// Set the initial step length
-//     fn set_radius(&mut self, radius: f64);
-//
-//     /// Set the gradient at the starting point
-//     fn set_grad(&mut self, grad: <Self as ArgminIter>::Param);
-//
-//     /// Set the gradient at the starting point
-//     fn set_hessian(&mut self, hessian: <Self as ArgminIter>::Hessian);
-// }
+pub trait ArgminTrustRegion<P, H>: Serialize {
+    /// Set the initial step length
+    fn set_radius(&mut self, radius: f64);
+
+    /// Set the gradient at the starting point
+    fn set_grad(&mut self, grad: P);
+
+    /// Set the gradient at the starting point
+    fn set_hessian(&mut self, hessian: H);
+}
 //
 /// Every method for the update of beta needs to implement this trait.
 pub trait ArgminNLCGBetaUpdate<T>: Serialize {
