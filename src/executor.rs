@@ -243,6 +243,8 @@ where
     S: Solver<O>,
 {
     pub fn new(op: O, solver: S, init_param: O::Param) -> Self {
+        // TODO: prev_grad and prev_hessian! Do not forget to add the corresponding code to
+        // update()!
         Executor {
             solver: solver,
             op: op,
@@ -278,6 +280,9 @@ where
 
     fn update(&mut self, data: &ArgminIterData<O>) -> Result<(), Error> {
         if let Some(cur_param) = data.get_param() {
+            self.prev_cost = self.cur_cost;
+            self.cur_cost = std::f64::NAN;
+            std::mem::swap(&mut self.prev_param, &mut self.cur_param);
             self.cur_param = cur_param;
         }
         if let Some(cur_cost) = data.get_cost() {
