@@ -249,6 +249,7 @@ pub trait ArgminWrite: Send + Sync {
 ///
 /// TODO: think about removing this or replacing it with something better. Actually, a tuple would
 /// be sufficient.
+#[derive(Clone, Serialize, Debug)]
 pub struct ArgminIterData<O: ArgminOp> {
     /// Current parameter vector
     param: Option<O::Param>,

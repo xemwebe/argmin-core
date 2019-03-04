@@ -18,7 +18,7 @@ use std::path::Path;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct OpWrapper<O: ArgminOp> {
     op: O,
     pub cost_func_count: u64,
@@ -131,6 +131,7 @@ pub trait ArgminOp: Clone + Send + Sync + Serialize {
 
 // currently this uses owned values, ideally this would only be references, but I don't want to
 // fight the borrow checker right now.
+#[derive(Clone, Debug, Serialize)]
 pub struct IterState<P, H> {
     pub cur_param: P,
     pub best_param: P,
@@ -280,12 +281,13 @@ where
 
     fn update(&mut self, data: &ArgminIterData<O>) -> Result<(), Error> {
         if let Some(cur_param) = data.get_param() {
-            self.prev_cost = self.cur_cost;
-            self.cur_cost = std::f64::NAN;
-            std::mem::swap(&mut self.prev_param, &mut self.cur_param);
+            // self.cur_cost = std::f64::NAN;
+            self.prev_param = self.cur_param.clone();
+            // std::mem::swap(&mut self.prev_param, &mut self.cur_param);
             self.cur_param = cur_param;
         }
         if let Some(cur_cost) = data.get_cost() {
+            self.prev_cost = self.cur_cost;
             self.cur_cost = cur_cost;
         }
         // check if parameters are the best so far
