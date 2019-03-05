@@ -367,15 +367,9 @@ pub trait ArgminLineSearch<P>: Serialize {
 
 /// Defines a common interface to methods which calculate approximate steps for trust region
 /// methods. Requires that `ArgminSolver` is implemented as well.
-pub trait ArgminTrustRegion<P, H>: Clone + Serialize {
+pub trait ArgminTrustRegion: Clone + Serialize {
     /// Set the initial step length
     fn set_radius(&mut self, radius: f64);
-
-    /// Set the gradient at the starting point
-    fn set_grad(&mut self, grad: P);
-
-    /// Set the gradient at the starting point
-    fn set_hessian(&mut self, hessian: H);
 }
 //
 /// Every method for the update of beta needs to implement this trait.

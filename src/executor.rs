@@ -527,12 +527,12 @@ where
         self
     }
 
-    pub fn cur_grad(mut self, grad: O::Param) -> Self {
+    pub fn grad(mut self, grad: O::Param) -> Self {
         self.cur_grad = grad;
         self
     }
 
-    pub fn cur_hessian(mut self, hessian: O::Hessian) -> Self {
+    pub fn hessian(mut self, hessian: O::Hessian) -> Self {
         self.cur_hessian = hessian;
         self
     }
