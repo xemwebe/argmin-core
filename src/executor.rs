@@ -130,25 +130,23 @@ pub trait ArgminOp: Clone + Send + Sync + Serialize {
     }
 }
 
-// currently this uses owned values, ideally this would only be references, but I don't want to
-// fight the borrow checker right now.
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct IterState<O: ArgminOp> {
-    pub param: Option<O::Param>,
-    pub prev_param: Option<O::Param>,
-    pub best_param: Option<O::Param>,
-    pub prev_best_param: Option<O::Param>,
-    pub cost: Option<f64>,
-    pub prev_cost: Option<f64>,
-    pub best_cost: Option<f64>,
-    pub prev_best_cost: Option<f64>,
-    pub target_cost: Option<f64>,
-    pub grad: Option<O::Param>,
-    pub prev_grad: Option<O::Param>,
-    pub hessian: Option<O::Hessian>,
-    pub prev_hessian: Option<O::Hessian>,
-    pub cur_iter: u64,
-    pub max_iters: u64,
+    param: Option<O::Param>,
+    prev_param: Option<O::Param>,
+    best_param: Option<O::Param>,
+    prev_best_param: Option<O::Param>,
+    cost: Option<f64>,
+    prev_cost: Option<f64>,
+    best_cost: Option<f64>,
+    prev_best_cost: Option<f64>,
+    target_cost: Option<f64>,
+    grad: Option<O::Param>,
+    prev_grad: Option<O::Param>,
+    hessian: Option<O::Hessian>,
+    prev_hessian: Option<O::Hessian>,
+    iter: u64,
+    max_iters: u64,
 }
 
 impl<O: ArgminOp> std::default::Default for IterState<O> {
@@ -192,7 +190,7 @@ impl<O: ArgminOp> IterState<O> {
             prev_grad: None,
             hessian: None,
             prev_hessian: None,
-            cur_iter: 0,
+            iter: 0,
             max_iters: std::u64::MAX,
         }
     }
@@ -210,7 +208,6 @@ impl<O: ArgminOp> IterState<O> {
     setter!(prev_grad, O::Param);
     setter!(hessian, O::Hessian);
     setter!(prev_hessian, O::Hessian);
-    setter!(max_iters, u64);
     getter!(param, O::Param);
     getter!(prev_param, O::Param);
     getter!(best_param, O::Param);
@@ -224,10 +221,22 @@ impl<O: ArgminOp> IterState<O> {
     getter!(prev_grad, O::Param);
     getter!(hessian, O::Hessian);
     getter!(prev_hessian, O::Hessian);
-    getter!(max_iters, u64);
 
     pub fn get_iter(&self) -> u64 {
         self.iter
+    }
+
+    pub fn get_max_iters(&self) -> u64 {
+        self.max_iters
+    }
+
+    pub fn max_iters(mut self, max_iters: u64) -> Self {
+        self.max_iters = max_iters;
+        self
+    }
+
+    pub fn increment_iter(&mut self) {
+        self.iter += 1;
     }
 }
 
@@ -278,28 +287,6 @@ pub struct Executor<O: ArgminOp, S> {
     op: O,
     /// State
     state: IterState<O>,
-    // /// Current parameter vector
-    // cur_param: O::Param,
-    // /// Current best parameter vector
-    // best_param: O::Param,
-    // /// Previous parameter vector
-    // prev_param: O::Param,
-    // /// Current cost function value
-    // cur_cost: f64,
-    // /// Cost function value of current best parameter vector
-    // best_cost: f64,
-    // /// Previous cost function value
-    // prev_cost: f64,
-    // /// Target cost function value
-    // target_cost: f64,
-    // /// Current gradient
-    // cur_grad: O::Param,
-    // /// Current hessian
-    // cur_hessian: O::Hessian,
-    // /// Current iteration number
-    // cur_iter: u64,
-    // /// Maximum number of iterations
-    // max_iters: u64,
     // TODO: make getters for these values
     /// Number of cost function evaluations so far
     pub cost_func_count: u64,
@@ -337,17 +324,6 @@ where
             solver: solver,
             op: op,
             state: IterState::new(),
-            // cur_param: init_param.clone(),
-            // best_param: init_param.clone(),
-            // prev_param: init_param,
-            // cur_cost: std::f64::INFINITY,
-            // best_cost: std::f64::INFINITY,
-            // prev_cost: std::f64::INFINITY,
-            // target_cost: std::f64::NEG_INFINITY,
-            // cur_grad: O::Param::default(),
-            // cur_hessian: O::Hessian::default(),
-            // cur_iter: 0,
-            // max_iters: std::u64::MAX,
             cost_func_count: 0,
             grad_func_count: 0,
             hessian_func_count: 0,
@@ -370,26 +346,32 @@ where
     fn update(&mut self, data: &ArgminIterData<O>) -> Result<(), Error> {
         if let Some(cur_param) = data.get_param() {
             // self.cur_cost = std::f64::NAN;
-            self.prev_param = self.cur_param.clone();
+            self.state = self.state.prev_param(self.state.get_param().unwrap());
             // std::mem::swap(&mut self.prev_param, &mut self.cur_param);
-            self.cur_param = cur_param;
+            self.state = self.state.param(cur_param);
         }
         if let Some(cur_cost) = data.get_cost() {
-            self.prev_cost = self.cur_cost;
-            self.cur_cost = cur_cost;
+            self.state = self.state.prev_cost(self.state.get_cost().unwrap());
+            self.state = self.state.cost(cur_cost);
         }
         // check if parameters are the best so far
-        if self.cur_cost <= self.best_cost {
-            self.best_param = self.cur_param.clone();
-            self.best_cost = self.cur_cost;
+        if self.state.get_cost().unwrap() <= self.state.get_best_cost().unwrap() {
+            self.state = self
+                .state
+                .best_param(self.state.get_param().clone().unwrap())
+                .best_cost(self.state.get_cost().unwrap());
             // Tell everyone!
-            self.writer.write(&self.best_param, self.cur_iter, true)?;
+            self.writer.write(
+                &self.state.get_best_param().unwrap(),
+                self.state.get_iter(),
+                true,
+            )?;
         }
         if let Some(grad) = data.get_grad() {
-            self.cur_grad = grad;
+            self.state = self.state.grad(grad);
         }
         if let Some(hessian) = data.get_hessian() {
-            self.cur_hessian = hessian;
+            self.state = self.state.hessian(hessian);
         }
         if let Some(termination_reason) = data.get_termination_reason() {
             self.termination_reason = termination_reason;
@@ -403,7 +385,7 @@ where
         // do the inital logging
         // let logs = make_kv!("max_iters" => self.max_iters();
         //                     #(#logs_str => #logs_expr;)*);
-        let logs = make_kv!("max_iters" => self.max_iters;);
+        let logs = make_kv!("max_iters" => self.state.get_max_iters(););
         // self.base.log_info(#solver_name, &logs)?;
         self.logger.log_info("blah", &logs)?;
 
@@ -478,9 +460,9 @@ where
 
             // logging
             let mut log = make_kv!(
-                "iter" => self.cur_iter;
-                "best_cost" => self.best_cost;
-                "cur_cost" => self.cur_cost;
+                "iter" => self.state.get_iter();
+                "best_cost" => self.state.get_best_cost();
+                "cur_cost" => self.state.get_cost();
                 "cost_func_count" => self.cost_func_count;
                 "grad_func_count" => self.grad_func_count;
                 "hessian_func_count" => self.hessian_func_count;
@@ -496,12 +478,16 @@ where
             self.logger.log_iter(&log)?;
 
             // Write to file or something
-            self.writer.write(&self.cur_param, self.cur_iter, false)?;
+            self.writer.write(
+                &self.state.get_param().unwrap(),
+                self.state.get_iter(),
+                false,
+            )?;
 
             // increment iteration number
-            self.cur_iter += 1;
+            self.state.increment_iter();
 
-            self.checkpoint.store_cond(self, self.cur_iter)?;
+            self.checkpoint.store_cond(self, self.state.get_iter())?;
 
             // Check if termination occured inside next_iter()
             if self.termination_reason.terminated() {
@@ -511,7 +497,9 @@ where
 
         // in case it stopped prematurely and `termination_reason` is still `NotTerminated`,
         // someone must have pulled the handbrake
-        if self.cur_iter < self.max_iters && !self.termination_reason.terminated() {
+        if self.state.get_iter() < self.state.get_max_iters()
+            && !self.termination_reason.terminated()
+        {
             self.termination_reason = TerminationReason::Aborted;
         }
 
@@ -532,16 +520,16 @@ where
         )?;
 
         Ok(ArgminResult::new(
-            self.best_param.clone(),
-            self.best_cost,
-            self.cur_iter,
+            self.state.get_best_param().unwrap(),
+            self.state.get_best_cost().unwrap(),
+            self.state.get_iter(),
             self.termination_reason,
         ))
     }
 
     pub fn run_fast(&mut self) -> Result<ArgminResult<O::Param>, Error> {
         let mut op_wrapper = OpWrapper::new(&self.op);
-        let init_data = self.solver.init(&mut op_wrapper, self.to_state())?;
+        let init_data = self.solver.init(&mut op_wrapper, self.state)?;
 
         // If init() returned something, deal with it
         if let Some(data) = init_data {
@@ -555,7 +543,7 @@ where
         self.modify_func_count = op_wrapper.modify_func_count;
 
         loop {
-            let state = self.to_state();
+            // let state = self.to_state();
 
             // check first if it has already terminated
             // This should probably be solved better.
@@ -564,14 +552,14 @@ where
             // whether it has terminated already, then it may overwrite a termination set
             // within `next_iter()`!
             if !self.termination_reason.terminated() {
-                self.termination_reason = self.solver.terminate_internal(&state);
+                self.termination_reason = self.solver.terminate_internal(&self.state);
             }
             // Now check once more if the algorithm has terminated. If yes, then break.
             if self.termination_reason.terminated() {
                 break;
             }
 
-            let data = self.solver.next_iter(&mut op_wrapper, state)?;
+            let data = self.solver.next_iter(&mut op_wrapper, self.state)?;
 
             self.cost_func_count = op_wrapper.cost_func_count;
             self.grad_func_count = op_wrapper.grad_func_count;
@@ -581,9 +569,9 @@ where
             self.update(&data)?;
 
             // increment iteration number
-            self.cur_iter += 1;
+            self.state.increment_iter();
 
-            self.checkpoint.store_cond(self, self.cur_iter)?;
+            self.checkpoint.store_cond(self, self.state.get_iter())?;
 
             // Check if termination occured inside next_iter()
             if self.termination_reason.terminated() {

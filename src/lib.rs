@@ -345,7 +345,6 @@ impl<O: ArgminOp> ArgminIterData<O> {
 /// former is convenient if cost and gradient at the starting point are already known for some
 /// reason (i.e. the solver which uses the line search has already computed cost and gradient) and
 /// avoids unneccessary computation of those values.
-// pub trait ArgminLineSearch<O: ArgminOp>: Solver<O> + Serialize {
 pub trait ArgminLineSearch<P>: Serialize {
     /// Set the initial parameter (starting point)
     fn set_init_param(&mut self, param: P);
