@@ -156,14 +156,14 @@ pub struct IterState<O: ArgminOp> {
 //     }
 // }
 
-macro_rules! setter_option {
-    ($name:ident, $type:ty) => {
-        pub fn $name(&mut self, $name: $type) -> &mut Self {
-            self.$name = Some($name);
-            self
-        }
-    };
-}
+// macro_rules! setter_option {
+//     ($name:ident, $type:ty) => {
+//         pub fn $name(&mut self, $name: $type) -> &mut Self {
+//             self.$name = Some($name);
+//             self
+//         }
+//     };
+// }
 
 macro_rules! setter {
     ($name:ident, $type:ty) => {
@@ -215,19 +215,43 @@ impl<O: ArgminOp> IterState<O> {
         }
     }
 
-    setter!(param, O::Param);
-    setter!(prev_param, O::Param);
-    setter!(best_param, O::Param);
-    setter!(prev_best_param, O::Param);
-    setter!(cost, f64);
-    setter!(prev_cost, f64);
-    setter!(best_cost, f64);
-    setter!(prev_best_cost, f64);
+    pub fn param(&mut self, param: O::Param) -> &mut Self {
+        std::mem::swap(&mut self.prev_param, &mut self.param);
+        self.param = param;
+        self
+    }
+
+    pub fn best_param(&mut self, param: O::Param) -> &mut Self {
+        std::mem::swap(&mut self.prev_best_param, &mut self.best_param);
+        self.best_param = param;
+        self
+    }
+
+    pub fn cost(&mut self, cost: f64) -> &mut Self {
+        std::mem::swap(&mut self.prev_cost, &mut self.cost);
+        self.cost = cost;
+        self
+    }
+
+    pub fn best_cost(&mut self, cost: f64) -> &mut Self {
+        std::mem::swap(&mut self.prev_best_cost, &mut self.best_cost);
+        self.best_cost = cost;
+        self
+    }
+
+    pub fn grad(&mut self, grad: O::Param) -> &mut Self {
+        std::mem::swap(&mut self.prev_grad, &mut self.grad);
+        self.grad = Some(grad);
+        self
+    }
+
+    pub fn hessian(&mut self, hessian: O::Hessian) -> &mut Self {
+        std::mem::swap(&mut self.prev_hessian, &mut self.hessian);
+        self.hessian = Some(hessian);
+        self
+    }
+
     setter!(target_cost, f64);
-    setter_option!(grad, O::Param);
-    setter_option!(prev_grad, O::Param);
-    setter_option!(hessian, O::Hessian);
-    setter_option!(prev_hessian, O::Hessian);
     setter!(max_iters, u64);
     getter!(param, O::Param);
     getter!(prev_param, O::Param);
@@ -356,13 +380,9 @@ where
 
     fn update(&mut self, data: &ArgminIterData<O>) -> Result<(), Error> {
         if let Some(cur_param) = data.get_param() {
-            // self.cur_cost = std::f64::NAN;
-            self.state.prev_param(self.state.get_param());
-            // std::mem::swap(&mut self.prev_param, &mut self.cur_param);
             self.state.param(cur_param);
         }
         if let Some(cur_cost) = data.get_cost() {
-            self.state.prev_cost(self.state.get_cost());
             self.state.cost(cur_cost);
         }
         // check if parameters are the best so far
