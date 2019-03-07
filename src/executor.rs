@@ -90,11 +90,11 @@ impl<O: ArgminOp> OpWrapper<O> {
 /// uses solver requires it.
 pub trait ArgminOp: Clone + Send + Sync + Serialize {
     /// Type of the parameter vector
-    type Param: Clone + Serialize;
+    type Param: Clone + Serialize + DeserializeOwned;
     /// Output of the operator
     type Output;
     /// Type of Hessian
-    type Hessian: Clone + Serialize;
+    type Hessian: Clone + Serialize + DeserializeOwned;
 
     /// Applies the operator/cost function to parameters
     fn apply(&self, _param: &Self::Param) -> Result<Self::Output, Error> {
@@ -157,7 +157,7 @@ impl<O: ArgminOp> std::default::Default for IterState<O> {
 
 macro_rules! setter {
     ($name:ident, $type:ty) => {
-        pub fn $name(mut self, $name: $type) -> Self {
+        pub fn $name(&mut self, $name: $type) -> &mut Self {
             self.$name = Some($name);
             self
         }
@@ -168,7 +168,7 @@ macro_rules! getter {
     ($name:ident, $type:ty) => {
         item! {
             pub fn [<get_ $name>](&self) -> Option<$type> {
-                self.$name
+                self.$name.clone()
             }
         }
     };
@@ -230,7 +230,7 @@ impl<O: ArgminOp> IterState<O> {
         self.max_iters
     }
 
-    pub fn max_iters(mut self, max_iters: u64) -> Self {
+    pub fn max_iters(&mut self, max_iters: u64) -> &mut Self {
         self.max_iters = max_iters;
         self
     }
@@ -245,7 +245,7 @@ pub trait Solver<O: ArgminOp>: Serialize {
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: IterState<O>,
+        state: &IterState<O>,
     ) -> Result<ArgminIterData<O>, Error>;
 
     /// Initializes the algorithm
@@ -255,7 +255,7 @@ pub trait Solver<O: ArgminOp>: Serialize {
     fn init(
         &mut self,
         _op: &mut OpWrapper<O>,
-        _state: IterState<O>,
+        _state: &IterState<O>,
     ) -> Result<Option<ArgminIterData<O>>, Error> {
         Ok(None)
     }
@@ -320,10 +320,12 @@ where
     pub fn new(op: O, solver: S, init_param: O::Param) -> Self {
         // TODO: prev_grad and prev_hessian! Do not forget to add the corresponding code to
         // update()!
+        let mut state = IterState::new();
+        state.param(init_param);
         Executor {
             solver: solver,
             op: op,
-            state: IterState::new(),
+            state: state,
             cost_func_count: 0,
             grad_func_count: 0,
             hessian_func_count: 0,
@@ -346,20 +348,19 @@ where
     fn update(&mut self, data: &ArgminIterData<O>) -> Result<(), Error> {
         if let Some(cur_param) = data.get_param() {
             // self.cur_cost = std::f64::NAN;
-            self.state = self.state.prev_param(self.state.get_param().unwrap());
+            self.state.prev_param(self.state.get_param().unwrap());
             // std::mem::swap(&mut self.prev_param, &mut self.cur_param);
-            self.state = self.state.param(cur_param);
+            self.state.param(cur_param);
         }
         if let Some(cur_cost) = data.get_cost() {
-            self.state = self.state.prev_cost(self.state.get_cost().unwrap());
-            self.state = self.state.cost(cur_cost);
+            self.state.prev_cost(self.state.get_cost().unwrap());
+            self.state.cost(cur_cost);
         }
         // check if parameters are the best so far
         if self.state.get_cost().unwrap() <= self.state.get_best_cost().unwrap() {
-            self.state = self
-                .state
-                .best_param(self.state.get_param().clone().unwrap())
-                .best_cost(self.state.get_cost().unwrap());
+            let param = self.state.get_param().clone().unwrap();
+            let cost = self.state.get_cost().unwrap();
+            self.state.best_param(param).best_cost(cost);
             // Tell everyone!
             self.writer.write(
                 &self.state.get_best_param().unwrap(),
@@ -368,10 +369,10 @@ where
             )?;
         }
         if let Some(grad) = data.get_grad() {
-            self.state = self.state.grad(grad);
+            self.state.grad(grad);
         }
         if let Some(hessian) = data.get_hessian() {
-            self.state = self.state.hessian(hessian);
+            self.state.hessian(hessian);
         }
         if let Some(termination_reason) = data.get_termination_reason() {
             self.termination_reason = termination_reason;
@@ -413,7 +414,7 @@ where
         }
 
         let mut op_wrapper = OpWrapper::new(&self.op);
-        let init_data = self.solver.init(&mut op_wrapper, self.state)?;
+        let init_data = self.solver.init(&mut op_wrapper, &self.state)?;
 
         // If init() returned something, deal with it
         if let Some(data) = init_data {
@@ -446,7 +447,7 @@ where
             // Start time measurement
             let start = std::time::Instant::now();
 
-            let data = self.solver.next_iter(&mut op_wrapper, self.state)?;
+            let data = self.solver.next_iter(&mut op_wrapper, &self.state)?;
 
             self.cost_func_count = op_wrapper.cost_func_count;
             self.grad_func_count = op_wrapper.grad_func_count;
@@ -529,7 +530,7 @@ where
 
     pub fn run_fast(&mut self) -> Result<ArgminResult<O::Param>, Error> {
         let mut op_wrapper = OpWrapper::new(&self.op);
-        let init_data = self.solver.init(&mut op_wrapper, self.state)?;
+        let init_data = self.solver.init(&mut op_wrapper, &self.state)?;
 
         // If init() returned something, deal with it
         if let Some(data) = init_data {
@@ -559,7 +560,7 @@ where
                 break;
             }
 
-            let data = self.solver.next_iter(&mut op_wrapper, self.state)?;
+            let data = self.solver.next_iter(&mut op_wrapper, &self.state)?;
 
             self.cost_func_count = op_wrapper.cost_func_count;
             self.grad_func_count = op_wrapper.grad_func_count;
@@ -593,23 +594,23 @@ where
         self
     }
 
-    pub fn max_iters(mut self, iters: u64) -> Self {
-        self.state = self.state.max_iters(iters);
+    pub fn max_iters(&mut self, iters: u64) -> &mut Self {
+        self.state.max_iters(iters);
         self
     }
 
-    pub fn target_cost(mut self, cost: f64) -> Self {
-        self.state = self.state.target_cost(cost);
+    pub fn target_cost(&mut self, cost: f64) -> &mut Self {
+        self.state.target_cost(cost);
         self
     }
 
-    pub fn grad(mut self, grad: O::Param) -> Self {
-        self.state = self.state.grad(grad);
+    pub fn grad(&mut self, grad: O::Param) -> &mut Self {
+        self.state.grad(grad);
         self
     }
 
-    pub fn hessian(mut self, hessian: O::Hessian) -> Self {
-        self.state = self.state.hessian(hessian);
+    pub fn hessian(&mut self, hessian: O::Hessian) -> &mut Self {
+        self.state.hessian(hessian);
         self
     }
 
