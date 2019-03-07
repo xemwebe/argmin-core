@@ -12,6 +12,7 @@ use crate::{
     ArgminCheckpoint, ArgminError, ArgminIterData, ArgminKV, ArgminLog, ArgminLogger, ArgminResult,
     ArgminWrite, ArgminWriter, Error, TerminationReason,
 };
+use paste::item;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use std::path::Path;
@@ -150,6 +151,27 @@ pub struct IterState<O: ArgminOp> {
     pub max_iters: u64,
 }
 
+macro_rules! setter {
+    ($name:ident, $type:ty) => {
+        pub fn $name(mut self, $name: $type) -> Self {
+            self.$name = Some($name);
+            self
+        }
+    };
+}
+
+macro_rules! getter {
+    ($name:ident, $type:ty) => {
+        item! {
+            ($name:ident, $type:ty) => {
+                pub fn [<get_ $name>](mut self, $name: $type) -> Option<$type> {
+                    self.$name
+                }
+            }
+        }
+    };
+}
+
 impl<O: ArgminOp> IterState<O> {
     pub fn new() -> Self {
         IterState {
@@ -170,6 +192,33 @@ impl<O: ArgminOp> IterState<O> {
             max_iters: std::u64::MAX,
         }
     }
+
+    setter!(param, O::Param);
+    setter!(prev_param, O::Param);
+    setter!(best_param, O::Param);
+    setter!(prev_best_param, O::Param);
+    setter!(cost, f64);
+    setter!(prev_cost, f64);
+    setter!(best_cost, f64);
+    setter!(prev_best_cost, f64);
+    setter!(target_cost, f64);
+    setter!(grad, O::Param);
+    setter!(prev_grad, O::Param);
+    setter!(hessian, O::Hessian);
+    setter!(prev_hessian, O::Hessian);
+    getter!(param, O::Param);
+    getter!(prev_param, O::Param);
+    getter!(best_param, O::Param);
+    getter!(prev_best_param, O::Param);
+    getter!(cost, f64);
+    getter!(prev_cost, f64);
+    getter!(best_cost, f64);
+    getter!(prev_best_cost, f64);
+    getter!(target_cost, f64);
+    getter!(grad, O::Param);
+    getter!(prev_grad, O::Param);
+    getter!(hessian, O::Hessian);
+    getter!(prev_hessian, O::Hessian);
 }
 
 pub trait Solver<O: ArgminOp>: Serialize {
