@@ -169,7 +169,7 @@ macro_rules! setter {
 macro_rules! getter {
     ($name:ident, $type:ty) => {
         item! {
-            pub fn [<get_ $name>](mut self, $name: $type) -> Option<$type> {
+            pub fn [<get_ $name>](&self) -> Option<$type> {
                 self.$name
             }
         }
@@ -210,6 +210,7 @@ impl<O: ArgminOp> IterState<O> {
     setter!(prev_grad, O::Param);
     setter!(hessian, O::Hessian);
     setter!(prev_hessian, O::Hessian);
+    setter!(max_iters, u64);
     getter!(param, O::Param);
     getter!(prev_param, O::Param);
     getter!(best_param, O::Param);
@@ -223,6 +224,11 @@ impl<O: ArgminOp> IterState<O> {
     getter!(prev_grad, O::Param);
     getter!(hessian, O::Hessian);
     getter!(prev_hessian, O::Hessian);
+    getter!(max_iters, u64);
+
+    pub fn get_iter(&self) -> u64 {
+        self.iter
+    }
 }
 
 pub trait Solver<O: ArgminOp>: Serialize {
@@ -253,7 +259,7 @@ pub trait Solver<O: ArgminOp>: Serialize {
         if state.get_iter() >= state.max_iters {
             return TerminationReason::MaxItersReached;
         }
-        if state.get_cur_cost() <= state.target_cost {
+        if state.get_cost() <= state.target_cost {
             return TerminationReason::TargetCostReached;
         }
         TerminationReason::NotTerminated
@@ -586,9 +592,9 @@ where
         }
 
         Ok(ArgminResult::new(
-            self.best_param.clone(),
-            self.best_cost,
-            self.cur_iter,
+            self.state.get_best_param().unwrap(),
+            self.state.get_best_cost().unwrap(),
+            self.state.get_iter(),
             self.termination_reason,
         ))
     }
@@ -600,22 +606,22 @@ where
     }
 
     pub fn max_iters(mut self, iters: u64) -> Self {
-        self.max_iters = iters;
+        self.state = self.state.max_iters(iters);
         self
     }
 
     pub fn target_cost(mut self, cost: f64) -> Self {
-        self.target_cost = cost;
+        self.state = self.state.target_cost(cost);
         self
     }
 
     pub fn grad(mut self, grad: O::Param) -> Self {
-        self.cur_grad = grad;
+        self.state = self.state.grad(grad);
         self
     }
 
     pub fn hessian(mut self, hessian: O::Hessian) -> Self {
-        self.cur_hessian = hessian;
+        self.state = self.state.hessian(hessian);
         self
     }
 
