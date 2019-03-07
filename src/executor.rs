@@ -132,18 +132,44 @@ pub trait ArgminOp: Clone + Send + Sync + Serialize {
 // currently this uses owned values, ideally this would only be references, but I don't want to
 // fight the borrow checker right now.
 #[derive(Clone, Debug, Serialize)]
-pub struct IterState<P, H> {
-    pub cur_param: P,
-    pub best_param: P,
-    pub prev_param: P,
-    pub cur_cost: f64,
-    pub best_cost: f64,
-    pub prev_cost: f64,
-    pub target_cost: f64,
-    pub cur_grad: P,
-    pub cur_hessian: H,
+pub struct IterState<O: ArgminOp> {
+    pub param: Option<O::Param>,
+    pub prev_param: Option<O::Param>,
+    pub best_param: Option<O::Param>,
+    pub prev_best_param: Option<O::Param>,
+    pub cost: Option<f64>,
+    pub prev_cost: Option<f64>,
+    pub best_cost: Option<f64>,
+    pub prev_best_cost: Option<f64>,
+    pub target_cost: Option<f64>,
+    pub grad: Option<O::Param>,
+    pub prev_grad: Option<O::Param>,
+    pub hessian: Option<O::Hessian>,
+    pub prev_hessian: Option<O::Hessian>,
     pub cur_iter: u64,
     pub max_iters: u64,
+}
+
+impl<O: ArgminOp> IterState<O> {
+    pub fn new() -> Self {
+        IterState {
+            param: None,
+            prev_param: None,
+            best_param: None,
+            prev_best_param: None,
+            cost: None,
+            prev_cost: None,
+            best_cost: None,
+            prev_best_cost: None,
+            target_cost: None,
+            grad: None,
+            prev_grad: None,
+            hessian: None,
+            prev_hessian: None,
+            cur_iter: 0,
+            max_iters: std::u64::MAX,
+        }
+    }
 }
 
 pub trait Solver<O: ArgminOp>: Serialize {
