@@ -151,6 +151,12 @@ pub struct IterState<O: ArgminOp> {
     pub max_iters: u64,
 }
 
+impl<O: ArgminOp> std::default::Default for IterState<O> {
+    fn default() -> Self {
+        IterState::new()
+    }
+}
+
 macro_rules! setter {
     ($name:ident, $type:ty) => {
         pub fn $name(mut self, $name: $type) -> Self {
@@ -324,17 +330,18 @@ where
         Executor {
             solver: solver,
             op: op,
-            cur_param: init_param.clone(),
-            best_param: init_param.clone(),
-            prev_param: init_param,
-            cur_cost: std::f64::INFINITY,
-            best_cost: std::f64::INFINITY,
-            prev_cost: std::f64::INFINITY,
-            target_cost: std::f64::NEG_INFINITY,
-            cur_grad: O::Param::default(),
-            cur_hessian: O::Hessian::default(),
-            cur_iter: 0,
-            max_iters: std::u64::MAX,
+            state: IterState::new(),
+            // cur_param: init_param.clone(),
+            // best_param: init_param.clone(),
+            // prev_param: init_param,
+            // cur_cost: std::f64::INFINITY,
+            // best_cost: std::f64::INFINITY,
+            // prev_cost: std::f64::INFINITY,
+            // target_cost: std::f64::NEG_INFINITY,
+            // cur_grad: O::Param::default(),
+            // cur_hessian: O::Hessian::default(),
+            // cur_iter: 0,
+            // max_iters: std::u64::MAX,
             cost_func_count: 0,
             grad_func_count: 0,
             hessian_func_count: 0,
@@ -418,7 +425,7 @@ where
         }
 
         let mut op_wrapper = OpWrapper::new(&self.op);
-        let init_data = self.solver.init(&mut op_wrapper, self.to_state())?;
+        let init_data = self.solver.init(&mut op_wrapper, self.state)?;
 
         // If init() returned something, deal with it
         if let Some(data) = init_data {
@@ -432,7 +439,7 @@ where
         self.modify_func_count = op_wrapper.modify_func_count;
 
         while running.load(Ordering::SeqCst) {
-            let state = self.to_state();
+            // let state = self.to_state();
 
             // check first if it has already terminated
             // This should probably be solved better.
@@ -441,7 +448,7 @@ where
             // whether it has terminated already, then it may overwrite a termination set
             // within `next_iter()`!
             if !self.termination_reason.terminated() {
-                self.termination_reason = self.solver.terminate_internal(&state);
+                self.termination_reason = self.solver.terminate_internal(&self.state);
             }
             // Now check once more if the algorithm has terminated. If yes, then break.
             if self.termination_reason.terminated() {
@@ -451,7 +458,7 @@ where
             // Start time measurement
             let start = std::time::Instant::now();
 
-            let data = self.solver.next_iter(&mut op_wrapper, state)?;
+            let data = self.solver.next_iter(&mut op_wrapper, self.state)?;
 
             self.cost_func_count = op_wrapper.cost_func_count;
             self.grad_func_count = op_wrapper.grad_func_count;
