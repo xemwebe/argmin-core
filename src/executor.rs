@@ -15,7 +15,6 @@ use crate::{
 use paste::item;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
-use std::fmt::Debug;
 use std::path::Path;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
@@ -347,7 +346,7 @@ pub struct Executor<O: ArgminOp, S> {
 impl<O, S> Executor<O, S>
 where
     O: ArgminOp,
-    O::Param: Clone + Default + Debug,
+    O::Param: Clone + Default,
     O::Hessian: Default,
     S: Solver<O>,
 {
