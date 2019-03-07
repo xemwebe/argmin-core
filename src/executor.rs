@@ -163,10 +163,8 @@ macro_rules! setter {
 macro_rules! getter {
     ($name:ident, $type:ty) => {
         item! {
-            ($name:ident, $type:ty) => {
-                pub fn [<get_ $name>](mut self, $name: $type) -> Option<$type> {
-                    self.$name
-                }
+            pub fn [<get_ $name>](mut self, $name: $type) -> Option<$type> {
+                self.$name
             }
         }
     };
@@ -226,7 +224,7 @@ pub trait Solver<O: ArgminOp>: Serialize {
     fn next_iter(
         &mut self,
         op: &mut OpWrapper<O>,
-        state: IterState<O::Param, O::Hessian>,
+        state: IterState<O>,
     ) -> Result<ArgminIterData<O>, Error>;
 
     /// Initializes the algorithm
@@ -236,26 +234,26 @@ pub trait Solver<O: ArgminOp>: Serialize {
     fn init(
         &mut self,
         _op: &mut OpWrapper<O>,
-        _state: IterState<O::Param, O::Hessian>,
+        _state: IterState<O>,
     ) -> Result<Option<ArgminIterData<O>>, Error> {
         Ok(None)
     }
 
-    fn terminate_internal(&mut self, state: &IterState<O::Param, O::Hessian>) -> TerminationReason {
+    fn terminate_internal(&mut self, state: &IterState<O>) -> TerminationReason {
         let solver_terminate = self.terminate(state);
         if solver_terminate.terminated() {
             return solver_terminate;
         }
-        if state.cur_iter >= state.max_iters {
+        if state.get_iter() >= state.max_iters {
             return TerminationReason::MaxItersReached;
         }
-        if state.cur_cost <= state.target_cost {
+        if state.get_cur_cost() <= state.target_cost {
             return TerminationReason::TargetCostReached;
         }
         TerminationReason::NotTerminated
     }
 
-    fn terminate(&mut self, _state: &IterState<O::Param, O::Hessian>) -> TerminationReason {
+    fn terminate(&mut self, _state: &IterState<O>) -> TerminationReason {
         TerminationReason::NotTerminated
     }
 }
@@ -266,28 +264,30 @@ pub struct Executor<O: ArgminOp, S> {
     solver: S,
     /// operator
     op: O,
-    /// Current parameter vector
-    cur_param: O::Param,
-    /// Current best parameter vector
-    best_param: O::Param,
-    /// Previous parameter vector
-    prev_param: O::Param,
-    /// Current cost function value
-    cur_cost: f64,
-    /// Cost function value of current best parameter vector
-    best_cost: f64,
-    /// Previous cost function value
-    prev_cost: f64,
-    /// Target cost function value
-    target_cost: f64,
-    /// Current gradient
-    cur_grad: O::Param,
-    /// Current hessian
-    cur_hessian: O::Hessian,
-    /// Current iteration number
-    cur_iter: u64,
-    /// Maximum number of iterations
-    max_iters: u64,
+    /// State
+    state: IterState<O>,
+    // /// Current parameter vector
+    // cur_param: O::Param,
+    // /// Current best parameter vector
+    // best_param: O::Param,
+    // /// Previous parameter vector
+    // prev_param: O::Param,
+    // /// Current cost function value
+    // cur_cost: f64,
+    // /// Cost function value of current best parameter vector
+    // best_cost: f64,
+    // /// Previous cost function value
+    // prev_cost: f64,
+    // /// Target cost function value
+    // target_cost: f64,
+    // /// Current gradient
+    // cur_grad: O::Param,
+    // /// Current hessian
+    // cur_hessian: O::Hessian,
+    // /// Current iteration number
+    // cur_iter: u64,
+    // /// Maximum number of iterations
+    // max_iters: u64,
     // TODO: make getters for these values
     /// Number of cost function evaluations so far
     pub cost_func_count: u64,
@@ -612,21 +612,21 @@ where
         self
     }
 
-    pub fn to_state(&self) -> IterState<O::Param, O::Hessian> {
-        IterState {
-            cur_param: self.cur_param.clone(),
-            prev_param: self.prev_param.clone(),
-            best_param: self.best_param.clone(),
-            cur_cost: self.cur_cost,
-            prev_cost: self.prev_cost,
-            best_cost: self.best_cost,
-            target_cost: self.target_cost,
-            cur_grad: self.cur_grad.clone(),
-            cur_hessian: self.cur_hessian.clone(),
-            cur_iter: self.cur_iter,
-            max_iters: self.max_iters,
-        }
-    }
+    // pub fn to_state(&self) -> IterState<O> {
+    //     IterState {
+    //         cur_param: self.cur_param.clone(),
+    //         prev_param: self.prev_param.clone(),
+    //         best_param: self.best_param.clone(),
+    //         cur_cost: self.cur_cost,
+    //         prev_cost: self.prev_cost,
+    //         best_cost: self.best_cost,
+    //         target_cost: self.target_cost,
+    //         cur_grad: self.cur_grad.clone(),
+    //         cur_hessian: self.cur_hessian.clone(),
+    //         cur_iter: self.cur_iter,
+    //         max_iters: self.max_iters,
+    //     }
+    // }
 
     /// Set checkpoint directory
     pub fn checkpoint_dir(mut self, dir: &str) -> Self {
