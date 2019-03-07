@@ -15,6 +15,7 @@ use crate::{
 use paste::item;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
+use std::fmt::Debug;
 use std::path::Path;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
@@ -132,15 +133,15 @@ pub trait ArgminOp: Clone + Send + Sync + Serialize {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct IterState<O: ArgminOp> {
-    param: Option<O::Param>,
-    prev_param: Option<O::Param>,
-    best_param: Option<O::Param>,
-    prev_best_param: Option<O::Param>,
-    cost: Option<f64>,
-    prev_cost: Option<f64>,
-    best_cost: Option<f64>,
-    prev_best_cost: Option<f64>,
-    target_cost: Option<f64>,
+    param: O::Param,
+    prev_param: O::Param,
+    best_param: O::Param,
+    prev_best_param: O::Param,
+    cost: f64,
+    prev_cost: f64,
+    best_cost: f64,
+    prev_best_cost: f64,
+    target_cost: f64,
     grad: Option<O::Param>,
     prev_grad: Option<O::Param>,
     hessian: Option<O::Hessian>,
@@ -149,13 +150,13 @@ pub struct IterState<O: ArgminOp> {
     max_iters: u64,
 }
 
-impl<O: ArgminOp> std::default::Default for IterState<O> {
-    fn default() -> Self {
-        IterState::new()
-    }
-}
+// impl<O: ArgminOp> std::default::Default for IterState<O> {
+//     fn default() -> Self {
+//         IterState::new(O::Param::default())
+//     }
+// }
 
-macro_rules! setter {
+macro_rules! setter_option {
     ($name:ident, $type:ty) => {
         pub fn $name(&mut self, $name: $type) -> &mut Self {
             self.$name = Some($name);
@@ -164,7 +165,16 @@ macro_rules! setter {
     };
 }
 
-macro_rules! getter {
+macro_rules! setter {
+    ($name:ident, $type:ty) => {
+        pub fn $name(&mut self, $name: $type) -> &mut Self {
+            self.$name = $name;
+            self
+        }
+    };
+}
+
+macro_rules! getter_option {
     ($name:ident, $type:ty) => {
         item! {
             pub fn [<get_ $name>](&self) -> Option<$type> {
@@ -174,18 +184,28 @@ macro_rules! getter {
     };
 }
 
+macro_rules! getter {
+    ($name:ident, $type:ty) => {
+        item! {
+            pub fn [<get_ $name>](&self) -> $type {
+                self.$name.clone()
+            }
+        }
+    };
+}
+
 impl<O: ArgminOp> IterState<O> {
-    pub fn new() -> Self {
+    pub fn new(param: O::Param) -> Self {
         IterState {
-            param: None,
-            prev_param: None,
-            best_param: None,
-            prev_best_param: None,
-            cost: None,
-            prev_cost: None,
-            best_cost: None,
-            prev_best_cost: None,
-            target_cost: None,
+            param: param.clone(),
+            prev_param: param.clone(),
+            best_param: param.clone(),
+            prev_best_param: param,
+            cost: std::f64::INFINITY,
+            prev_cost: std::f64::INFINITY,
+            best_cost: std::f64::INFINITY,
+            prev_best_cost: std::f64::INFINITY,
+            target_cost: std::f64::NEG_INFINITY,
             grad: None,
             prev_grad: None,
             hessian: None,
@@ -204,10 +224,11 @@ impl<O: ArgminOp> IterState<O> {
     setter!(best_cost, f64);
     setter!(prev_best_cost, f64);
     setter!(target_cost, f64);
-    setter!(grad, O::Param);
-    setter!(prev_grad, O::Param);
-    setter!(hessian, O::Hessian);
-    setter!(prev_hessian, O::Hessian);
+    setter_option!(grad, O::Param);
+    setter_option!(prev_grad, O::Param);
+    setter_option!(hessian, O::Hessian);
+    setter_option!(prev_hessian, O::Hessian);
+    setter!(max_iters, u64);
     getter!(param, O::Param);
     getter!(prev_param, O::Param);
     getter!(best_param, O::Param);
@@ -217,23 +238,12 @@ impl<O: ArgminOp> IterState<O> {
     getter!(best_cost, f64);
     getter!(prev_best_cost, f64);
     getter!(target_cost, f64);
-    getter!(grad, O::Param);
-    getter!(prev_grad, O::Param);
-    getter!(hessian, O::Hessian);
-    getter!(prev_hessian, O::Hessian);
-
-    pub fn get_iter(&self) -> u64 {
-        self.iter
-    }
-
-    pub fn get_max_iters(&self) -> u64 {
-        self.max_iters
-    }
-
-    pub fn max_iters(&mut self, max_iters: u64) -> &mut Self {
-        self.max_iters = max_iters;
-        self
-    }
+    getter_option!(grad, O::Param);
+    getter_option!(prev_grad, O::Param);
+    getter_option!(hessian, O::Hessian);
+    getter_option!(prev_hessian, O::Hessian);
+    getter!(iter, u64);
+    getter!(max_iters, u64);
 
     pub fn increment_iter(&mut self) {
         self.iter += 1;
@@ -313,15 +323,14 @@ pub struct Executor<O: ArgminOp, S> {
 impl<O, S> Executor<O, S>
 where
     O: ArgminOp,
-    O::Param: Clone + Default,
+    O::Param: Clone + Default + Debug,
     O::Hessian: Default,
     S: Solver<O>,
 {
     pub fn new(op: O, solver: S, init_param: O::Param) -> Self {
         // TODO: prev_grad and prev_hessian! Do not forget to add the corresponding code to
         // update()!
-        let mut state = IterState::new();
-        state.param(init_param);
+        let state = IterState::new(init_param);
         Executor {
             solver: solver,
             op: op,
@@ -348,25 +357,22 @@ where
     fn update(&mut self, data: &ArgminIterData<O>) -> Result<(), Error> {
         if let Some(cur_param) = data.get_param() {
             // self.cur_cost = std::f64::NAN;
-            self.state.prev_param(self.state.get_param().unwrap());
+            self.state.prev_param(self.state.get_param());
             // std::mem::swap(&mut self.prev_param, &mut self.cur_param);
             self.state.param(cur_param);
         }
         if let Some(cur_cost) = data.get_cost() {
-            self.state.prev_cost(self.state.get_cost().unwrap());
+            self.state.prev_cost(self.state.get_cost());
             self.state.cost(cur_cost);
         }
         // check if parameters are the best so far
-        if self.state.get_cost().unwrap() <= self.state.get_best_cost().unwrap() {
-            let param = self.state.get_param().clone().unwrap();
-            let cost = self.state.get_cost().unwrap();
+        if self.state.get_cost() <= self.state.get_best_cost() {
+            let param = self.state.get_param().clone();
+            let cost = self.state.get_cost();
             self.state.best_param(param).best_cost(cost);
             // Tell everyone!
-            self.writer.write(
-                &self.state.get_best_param().unwrap(),
-                self.state.get_iter(),
-                true,
-            )?;
+            self.writer
+                .write(&self.state.get_best_param(), self.state.get_iter(), true)?;
         }
         if let Some(grad) = data.get_grad() {
             self.state.grad(grad);
@@ -479,11 +485,8 @@ where
             self.logger.log_iter(&log)?;
 
             // Write to file or something
-            self.writer.write(
-                &self.state.get_param().unwrap(),
-                self.state.get_iter(),
-                false,
-            )?;
+            self.writer
+                .write(&self.state.get_param(), self.state.get_iter(), false)?;
 
             // increment iteration number
             self.state.increment_iter();
@@ -521,8 +524,8 @@ where
         )?;
 
         Ok(ArgminResult::new(
-            self.state.get_best_param().unwrap(),
-            self.state.get_best_cost().unwrap(),
+            self.state.get_best_param(),
+            self.state.get_best_cost(),
             self.state.get_iter(),
             self.termination_reason,
         ))
@@ -581,8 +584,8 @@ where
         }
 
         Ok(ArgminResult::new(
-            self.state.get_best_param().unwrap(),
-            self.state.get_best_cost().unwrap(),
+            self.state.get_best_param(),
+            self.state.get_best_cost(),
             self.state.get_iter(),
             self.termination_reason,
         ))
