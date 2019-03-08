@@ -322,22 +322,28 @@ where
         self
     }
 
-    pub fn max_iters(&mut self, iters: u64) -> &mut Self {
+    /// Attaches a logger which implements `ArgminLog` to the solver.
+    pub fn add_writer(mut self, writer: std::sync::Arc<ArgminWrite<Param = O::Param>>) -> Self {
+        self.writer.push(writer);
+        self
+    }
+
+    pub fn max_iters(mut self, iters: u64) -> Self {
         self.state.max_iters(iters);
         self
     }
 
-    pub fn target_cost(&mut self, cost: f64) -> &mut Self {
+    pub fn target_cost(mut self, cost: f64) -> Self {
         self.state.target_cost(cost);
         self
     }
 
-    pub fn grad(&mut self, grad: O::Param) -> &mut Self {
+    pub fn grad(mut self, grad: O::Param) -> Self {
         self.state.grad(grad);
         self
     }
 
-    pub fn hessian(&mut self, hessian: O::Hessian) -> &mut Self {
+    pub fn hessian(mut self, hessian: O::Hessian) -> Self {
         self.state.hessian(hessian);
         self
     }
