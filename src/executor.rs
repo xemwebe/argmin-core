@@ -80,6 +80,13 @@ impl<O: ArgminOp> OpWrapper<O> {
         self.modify_func_count += 1;
         self.op.modify(param, extent)
     }
+
+    pub fn consume_op<O2: ArgminOp>(&mut self, other: OpWrapper<O2>) {
+        self.cost_func_count += other.cost_func_count;
+        self.grad_func_count += other.grad_func_count;
+        self.hessian_func_count += other.hessian_func_count;
+        self.modify_func_count += other.modify_func_count;
+    }
 }
 
 /// This trait needs to be implemented for every operator/cost function.
