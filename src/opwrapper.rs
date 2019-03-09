@@ -54,6 +54,22 @@ impl<O: ArgminOp> OpWrapper<O> {
         self.hessian_func_count += other.hessian_func_count;
         self.modify_func_count += other.modify_func_count;
     }
+
+    pub fn reset(mut self) -> Self {
+        self.cost_func_count = 0;
+        self.grad_func_count = 0;
+        self.hessian_func_count = 0;
+        self.modify_func_count = 0;
+        self
+    }
+
+    pub fn get_op(&self) -> O {
+        self.op.clone()
+    }
+
+    pub fn new_from_op(op: &OpWrapper<O>) -> Self {
+        Self::new(&op.get_op())
+    }
 }
 
 impl<O: ArgminOp> ArgminOp for OpWrapper<O> {
