@@ -338,6 +338,11 @@ where
         self
     }
 
+    pub fn cost(mut self, cost: f64) -> Self {
+        self.state.cost(cost);
+        self
+    }
+
     pub fn grad(mut self, grad: O::Param) -> Self {
         self.state.grad(grad);
         self
