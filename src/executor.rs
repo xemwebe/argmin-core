@@ -111,7 +111,7 @@ where
         Ok(())
     }
 
-    pub fn run(&mut self) -> Result<ArgminResult<O::Param>, Error> {
+    pub fn run(mut self) -> Result<ArgminResult<O>, Error> {
         let total_time = std::time::Instant::now();
 
         // do the inital logging
@@ -216,7 +216,7 @@ where
             // increment iteration number
             self.state.increment_iter();
 
-            self.checkpoint.store_cond(self, self.state.get_iter())?;
+            self.checkpoint.store_cond(&self, self.state.get_iter())?;
 
             // Check if termination occured inside next_iter()
             if self.termination_reason.terminated() {
@@ -253,10 +253,11 @@ where
             self.state.get_best_cost(),
             self.state.get_iter(),
             self.termination_reason,
+            self.op,
         ))
     }
 
-    pub fn run_fast(&mut self) -> Result<ArgminResult<O::Param>, Error> {
+    pub fn run_fast(mut self) -> Result<ArgminResult<O>, Error> {
         let mut op_wrapper = OpWrapper::new(&self.op);
         let init_data = self.solver.init(&mut op_wrapper, &self.state)?;
 
@@ -300,7 +301,7 @@ where
             // increment iteration number
             self.state.increment_iter();
 
-            self.checkpoint.store_cond(self, self.state.get_iter())?;
+            self.checkpoint.store_cond(&self, self.state.get_iter())?;
 
             // Check if termination occured inside next_iter()
             if self.termination_reason.terminated() {
@@ -313,6 +314,7 @@ where
             self.state.get_best_cost(),
             self.state.get_iter(),
             self.termination_reason,
+            self.op,
         ))
     }
 
