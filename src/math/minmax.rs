@@ -22,17 +22,17 @@ macro_rules! make_minmax {
     };
 }
 
-make_random!(f32);
-make_random!(f64);
-make_random!(i8);
-make_random!(i16);
-make_random!(i32);
-make_random!(i64);
-make_random!(u8);
-make_random!(u16);
-make_random!(u32);
-make_random!(u64);
-make_random!(isize);
-make_random!(usize);
+make_minmax!(f32);
+make_minmax!(f64);
+make_minmax!(i8);
+make_minmax!(i16);
+make_minmax!(i32);
+make_minmax!(i64);
+make_minmax!(u8);
+make_minmax!(u16);
+make_minmax!(u32);
+make_minmax!(u64);
+make_minmax!(isize);
+make_minmax!(usize);
 
 // TODO: test
