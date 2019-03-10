@@ -143,9 +143,13 @@ pub trait ArgminWeightedDot<T, U, V> {
 /// Return param vector of all zeros (for now, this is a hack. It should be done better)
 pub trait ArgminZero {
     /// Return zero(s)
-    fn zero_like(&self) -> Self;
-    /// Return zero(s)
     fn zero() -> Self;
+}
+
+/// Zero for dynamically sized objects
+pub trait ArgminZeroLike {
+    /// Return zero(s)
+    fn zero_like(&self) -> Self;
 }
 
 pub trait ArgminEye {

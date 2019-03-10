@@ -5,24 +5,19 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use crate::math::ArgminZero;
+use crate::math::ArgminZeroLike;
 
-impl<T> ArgminZero for Vec<T>
+impl<T> ArgminZeroLike for Vec<T>
 where
-    T: ArgminZero + Clone,
+    T: ArgminZeroLike + Clone,
 {
     #[inline]
     fn zero_like(&self) -> Vec<T> {
         if !self.is_empty() {
             vec![self[0].zero_like(); self.len()]
         } else {
-            vec![T::zero(); self.len()]
+            vec![]
         }
-    }
-
-    #[inline]
-    fn zero() -> Vec<T> {
-        vec![]
     }
 }
 
@@ -33,15 +28,6 @@ mod tests {
 
     macro_rules! make_test {
         ($t:ty) => {
-            item! {
-                #[test]
-                fn [<test_zero_ $t>]() {
-                    let a = <Vec<$t> as ArgminZero>::zero();
-                    let b: Vec<$t> = vec![];
-                    assert_eq!(a, b);
-                }
-            }
-
             item! {
                 #[test]
                 fn [<test_zero_like_ $t>]() {
@@ -58,15 +44,6 @@ mod tests {
                     for i in 0..4 {
                         assert!(((0 as $t - a[i]) as f64).abs() < std::f64::EPSILON);
                     }
-                }
-            }
-
-            item! {
-                #[test]
-                fn [<test_2d_zero_ $t>]() {
-                    let a = <Vec<Vec<$t>> as ArgminZero>::zero();
-                    let b: Vec<Vec<$t>> = vec![];
-                    assert_eq!(a, b);
                 }
             }
 
