@@ -111,7 +111,6 @@ impl ArgminCheckpoint {
     }
 }
 
-// pub fn load_checkpoint<T: DeserializeOwned, P: AsRef<Path>>(path: P) -> Result<T, Error> {
 pub fn load_checkpoint<T: DeserializeOwned, P: AsRef<Path>>(path: P) -> Result<T, Error> {
     let path = path.as_ref();
     if !path.exists() {

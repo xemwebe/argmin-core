@@ -14,14 +14,15 @@
 //!   * Maybe it is more appropriate to return the `base` struct?
 
 use crate::termination::TerminationReason;
+use crate::ArgminOp;
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 
 /// Return struct for all solvers.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
-pub struct ArgminResult<T> {
+pub struct ArgminResult<O: ArgminOp> {
     /// Final parameter vector
-    pub param: T,
+    pub param: O::Param,
     /// Final cost value
     pub cost: f64,
     /// Number of iterations
@@ -30,27 +31,40 @@ pub struct ArgminResult<T> {
     pub terminated: bool,
     /// Reason of termination
     pub termination_reason: TerminationReason,
+    /// operator
+    pub operator: O,
 }
 
-impl<T> ArgminResult<T> {
+impl<O: ArgminOp> ArgminResult<O> {
     /// Constructor
     ///
     /// `param`: Final (best) parameter vector
     /// `cost`: Final (best) cost function value
     /// `iters`: Number of iterations
     /// `termination_reason`: Reason of termination
-    pub fn new(param: T, cost: f64, iters: u64, termination_reason: TerminationReason) -> Self {
+    pub fn new(
+        param: O::Param,
+        cost: f64,
+        iters: u64,
+        termination_reason: TerminationReason,
+        operator: O,
+    ) -> Self {
         ArgminResult {
             param,
             cost,
             iters,
             terminated: termination_reason.terminated(),
             termination_reason,
+            operator,
         }
     }
 }
 
-impl<T: std::fmt::Debug> std::fmt::Display for ArgminResult<T> {
+impl<O> std::fmt::Display for ArgminResult<O>
+where
+    O: ArgminOp,
+    O::Param: std::fmt::Debug,
+{
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         writeln!(f, "ArgminResult:")?;
         writeln!(f, "    param:       {:?}", self.param)?;
@@ -61,16 +75,16 @@ impl<T: std::fmt::Debug> std::fmt::Display for ArgminResult<T> {
     }
 }
 
-impl<T> PartialEq for ArgminResult<T> {
-    fn eq(&self, other: &ArgminResult<T>) -> bool {
+impl<O: ArgminOp> PartialEq for ArgminResult<O> {
+    fn eq(&self, other: &ArgminResult<O>) -> bool {
         (self.cost - other.cost).abs() < std::f64::EPSILON
     }
 }
 
-impl<T> Eq for ArgminResult<T> {}
+impl<O: ArgminOp> Eq for ArgminResult<O> {}
 
-impl<T> Ord for ArgminResult<T> {
-    fn cmp(&self, other: &ArgminResult<T>) -> Ordering {
+impl<O: ArgminOp> Ord for ArgminResult<O> {
+    fn cmp(&self, other: &ArgminResult<O>) -> Ordering {
         let t = self.cost - other.cost;
         if t.abs() < std::f64::EPSILON {
             Ordering::Equal
@@ -82,8 +96,8 @@ impl<T> Ord for ArgminResult<T> {
     }
 }
 
-impl<T> PartialOrd for ArgminResult<T> {
-    fn partial_cmp(&self, other: &ArgminResult<T>) -> Option<Ordering> {
+impl<O: ArgminOp> PartialOrd for ArgminResult<O> {
+    fn partial_cmp(&self, other: &ArgminResult<O>) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }

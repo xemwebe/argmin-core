@@ -17,7 +17,7 @@
 use serde::{Deserialize, Serialize};
 
 /// Indicates why the optimization algorithm stopped
-#[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize, Deserialize)]
 pub enum TerminationReason {
     /// In case it has not terminated yet
     NotTerminated,
@@ -41,8 +41,8 @@ pub enum TerminationReason {
 
 impl TerminationReason {
     /// Returns `true` if a solver terminated and `false` otherwise
-    pub fn terminated(&self) -> bool {
-        match *self {
+    pub fn terminated(self) -> bool {
+        match self {
             TerminationReason::NotTerminated => false,
             _ => true,
         }
