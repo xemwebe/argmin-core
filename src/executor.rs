@@ -57,13 +57,11 @@ where
     S: Solver<O>,
 {
     pub fn new(op: O, solver: S, init_param: O::Param) -> Self {
-        // TODO: prev_grad and prev_hessian! Do not forget to add the corresponding code to
-        // update()!
         let state = IterState::new(init_param);
         Executor {
-            solver: solver,
-            op: op,
-            state: state,
+            solver,
+            op,
+            state,
             cost_func_count: 0,
             grad_func_count: 0,
             hessian_func_count: 0,
@@ -139,8 +137,7 @@ where
                 r.store(false, Ordering::SeqCst);
             }) {
                 Err(ctrlc::Error::MultipleHandlers) => Ok(()),
-                Err(e) => Err(e),
-                Ok(r) => Ok(r),
+                r => r,
             }?;
         }
 
@@ -203,7 +200,7 @@ where
             if let Some(ref mut iter_log) = data.get_kv() {
                 iter_log.push(
                     "time",
-                    duration.as_secs() as f64 + duration.subsec_nanos() as f64 * 1e-9,
+                    duration.as_secs() as f64 + f64::from(duration.subsec_nanos()) * 1e-9,
                 );
                 log.merge(&mut iter_log.clone());
             }
@@ -237,7 +234,7 @@ where
         let kv = make_kv!(
             "termination_reason" => self.termination_reason;
             "total_time" => self.total_time.as_secs() as f64 +
-                            self.total_time.subsec_nanos() as f64 * 1e-9;
+                            f64::from(self.total_time.subsec_nanos()) * 1e-9;
         );
 
         self.logger.log_info(

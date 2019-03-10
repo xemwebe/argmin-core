@@ -17,9 +17,6 @@
 // I really do not like the a..=b syntax
 #![allow(clippy::range_plus_one)]
 
-#[cfg(feature = "ctrlc")]
-pub extern crate ctrlc;
-
 /// Macros
 #[macro_use]
 pub mod macros;
@@ -183,7 +180,7 @@ pub trait ArgminWrite: Send + Sync {
 }
 
 /// The datastructure which is returned by the `next_iter` method of the `Solver` trait.
-#[derive(Clone, Serialize, Debug)]
+#[derive(Clone, Serialize, Debug, Default)]
 pub struct ArgminIterData<O: ArgminOp> {
     /// Current parameter vector
     param: Option<O::Param>,

@@ -41,8 +41,8 @@ pub enum TerminationReason {
 
 impl TerminationReason {
     /// Returns `true` if a solver terminated and `false` otherwise
-    pub fn terminated(&self) -> bool {
-        match *self {
+    pub fn terminated(self) -> bool {
+        match self {
             TerminationReason::NotTerminated => false,
             _ => true,
         }
