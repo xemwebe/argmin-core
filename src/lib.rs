@@ -121,6 +121,8 @@ pub trait ArgminOp: Clone + Send + Sync + Serialize {
 }
 
 pub trait Solver<O: ArgminOp>: Serialize {
+    const NAME: &'static str = "UNDEFINED";
+
     /// Computes one iteration of the algorithm.
     fn next_iter(
         &mut self,

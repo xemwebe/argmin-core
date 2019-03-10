@@ -117,7 +117,7 @@ where
         //                     #(#logs_str => #logs_expr;)*);
         let logs = make_kv!("max_iters" => self.state.get_max_iters(););
         // self.base.log_info(#solver_name, &logs)?;
-        self.logger.log_info("blah", &logs)?;
+        self.logger.log_info(S::NAME, &logs)?;
 
         let running = Arc::new(AtomicBool::new(true));
 
