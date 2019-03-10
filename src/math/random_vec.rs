@@ -6,14 +6,12 @@
 // copied, modified, or distributed except according to those terms.
 
 use crate::math::ArgminRandom;
-use rand::Rng;
 use rand::distributions::uniform::SampleUniform;
+use rand::Rng;
 
 impl<T> ArgminRandom for Vec<T>
-where T
-    : SampleUniform
-    + std::cmp::PartialOrd
-    + Clone
+where
+    T: SampleUniform + std::cmp::PartialOrd + Clone,
 {
     fn rand_from_range(min: &Self, max: &Self) -> Vec<T> {
         assert!(min.len() > 0);
@@ -21,17 +19,19 @@ where T
 
         let mut rng = rand::thread_rng();
 
-        min.iter().zip(max.iter()).map(|(a, b)| {
+        min.iter()
+            .zip(max.iter())
+            .map(|(a, b)| {
+                // Do not require a < b:
 
-            // Do not require a < b:
-
-            if a == b {
-                a.clone()
-            } else if a < b {
-                rng.gen_range(a, b)
-            } else {
-                rng.gen_range(b, a)
-            }
-        }).collect()
+                if a == b {
+                    a.clone()
+                } else if a < b {
+                    rng.gen_range(a, b)
+                } else {
+                    rng.gen_range(b, a)
+                }
+            })
+            .collect()
     }
 }

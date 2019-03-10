@@ -8,37 +8,26 @@
 use crate::math::ArgminMinMax;
 
 impl<T> ArgminMinMax for Vec<T>
-where T
-    : std::cmp::PartialOrd
-    + Clone
+where
+    T: std::cmp::PartialOrd + Clone,
 {
     fn min(x: &Self, y: &Self) -> Vec<T> {
         assert!(x.len() > 0);
         assert_eq!(x.len(), y.len());
 
-        x.iter().zip(y.iter()).map(|(a, b)| {
-
-            if a < b {
-                a.clone()
-            } else {
-                b.clone()
-            }
-
-        }).collect()
+        x.iter()
+            .zip(y.iter())
+            .map(|(a, b)| if a < b { a.clone() } else { b.clone() })
+            .collect()
     }
 
     fn max(x: &Self, y: &Self) -> Vec<T> {
         assert!(x.len() > 0);
         assert_eq!(x.len(), y.len());
 
-        x.iter().zip(y.iter()).map(|(a, b)| {
-
-            if a > b {
-                a.clone()
-            } else {
-                b.clone()
-            }
-
-        }).collect()
+        x.iter()
+            .zip(y.iter())
+            .map(|(a, b)| if a > b { a.clone() } else { b.clone() })
+            .collect()
     }
 }
