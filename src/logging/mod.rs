@@ -11,24 +11,24 @@
 
 pub mod slog_logger;
 
-use crate::{ArgminKV, ArgminLog, Error};
+use crate::{ArgminKV, Error, Observe};
 use std::sync::Arc;
 
-/// Container for `ArgminLog`gers
+/// Container for Observers
 #[derive(Clone, Default)]
-pub struct ArgminLogger {
+pub struct Observer {
     /// Vector of boxed types which implement `ArgminLog`
-    logger: Vec<Arc<ArgminLog>>,
+    logger: Vec<Arc<Observe>>,
 }
 
-impl ArgminLogger {
+impl Observer {
     /// Constructor
     pub fn new() -> Self {
-        ArgminLogger { logger: vec![] }
+        Observer { logger: vec![] }
     }
 
     /// Push another `ArgminLog` to the `logger` field
-    pub fn push(&mut self, logger: Arc<ArgminLog>) -> &mut Self {
+    pub fn push(&mut self, logger: Arc<Observe>) -> &mut Self {
         self.logger.push(logger);
         self
     }
@@ -36,7 +36,7 @@ impl ArgminLogger {
 
 /// By implementing `ArgminLog` for `ArgminLogger` we basically allow a set of `ArgminLog`gers to
 /// be used just like a single `ArgminLog`ger.
-impl ArgminLog for ArgminLogger {
+impl Observe for Observer {
     /// Log general info
     fn log_info(&self, msg: &str, kv: &ArgminKV) -> Result<(), Error> {
         for l in self.logger.iter() {

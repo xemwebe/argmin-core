@@ -52,7 +52,7 @@ pub use crate::executor::*;
 pub use crate::iterstate::*;
 pub use crate::kv::ArgminKV;
 pub use crate::logging::slog_logger::ArgminSlogLogger;
-pub use crate::logging::ArgminLogger;
+pub use crate::logging::Observer;
 pub use crate::math::*;
 pub use crate::nooperator::*;
 pub use crate::opwrapper::*;
@@ -161,8 +161,8 @@ pub trait Solver<O: ArgminOp>: Serialize {
     }
 }
 
-/// Defince the interface every logger needs to expose
-pub trait ArgminLog: Send + Sync {
+/// Defince the interface every Observer needs to expose
+pub trait Observe: Send + Sync {
     /// Logs general information (a message `msg` and/or key-value pairs `kv`).
     fn log_info(&self, msg: &str, kv: &ArgminKV) -> Result<(), Error>;
 
@@ -195,7 +195,7 @@ pub struct ArgminIterData<O: ArgminOp> {
     /// terminationreason
     termination_reason: Option<TerminationReason>,
     /// Key value pairs which are currently only used to provide additional information for the
-    /// loggers
+    /// Observers
     kv: Option<ArgminKV>,
 }
 

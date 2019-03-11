@@ -7,7 +7,7 @@
 
 //! # Loggers based on the `slog` crate
 
-use crate::{ArgminKV, ArgminLog, Error};
+use crate::{ArgminKV, Error, Observe};
 use slog;
 use slog::{info, o, Drain, Record, Serializer, KV};
 use slog_async;
@@ -102,7 +102,7 @@ impl<'a> From<&'a ArgminKV> for ArgminSlogKV {
     }
 }
 
-impl ArgminLog for ArgminSlogLogger {
+impl Observe for ArgminSlogLogger {
     /// Log general info
     fn log_info(&self, msg: &str, kv: &ArgminKV) -> Result<(), Error> {
         info!(self.logger, "{}", msg; ArgminSlogKV::from(kv));

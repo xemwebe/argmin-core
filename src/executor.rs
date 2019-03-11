@@ -9,8 +9,8 @@
 
 use crate::serialization::*;
 use crate::{
-    ArgminCheckpoint, ArgminIterData, ArgminKV, ArgminLog, ArgminLogger, ArgminOp, ArgminResult,
-    ArgminWrite, ArgminWriter, Error, IterState, OpWrapper, Solver, TerminationReason,
+    ArgminCheckpoint, ArgminIterData, ArgminKV, ArgminOp, ArgminResult, ArgminWrite, ArgminWriter,
+    Error, IterState, Observe, Observer, OpWrapper, Solver, TerminationReason,
 };
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
@@ -41,7 +41,7 @@ pub struct Executor<O: ArgminOp, S> {
     total_time: std::time::Duration,
     /// Storage for loggers
     #[serde(skip)]
-    logger: ArgminLogger,
+    logger: Observer,
     /// Storage for writers
     #[serde(skip)]
     writer: ArgminWriter<O::Param>,
@@ -68,7 +68,7 @@ where
             modify_func_count: 0,
             termination_reason: TerminationReason::NotTerminated,
             total_time: std::time::Duration::new(0, 0),
-            logger: ArgminLogger::new(),
+            logger: Observer::new(),
             writer: ArgminWriter::new(),
             checkpoint: ArgminCheckpoint::default(),
         }
@@ -316,7 +316,7 @@ where
     }
 
     /// Attaches a logger which implements `ArgminLog` to the solver.
-    pub fn add_logger(mut self, logger: std::sync::Arc<ArgminLog>) -> Self {
+    pub fn add_logger(mut self, logger: std::sync::Arc<Observe>) -> Self {
         self.logger.push(logger);
         self
     }
