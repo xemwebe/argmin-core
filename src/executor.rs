@@ -41,7 +41,7 @@ pub struct Executor<O: ArgminOp, S> {
     total_time: std::time::Duration,
     /// Storage for loggers
     #[serde(skip)]
-    logger: Observer,
+    logger: Observer<O>,
     /// Storage for writers
     #[serde(skip)]
     writer: ArgminWriter<O::Param>,
@@ -204,7 +204,7 @@ where
                 );
                 log.merge(&mut iter_log.clone());
             }
-            self.logger.observe_iter(&log)?;
+            self.logger.observe_iter(&self.state, &log)?;
 
             // Write to file or something
             self.writer
@@ -322,7 +322,7 @@ where
     }
 
     /// Attaches a logger which implements `ArgminLog` to the solver.
-    pub fn add_logger(mut self, logger: std::sync::Arc<Observe>) -> Self {
+    pub fn add_logger(mut self, logger: std::sync::Arc<Observe<O>>) -> Self {
         self.logger.push(logger);
         self
     }

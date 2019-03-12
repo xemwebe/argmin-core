@@ -11,24 +11,24 @@
 
 pub mod slog_logger;
 
-use crate::{ArgminKV, Error, Observe};
+use crate::{ArgminKV, ArgminOp, Error, IterState, Observe};
 use std::sync::Arc;
 
 /// Container for Observers
 #[derive(Clone, Default)]
-pub struct Observer {
+pub struct Observer<O> {
     /// Vector of boxed types which implement `ArgminLog`
-    logger: Vec<Arc<Observe>>,
+    logger: Vec<Arc<Observe<O>>>,
 }
 
-impl Observer {
+impl<O: ArgminOp> Observer<O> {
     /// Constructor
     pub fn new() -> Self {
         Observer { logger: vec![] }
     }
 
     /// Push another `ArgminLog` to the `logger` field
-    pub fn push(&mut self, logger: Arc<Observe>) -> &mut Self {
+    pub fn push(&mut self, logger: Arc<Observe<O>>) -> &mut Self {
         self.logger.push(logger);
         self
     }
@@ -36,7 +36,7 @@ impl Observer {
 
 /// By implementing `ArgminLog` for `ArgminLogger` we basically allow a set of `ArgminLog`gers to
 /// be used just like a single `ArgminLog`ger.
-impl Observe for Observer {
+impl<O: ArgminOp> Observe<O> for Observer<O> {
     /// Log general info
     fn observe_init(&self, msg: &str, kv: &ArgminKV) -> Result<(), Error> {
         for l in self.logger.iter() {
@@ -47,9 +47,9 @@ impl Observe for Observer {
 
     /// This should be used to log iteration data only (because this is what may be saved in a CSV
     /// file or a database)
-    fn observe_iter(&self, kv: &ArgminKV) -> Result<(), Error> {
+    fn observe_iter(&self, state: &IterState<O>, kv: &ArgminKV) -> Result<(), Error> {
         for l in self.logger.iter() {
-            l.observe_iter(kv)?
+            l.observe_iter(state, kv)?
         }
         Ok(())
     }
