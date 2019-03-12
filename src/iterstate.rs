@@ -5,7 +5,7 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use crate::ArgminOp;
+use crate::{ArgminOp, OpWrapper};
 use paste::item;
 use serde::{Deserialize, Serialize};
 
@@ -26,6 +26,14 @@ pub struct IterState<O: ArgminOp> {
     prev_hessian: Option<O::Hessian>,
     iter: u64,
     max_iters: u64,
+    /// Number of cost function evaluations so far
+    cost_func_count: u64,
+    /// Number of gradient evaluations so far
+    grad_func_count: u64,
+    /// Number of gradient evaluations so far
+    hessian_func_count: u64,
+    /// Number of modify evaluations so far
+    modify_func_count: u64,
 }
 
 macro_rules! setter {
@@ -75,6 +83,10 @@ impl<O: ArgminOp> IterState<O> {
             prev_hessian: None,
             iter: 0,
             max_iters: std::u64::MAX,
+            cost_func_count: 0,
+            grad_func_count: 0,
+            hessian_func_count: 0,
+            modify_func_count: 0,
         }
     }
 
@@ -125,6 +137,10 @@ impl<O: ArgminOp> IterState<O> {
     getter!(best_cost, f64);
     getter!(prev_best_cost, f64);
     getter!(target_cost, f64);
+    getter!(cost_func_count, u64);
+    getter!(grad_func_count, u64);
+    getter!(hessian_func_count, u64);
+    getter!(modify_func_count, u64);
     getter_option!(grad, O::Param);
     getter_option!(prev_grad, O::Param);
     getter_option!(hessian, O::Hessian);
@@ -134,5 +150,28 @@ impl<O: ArgminOp> IterState<O> {
 
     pub fn increment_iter(&mut self) {
         self.iter += 1;
+    }
+
+    pub fn increment_func_counts(&mut self, op: &OpWrapper<O>) {
+        self.cost_func_count += op.cost_func_count;
+        self.grad_func_count += op.grad_func_count;
+        self.hessian_func_count += op.hessian_func_count;
+        self.modify_func_count += op.modify_func_count;
+    }
+
+    pub fn increment_cost_func_count(&mut self, num: u64) {
+        self.cost_func_count += num;
+    }
+
+    pub fn increment_grad_func_count(&mut self, num: u64) {
+        self.grad_func_count += num;
+    }
+
+    pub fn increment_hessian_func_count(&mut self, num: u64) {
+        self.hessian_func_count += num;
+    }
+
+    pub fn increment_modify_func_count(&mut self, num: u64) {
+        self.modify_func_count += num;
     }
 }

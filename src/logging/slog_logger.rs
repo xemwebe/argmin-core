@@ -101,10 +101,16 @@ impl<O: ArgminOp> KV for IterState<O> {
         serializer.emit_str("best_cost", &self.get_best_cost().to_string())?;
         serializer.emit_str("cost", &self.get_cost().to_string())?;
         serializer.emit_str("iter", &self.get_iter().to_string())?;
-        // serializer.emit_str("cost_func_count", &self.get_best_cost().to_string())?;
-        // serializer.emit_str("grad_func_count", &self.get_best_cost().to_string())?;
-        // serializer.emit_str("hessian_func_count", &self.get_best_cost().to_string())?;
-        // serializer.emit_str("modify_func_count", &self.get_best_cost().to_string())?;
+        serializer.emit_str("cost_func_count", &self.get_cost_func_count().to_string())?;
+        serializer.emit_str("grad_func_count", &self.get_grad_func_count().to_string())?;
+        serializer.emit_str(
+            "hessian_func_count",
+            &self.get_hessian_func_count().to_string(),
+        )?;
+        serializer.emit_str(
+            "modify_func_count",
+            &self.get_modify_func_count().to_string(),
+        )?;
         Ok(())
     }
 }

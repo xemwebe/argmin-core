@@ -26,15 +26,6 @@ pub struct Executor<O: ArgminOp, S> {
     op: O,
     /// State
     state: IterState<O>,
-    // TODO: make getters for these values
-    /// Number of cost function evaluations so far
-    pub cost_func_count: u64,
-    /// Number of gradient evaluations so far
-    pub grad_func_count: u64,
-    /// Number of gradient evaluations so far
-    pub hessian_func_count: u64,
-    /// Number of modify evaluations so far
-    pub modify_func_count: u64,
     /// Reason of termination
     termination_reason: TerminationReason,
     /// Total time the solver required.
@@ -62,10 +53,6 @@ where
             solver,
             op,
             state,
-            cost_func_count: 0,
-            grad_func_count: 0,
-            hessian_func_count: 0,
-            modify_func_count: 0,
             termination_reason: TerminationReason::NotTerminated,
             total_time: std::time::Duration::new(0, 0),
             logger: Observer::new(),
@@ -149,15 +136,9 @@ where
             self.update(&data)?;
         }
 
-        // TODO: write a method for this?
-        self.cost_func_count = op_wrapper.cost_func_count;
-        self.grad_func_count = op_wrapper.grad_func_count;
-        self.hessian_func_count = op_wrapper.hessian_func_count;
-        self.modify_func_count = op_wrapper.modify_func_count;
+        self.state.increment_func_counts(&op_wrapper);
 
         while running.load(Ordering::SeqCst) {
-            // let state = self.to_state();
-
             // check first if it has already terminated
             // This should probably be solved better.
             // First, check if it isn't already terminated. If it isn't, evaluate the
@@ -177,10 +158,7 @@ where
 
             let data = self.solver.next_iter(&mut op_wrapper, &self.state)?;
 
-            self.cost_func_count = op_wrapper.cost_func_count;
-            self.grad_func_count = op_wrapper.grad_func_count;
-            self.hessian_func_count = op_wrapper.hessian_func_count;
-            self.modify_func_count = op_wrapper.modify_func_count;
+            self.state.increment_func_counts(&op_wrapper);
 
             // End time measurement
             let duration = start.elapsed();
@@ -244,11 +222,7 @@ where
             self.update(&data)?;
         }
 
-        // TODO: write a method for this?
-        self.cost_func_count = op_wrapper.cost_func_count;
-        self.grad_func_count = op_wrapper.grad_func_count;
-        self.hessian_func_count = op_wrapper.hessian_func_count;
-        self.modify_func_count = op_wrapper.modify_func_count;
+        self.state.increment_func_counts(&op_wrapper);
 
         loop {
             // let state = self.to_state();
@@ -269,10 +243,7 @@ where
 
             let data = self.solver.next_iter(&mut op_wrapper, &self.state)?;
 
-            self.cost_func_count = op_wrapper.cost_func_count;
-            self.grad_func_count = op_wrapper.grad_func_count;
-            self.hessian_func_count = op_wrapper.hessian_func_count;
-            self.modify_func_count = op_wrapper.modify_func_count;
+            self.state.increment_func_counts(&op_wrapper);
 
             self.update(&data)?;
 
