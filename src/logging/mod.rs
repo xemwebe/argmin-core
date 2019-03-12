@@ -38,18 +38,18 @@ impl Observer {
 /// be used just like a single `ArgminLog`ger.
 impl Observe for Observer {
     /// Log general info
-    fn log_info(&self, msg: &str, kv: &ArgminKV) -> Result<(), Error> {
+    fn observe_init(&self, msg: &str, kv: &ArgminKV) -> Result<(), Error> {
         for l in self.logger.iter() {
-            l.log_info(msg, kv)?
+            l.observe_init(msg, kv)?
         }
         Ok(())
     }
 
     /// This should be used to log iteration data only (because this is what may be saved in a CSV
     /// file or a database)
-    fn log_iter(&self, kv: &ArgminKV) -> Result<(), Error> {
+    fn observe_iter(&self, kv: &ArgminKV) -> Result<(), Error> {
         for l in self.logger.iter() {
-            l.log_iter(kv)?
+            l.observe_iter(kv)?
         }
         Ok(())
     }

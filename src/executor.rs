@@ -117,7 +117,7 @@ where
         //                     #(#logs_str => #logs_expr;)*);
         let logs = make_kv!("max_iters" => self.state.get_max_iters(););
         // self.base.log_info(#solver_name, &logs)?;
-        self.logger.log_info(S::NAME, &logs)?;
+        self.logger.observe_init(S::NAME, &logs)?;
 
         let running = Arc::new(AtomicBool::new(true));
 
@@ -204,7 +204,7 @@ where
                 );
                 log.merge(&mut iter_log.clone());
             }
-            self.logger.log_iter(&log)?;
+            self.logger.observe_iter(&log)?;
 
             // Write to file or something
             self.writer
@@ -231,19 +231,19 @@ where
 
         self.total_time = total_time.elapsed();
 
-        let kv = make_kv!(
-            "termination_reason" => self.termination_reason;
-            "total_time" => self.total_time.as_secs() as f64 +
-                            f64::from(self.total_time.subsec_nanos()) * 1e-9;
-        );
-
-        self.logger.log_info(
-            &format!(
-                "Terminated: {reason}",
-                reason = self.termination_reason.text(),
-            ),
-            &kv,
-        )?;
+        // let kv = make_kv!(
+        //     "termination_reason" => self.termination_reason;
+        //     "total_time" => self.total_time.as_secs() as f64 +
+        //                     f64::from(self.total_time.subsec_nanos()) * 1e-9;
+        // );
+        //
+        // self.logger.log_info(
+        //     &format!(
+        //         "Terminated: {reason}",
+        //         reason = self.termination_reason.text(),
+        //     ),
+        //     &kv,
+        // )?;
 
         Ok(ArgminResult::new(
             self.state.get_best_param(),
@@ -251,10 +251,13 @@ where
             self.state.get_iter(),
             self.termination_reason,
             self.op,
+            self.total_time,
         ))
     }
 
     pub fn run_fast(mut self) -> Result<ArgminResult<O>, Error> {
+        let total_time = std::time::Instant::now();
+
         let mut op_wrapper = OpWrapper::new(&self.op);
         let init_data = self.solver.init(&mut op_wrapper, &self.state)?;
 
@@ -306,12 +309,15 @@ where
             }
         }
 
+        self.total_time = total_time.elapsed();
+
         Ok(ArgminResult::new(
             self.state.get_best_param(),
             self.state.get_best_cost(),
             self.state.get_iter(),
             self.termination_reason,
             self.op,
+            self.total_time,
         ))
     }
 

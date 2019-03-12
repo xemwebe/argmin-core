@@ -33,6 +33,8 @@ pub struct ArgminResult<O: ArgminOp> {
     pub termination_reason: TerminationReason,
     /// operator
     pub operator: O,
+    /// total time
+    pub total_time: std::time::Duration,
 }
 
 impl<O: ArgminOp> ArgminResult<O> {
@@ -48,6 +50,7 @@ impl<O: ArgminOp> ArgminResult<O> {
         iters: u64,
         termination_reason: TerminationReason,
         operator: O,
+        total_time: std::time::Duration,
     ) -> Self {
         ArgminResult {
             param,
@@ -56,6 +59,7 @@ impl<O: ArgminOp> ArgminResult<O> {
             terminated: termination_reason.terminated(),
             termination_reason,
             operator,
+            total_time,
         }
     }
 }
@@ -71,6 +75,7 @@ where
         writeln!(f, "    cost:        {}", self.cost)?;
         writeln!(f, "    iters:       {}", self.iters)?;
         writeln!(f, "    termination: {}", self.termination_reason)?;
+        writeln!(f, "    time:        {:?}", self.total_time)?;
         Ok(())
     }
 }

@@ -104,14 +104,14 @@ impl<'a> From<&'a ArgminKV> for ArgminSlogKV {
 
 impl Observe for ArgminSlogLogger {
     /// Log general info
-    fn log_info(&self, msg: &str, kv: &ArgminKV) -> Result<(), Error> {
+    fn observe_init(&self, msg: &str, kv: &ArgminKV) -> Result<(), Error> {
         info!(self.logger, "{}", msg; ArgminSlogKV::from(kv));
         Ok(())
     }
 
     /// This should be used to log iteration data only (because this is what may be saved in a CSV
     /// file or a database)
-    fn log_iter(&self, kv: &ArgminKV) -> Result<(), Error> {
+    fn observe_iter(&self, kv: &ArgminKV) -> Result<(), Error> {
         info!(self.logger, ""; ArgminSlogKV::from(kv));
         Ok(())
     }

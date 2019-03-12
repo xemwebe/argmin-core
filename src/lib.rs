@@ -164,12 +164,12 @@ pub trait Solver<O: ArgminOp>: Serialize {
 /// Defince the interface every Observer needs to expose
 pub trait Observe: Send + Sync {
     /// Logs general information (a message `msg` and/or key-value pairs `kv`).
-    fn log_info(&self, msg: &str, kv: &ArgminKV) -> Result<(), Error>;
+    fn observe_init(&self, msg: &str, kv: &ArgminKV) -> Result<(), Error>;
 
     /// Logs information from iterations. Only accepts key-value pairs. `log_iter` is made to log
     /// to a database or a CSV file. Therefore the structure of the key-value pairs should not
     /// change inbetween iterations.
-    fn log_iter(&self, kv: &ArgminKV) -> Result<(), Error>;
+    fn observe_iter(&self, kv: &ArgminKV) -> Result<(), Error>;
 }
 
 /// Every writer (which is something that writes parameter vectors somewhere after each iteration)
