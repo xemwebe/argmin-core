@@ -96,6 +96,19 @@ impl KV for ArgminSlogKV {
     }
 }
 
+impl<O: ArgminOp> KV for IterState<O> {
+    fn serialize(&self, _record: &Record, serializer: &mut Serializer) -> slog::Result {
+        serializer.emit_str("best_cost", &self.get_best_cost().to_string())?;
+        serializer.emit_str("cost", &self.get_cost().to_string())?;
+        serializer.emit_str("iter", &self.get_iter().to_string())?;
+        // serializer.emit_str("cost_func_count", &self.get_best_cost().to_string())?;
+        // serializer.emit_str("grad_func_count", &self.get_best_cost().to_string())?;
+        // serializer.emit_str("hessian_func_count", &self.get_best_cost().to_string())?;
+        // serializer.emit_str("modify_func_count", &self.get_best_cost().to_string())?;
+        Ok(())
+    }
+}
+
 impl<'a> From<&'a ArgminKV> for ArgminSlogKV {
     fn from(i: &'a ArgminKV) -> ArgminSlogKV {
         ArgminSlogKV { kv: i.kv.clone() }
@@ -111,8 +124,8 @@ impl<O: ArgminOp> Observe<O> for ArgminSlogLogger {
 
     /// This should be used to log iteration data only (because this is what may be saved in a CSV
     /// file or a database)
-    fn observe_iter(&self, _state: &IterState<O>, kv: &ArgminKV) -> Result<(), Error> {
-        info!(self.logger, ""; ArgminSlogKV::from(kv));
+    fn observe_iter(&self, state: &IterState<O>, kv: &ArgminKV) -> Result<(), Error> {
+        info!(self.logger, ""; state, ArgminSlogKV::from(kv));
         Ok(())
     }
 }

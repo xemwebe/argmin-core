@@ -188,15 +188,7 @@ where
             self.update(&data)?;
 
             // logging
-            let mut log = make_kv!(
-                "iter" => self.state.get_iter();
-                "best_cost" => self.state.get_best_cost();
-                "cur_cost" => self.state.get_cost();
-                "cost_func_count" => self.cost_func_count;
-                "grad_func_count" => self.grad_func_count;
-                "hessian_func_count" => self.hessian_func_count;
-                "modify_func_count" => self.modify_func_count;
-            );
+            let mut log = make_kv!();
             if let Some(ref mut iter_log) = data.get_kv() {
                 iter_log.push(
                     "time",
@@ -230,20 +222,6 @@ where
         }
 
         self.total_time = total_time.elapsed();
-
-        // let kv = make_kv!(
-        //     "termination_reason" => self.termination_reason;
-        //     "total_time" => self.total_time.as_secs() as f64 +
-        //                     f64::from(self.total_time.subsec_nanos()) * 1e-9;
-        // );
-        //
-        // self.logger.log_info(
-        //     &format!(
-        //         "Terminated: {reason}",
-        //         reason = self.termination_reason.text(),
-        //     ),
-        //     &kv,
-        // )?;
 
         Ok(ArgminResult::new(
             self.state.get_best_param(),
