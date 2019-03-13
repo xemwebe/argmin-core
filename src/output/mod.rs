@@ -19,7 +19,6 @@ pub mod file;
 use serde::{Deserialize, Serialize};
 use std::default::Default;
 
-// naming is somewhat inconsistent... maybe ArgminWriteMode ?
 #[derive(Copy, Clone, Serialize, Deserialize, Debug, Eq, PartialEq, Ord, PartialOrd)]
 pub enum WriterMode {
     Never,

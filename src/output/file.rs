@@ -85,11 +85,10 @@ impl<O: ArgminOp> Observe<O> for WriteToFile<O> {
     fn observe_iter(&self, state: &IterState<O>, _kv: &ArgminKV) -> Result<(), Error> {
         use WriterMode::*;
         let iter = state.get_iter();
-        let new_best = true;
         match self.mode {
             Always => self.write_to_file(&state.get_param(), iter),
             Every(i) if iter % i == 0 => self.write_to_file(&state.get_param(), iter),
-            NewBest if new_best => self.write_to_file(&state.get_param(), iter),
+            NewBest if state.is_best() => self.write_to_file(&state.get_param(), iter),
             Never | Every(_) | NewBest => Ok(()),
         }
     }

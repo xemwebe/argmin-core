@@ -76,9 +76,7 @@ where
             let param = self.state.get_param().clone();
             let cost = self.state.get_cost();
             self.state.best_param(param).best_cost(cost);
-            // Tell everyone!
-            // self.writer
-            //     .write(&self.state.get_best_param(), self.state.get_iter(), true)?;
+            self.state.new_best();
         }
         if let Some(grad) = data.get_grad() {
             self.state.grad(grad);

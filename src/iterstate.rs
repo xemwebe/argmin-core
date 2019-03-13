@@ -25,6 +25,7 @@ pub struct IterState<O: ArgminOp> {
     hessian: Option<O::Hessian>,
     prev_hessian: Option<O::Hessian>,
     iter: u64,
+    last_best_iter: u64,
     max_iters: u64,
     /// Number of cost function evaluations so far
     cost_func_count: u64,
@@ -82,6 +83,7 @@ impl<O: ArgminOp> IterState<O> {
             hessian: None,
             prev_hessian: None,
             iter: 0,
+            last_best_iter: 0,
             max_iters: std::u64::MAX,
             cost_func_count: 0,
             grad_func_count: 0,
@@ -128,6 +130,7 @@ impl<O: ArgminOp> IterState<O> {
 
     setter!(target_cost, f64);
     setter!(max_iters, u64);
+    setter!(last_best_iter, u64);
     getter!(param, O::Param);
     getter!(prev_param, O::Param);
     getter!(best_param, O::Param);
@@ -141,6 +144,7 @@ impl<O: ArgminOp> IterState<O> {
     getter!(grad_func_count, u64);
     getter!(hessian_func_count, u64);
     getter!(modify_func_count, u64);
+    getter!(last_best_iter, u64);
     getter_option!(grad, O::Param);
     getter_option!(prev_grad, O::Param);
     getter_option!(hessian, O::Hessian);
@@ -173,5 +177,13 @@ impl<O: ArgminOp> IterState<O> {
 
     pub fn increment_modify_func_count(&mut self, num: u64) {
         self.modify_func_count += num;
+    }
+
+    pub fn new_best(&mut self) {
+        self.last_best_iter = self.iter;
+    }
+
+    pub fn is_best(&self) -> bool {
+        self.last_best_iter == self.iter
     }
 }
