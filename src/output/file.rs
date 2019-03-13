@@ -7,9 +7,7 @@
 
 //! # Output parameter vectors to file
 
-use crate::ArgminWrite;
-use crate::Error;
-use crate::WriterMode;
+use crate::{ArgminKV, ArgminOp, Error, IterState, Observe, WriterMode};
 use serde::{Deserialize, Serialize};
 use std::default::Default;
 use std::fs::File;
@@ -29,15 +27,15 @@ impl Default for WriteToFileSerializer {
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug, Eq, PartialEq, Ord, PartialOrd)]
-pub struct WriteToFile<T> {
+pub struct WriteToFile<O> {
     dir: String,
     prefix: String,
     mode: WriterMode,
     serializer: WriteToFileSerializer,
-    _param: std::marker::PhantomData<T>,
+    _param: std::marker::PhantomData<O>,
 }
 
-impl<T: Serialize + Send + Sync> WriteToFile<T> {
+impl<O: ArgminOp> WriteToFile<O> {
     pub fn new(dir: &str, prefix: &str) -> Self {
         WriteToFile {
             dir: dir.to_string(),
@@ -58,7 +56,7 @@ impl<T: Serialize + Send + Sync> WriteToFile<T> {
         self
     }
 
-    fn write_to_file(&self, param: &T, iter: u64) -> Result<(), Error> {
+    fn write_to_file(&self, param: &O::Param, iter: u64) -> Result<(), Error> {
         let dir = Path::new(&self.dir);
         if !dir.exists() {
             std::fs::create_dir_all(&dir)?
@@ -83,15 +81,15 @@ impl<T: Serialize + Send + Sync> WriteToFile<T> {
     }
 }
 
-impl<T: Serialize + Send + Sync> ArgminWrite for WriteToFile<T> {
-    type Param = T;
-
-    fn write(&self, param: &T, iter: u64, new_best: bool) -> Result<(), Error> {
+impl<O: ArgminOp> Observe<O> for WriteToFile<O> {
+    fn observe_iter(&self, state: &IterState<O>, _kv: &ArgminKV) -> Result<(), Error> {
         use WriterMode::*;
+        let iter = state.get_iter();
+        let new_best = true;
         match self.mode {
-            Always => self.write_to_file(param, iter),
-            Every(i) if iter % i == 0 => self.write_to_file(param, iter),
-            NewBest if new_best => self.write_to_file(param, iter),
+            Always => self.write_to_file(&state.get_param(), iter),
+            Every(i) if iter % i == 0 => self.write_to_file(&state.get_param(), iter),
+            NewBest if new_best => self.write_to_file(&state.get_param(), iter),
             Never | Every(_) | NewBest => Ok(()),
         }
     }

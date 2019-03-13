@@ -163,18 +163,13 @@ pub trait Solver<O: ArgminOp>: Serialize {
 
 /// Defince the interface every Observer needs to expose
 pub trait Observe<O: ArgminOp>: Send + Sync {
-    fn observe_init(&self, msg: &str, kv: &ArgminKV) -> Result<(), Error>;
+    fn observe_init(&self, _msg: &str, _kv: &ArgminKV) -> Result<(), Error> {
+        Ok(())
+    }
 
-    fn observe_iter(&self, state: &IterState<O>, kv: &ArgminKV) -> Result<(), Error>;
-}
-
-/// Every writer (which is something that writes parameter vectors somewhere after each iteration)
-/// needs to implement this.
-pub trait ArgminWrite: Send + Sync {
-    type Param;
-
-    /// Writes the parameter vector somewhere
-    fn write(&self, param: &Self::Param, iter: u64, new_best: bool) -> Result<(), Error>;
+    fn observe_iter(&self, _state: &IterState<O>, _kv: &ArgminKV) -> Result<(), Error> {
+        Ok(())
+    }
 }
 
 /// The datastructure which is returned by the `next_iter` method of the `Solver` trait.

@@ -9,8 +9,8 @@
 
 use crate::serialization::*;
 use crate::{
-    ArgminCheckpoint, ArgminIterData, ArgminKV, ArgminOp, ArgminResult, ArgminWrite, ArgminWriter,
-    Error, IterState, Observe, Observer, OpWrapper, Solver, TerminationReason,
+    ArgminCheckpoint, ArgminIterData, ArgminKV, ArgminOp, ArgminResult, Error, IterState, Observe,
+    Observer, OpWrapper, Solver, TerminationReason,
 };
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
@@ -33,9 +33,6 @@ pub struct Executor<O: ArgminOp, S> {
     /// Storage for observers
     #[serde(skip)]
     observers: Observer<O>,
-    /// Storage for writers
-    #[serde(skip)]
-    writer: ArgminWriter<O::Param>,
     /// Checkpoint
     checkpoint: ArgminCheckpoint,
 }
@@ -56,7 +53,6 @@ where
             termination_reason: TerminationReason::NotTerminated,
             total_time: std::time::Duration::new(0, 0),
             observers: Observer::new(),
-            writer: ArgminWriter::new(),
             checkpoint: ArgminCheckpoint::default(),
         }
     }
@@ -81,8 +77,8 @@ where
             let cost = self.state.get_cost();
             self.state.best_param(param).best_cost(cost);
             // Tell everyone!
-            self.writer
-                .write(&self.state.get_best_param(), self.state.get_iter(), true)?;
+            // self.writer
+            //     .write(&self.state.get_best_param(), self.state.get_iter(), true)?;
         }
         if let Some(grad) = data.get_grad() {
             self.state.grad(grad);
@@ -175,10 +171,6 @@ where
                 log.merge(&mut iter_log.clone());
             }
             self.observers.observe_iter(&self.state, &log)?;
-
-            // Write to file or something
-            self.writer
-                .write(&self.state.get_param(), self.state.get_iter(), false)?;
 
             // increment iteration number
             self.state.increment_iter();
@@ -277,8 +269,8 @@ where
     }
 
     /// Attaches a observer which implements `ArgminLog` to the solver.
-    pub fn add_writer(mut self, writer: std::sync::Arc<ArgminWrite<Param = O::Param>>) -> Self {
-        self.writer.push(writer);
+    pub fn add_writer(mut self, observer: std::sync::Arc<Observe<O>>) -> Self {
+        self.observers.push(observer);
         self
     }
 

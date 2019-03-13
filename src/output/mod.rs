@@ -16,11 +16,8 @@
 
 pub mod file;
 
-use crate::ArgminWrite;
-use crate::Error;
 use serde::{Deserialize, Serialize};
 use std::default::Default;
-use std::sync::Arc;
 
 // naming is somewhat inconsistent... maybe ArgminWriteMode ?
 #[derive(Copy, Clone, Serialize, Deserialize, Debug, Eq, PartialEq, Ord, PartialOrd)]
@@ -37,42 +34,9 @@ impl Default for WriterMode {
     }
 }
 
-#[derive(Clone)]
-pub struct ArgminWriter<T> {
-    writers: Vec<Arc<ArgminWrite<Param = T>>>,
-}
-
-impl<T> Default for ArgminWriter<T> {
-    fn default() -> Self {
-        ArgminWriter { writers: vec![] }
-    }
-}
-
-impl<T> ArgminWriter<T> {
-    pub fn new() -> Self {
-        ArgminWriter { writers: vec![] }
-    }
-
-    pub fn push(&mut self, writer: Arc<ArgminWrite<Param = T>>) -> &mut Self {
-        self.writers.push(writer);
-        self
-    }
-}
-
-impl<T: Clone> ArgminWrite for ArgminWriter<T> {
-    type Param = T;
-
-    fn write(&self, param: &T, iter: u64, new_best: bool) -> Result<(), Error> {
-        for w in self.writers.iter() {
-            w.write(param, iter, new_best)?;
-        }
-        Ok(())
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    send_sync_test!(argmin_write, ArgminWriter<Vec<f64>>);
-}
+// #[cfg(test)]
+// mod tests {
+//     use super::*;
+//
+//     send_sync_test!(argmin_write, ArgminWriter<Vec<f64>>);
+// }
