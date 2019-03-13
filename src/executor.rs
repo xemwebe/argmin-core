@@ -30,9 +30,9 @@ pub struct Executor<O: ArgminOp, S> {
     termination_reason: TerminationReason,
     /// Total time the solver required.
     total_time: std::time::Duration,
-    /// Storage for loggers
+    /// Storage for observers
     #[serde(skip)]
-    logger: Observer<O>,
+    observers: Observer<O>,
     /// Storage for writers
     #[serde(skip)]
     writer: ArgminWriter<O::Param>,
@@ -55,7 +55,7 @@ where
             state,
             termination_reason: TerminationReason::NotTerminated,
             total_time: std::time::Duration::new(0, 0),
-            logger: Observer::new(),
+            observers: Observer::new(),
             writer: ArgminWriter::new(),
             checkpoint: ArgminCheckpoint::default(),
         }
@@ -104,7 +104,7 @@ where
         //                     #(#logs_str => #logs_expr;)*);
         let logs = make_kv!("max_iters" => self.state.get_max_iters(););
         // self.base.log_info(#solver_name, &logs)?;
-        self.logger.observe_init(S::NAME, &logs)?;
+        self.observers.observe_init(S::NAME, &logs)?;
 
         let running = Arc::new(AtomicBool::new(true));
 
@@ -174,7 +174,7 @@ where
                 );
                 log.merge(&mut iter_log.clone());
             }
-            self.logger.observe_iter(&self.state, &log)?;
+            self.observers.observe_iter(&self.state, &log)?;
 
             // Write to file or something
             self.writer
@@ -270,13 +270,13 @@ where
         ))
     }
 
-    /// Attaches a logger which implements `ArgminLog` to the solver.
-    pub fn add_logger(mut self, logger: std::sync::Arc<Observe<O>>) -> Self {
-        self.logger.push(logger);
+    /// Attaches a observer which implements `ArgminLog` to the solver.
+    pub fn add_observer(mut self, observer: std::sync::Arc<Observe<O>>) -> Self {
+        self.observers.push(observer);
         self
     }
 
-    /// Attaches a logger which implements `ArgminLog` to the solver.
+    /// Attaches a observer which implements `ArgminLog` to the solver.
     pub fn add_writer(mut self, writer: std::sync::Arc<ArgminWrite<Param = O::Param>>) -> Self {
         self.writer.push(writer);
         self
