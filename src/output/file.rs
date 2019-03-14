@@ -46,12 +46,12 @@ impl<O: ArgminOp> WriteToFile<O> {
         }
     }
 
-    pub fn set_serializer(&mut self, serializer: WriteToFileSerializer) -> &mut Self {
+    pub fn serializer(mut self, serializer: WriteToFileSerializer) -> Self {
         self.serializer = serializer;
         self
     }
 
-    pub fn set_mode(&mut self, mode: WriterMode) -> &mut Self {
+    pub fn mode(mut self, mode: WriterMode) -> Self {
         self.mode = mode;
         self
     }
