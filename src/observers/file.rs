@@ -7,7 +7,7 @@
 
 //! # Output parameter vectors to file
 
-use crate::{ArgminKV, ArgminOp, Error, IterState, Observe, ObserverMode};
+use crate::{ArgminKV, ArgminOp, Error, IterState, Observe};
 use serde::{Deserialize, Serialize};
 use std::default::Default;
 use std::fs::File;
@@ -30,7 +30,6 @@ impl Default for WriteToFileSerializer {
 pub struct WriteToFile<O> {
     dir: String,
     prefix: String,
-    mode: ObserverMode,
     serializer: WriteToFileSerializer,
     _param: std::marker::PhantomData<O>,
 }
@@ -40,7 +39,6 @@ impl<O: ArgminOp> WriteToFile<O> {
         WriteToFile {
             dir: dir.to_string(),
             prefix: prefix.to_string(),
-            mode: ObserverMode::default(),
             serializer: WriteToFileSerializer::Bincode,
             _param: std::marker::PhantomData,
         }
@@ -48,11 +46,6 @@ impl<O: ArgminOp> WriteToFile<O> {
 
     pub fn serializer(mut self, serializer: WriteToFileSerializer) -> Self {
         self.serializer = serializer;
-        self
-    }
-
-    pub fn mode(mut self, mode: ObserverMode) -> Self {
-        self.mode = mode;
         self
     }
 
@@ -83,14 +76,7 @@ impl<O: ArgminOp> WriteToFile<O> {
 
 impl<O: ArgminOp> Observe<O> for WriteToFile<O> {
     fn observe_iter(&self, state: &IterState<O>, _kv: &ArgminKV) -> Result<(), Error> {
-        use ObserverMode::*;
-        let iter = state.get_iter();
-        match self.mode {
-            Always => self.write_to_file(&state.get_param(), iter),
-            Every(i) if iter % i == 0 => self.write_to_file(&state.get_param(), iter),
-            NewBest if state.is_best() => self.write_to_file(&state.get_param(), iter),
-            Never | Every(_) | NewBest => Ok(()),
-        }
+        self.write_to_file(&state.get_param(), state.get_iter())
     }
 }
 
