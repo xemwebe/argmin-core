@@ -9,10 +9,16 @@
 //!
 //! Provides logging functionality for solvers.
 
+pub mod file;
 pub mod slog_logger;
 
 use crate::{ArgminKV, ArgminOp, Error, IterState, Observe};
+use serde::{Deserialize, Serialize};
+use std::default::Default;
 use std::sync::Arc;
+
+pub use file::*;
+pub use slog_logger::*;
 
 /// Container for Observers
 #[derive(Clone, Default)]
@@ -52,6 +58,20 @@ impl<O: ArgminOp> Observe<O> for Observer<O> {
             l.observe_iter(state, kv)?
         }
         Ok(())
+    }
+}
+
+#[derive(Copy, Clone, Serialize, Deserialize, Debug, Eq, PartialEq, Ord, PartialOrd)]
+pub enum WriterMode {
+    Never,
+    Always,
+    Every(u64),
+    NewBest,
+}
+
+impl Default for WriterMode {
+    fn default() -> WriterMode {
+        WriterMode::Always
     }
 }
 

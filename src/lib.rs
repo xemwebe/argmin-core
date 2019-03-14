@@ -28,17 +28,15 @@ pub mod executor;
 mod iterstate;
 /// Key value datastructure
 mod kv;
-/// Logging
-mod logging;
 /// Math utilities
 mod math;
 /// Phony Operator
 // #[cfg(test)]
 mod nooperator;
+/// Observers;
+mod observers;
 /// Wrapper around operators which keeps track of function evaluation counts
 mod opwrapper;
-/// Output
-mod output;
 /// Definition of the return type of the solvers
 mod result;
 /// Serialization of `ArgminSolver`s
@@ -51,13 +49,10 @@ pub use crate::errors::*;
 pub use crate::executor::*;
 pub use crate::iterstate::*;
 pub use crate::kv::ArgminKV;
-pub use crate::logging::slog_logger::ArgminSlogLogger;
-pub use crate::logging::Observer;
 pub use crate::math::*;
 pub use crate::nooperator::*;
+pub use crate::observers::*;
 pub use crate::opwrapper::*;
-pub use crate::output::file::{WriteToFile, WriteToFileSerializer};
-pub use crate::output::*;
 pub use crate::result::ArgminResult;
 pub use crate::termination::TerminationReason;
 pub use failure::Error;
