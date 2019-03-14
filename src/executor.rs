@@ -10,7 +10,7 @@
 use crate::serialization::*;
 use crate::{
     ArgminCheckpoint, ArgminIterData, ArgminKV, ArgminOp, ArgminResult, Error, IterState, Observe,
-    Observer, OpWrapper, Solver, TerminationReason,
+    Observer, ObserverMode, OpWrapper, Solver, TerminationReason,
 };
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
@@ -261,8 +261,12 @@ where
     }
 
     /// Attaches a observer which implements `ArgminLog` to the solver.
-    pub fn add_observer<OBS: Observe<O> + 'static>(mut self, observer: OBS) -> Self {
-        self.observers.push(observer);
+    pub fn add_observer<OBS: Observe<O> + 'static>(
+        mut self,
+        observer: OBS,
+        mode: ObserverMode,
+    ) -> Self {
+        self.observers.push(observer, mode);
         self
     }
 

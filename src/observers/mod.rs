@@ -24,7 +24,7 @@ pub use slog_logger::*;
 #[derive(Clone, Default)]
 pub struct Observer<O> {
     /// Vector of boxed types which implement `ArgminLog`
-    logger: Vec<Arc<Observe<O>>>,
+    logger: Vec<(Arc<Observe<O>>, ObserverMode)>,
 }
 
 impl<O: ArgminOp> Observer<O> {
@@ -34,8 +34,12 @@ impl<O: ArgminOp> Observer<O> {
     }
 
     /// Push another `ArgminLog` to the `logger` field
-    pub fn push<OBS: Observe<O> + 'static>(&mut self, observer: OBS) -> &mut Self {
-        self.logger.push(Arc::new(observer));
+    pub fn push<OBS: Observe<O> + 'static>(
+        &mut self,
+        observer: OBS,
+        mode: ObserverMode,
+    ) -> &mut Self {
+        self.logger.push((Arc::new(observer), mode));
         self
     }
 }
@@ -46,7 +50,7 @@ impl<O: ArgminOp> Observe<O> for Observer<O> {
     /// Log general info
     fn observe_init(&self, msg: &str, kv: &ArgminKV) -> Result<(), Error> {
         for l in self.logger.iter() {
-            l.observe_init(msg, kv)?
+            l.0.observe_init(msg, kv)?
         }
         Ok(())
     }
@@ -54,8 +58,15 @@ impl<O: ArgminOp> Observe<O> for Observer<O> {
     /// This should be used to log iteration data only (because this is what may be saved in a CSV
     /// file or a database)
     fn observe_iter(&self, state: &IterState<O>, kv: &ArgminKV) -> Result<(), Error> {
+        use ObserverMode::*;
         for l in self.logger.iter() {
-            l.observe_iter(state, kv)?
+            let iter = state.get_iter();
+            match l.1 {
+                Always => l.0.observe_iter(state, kv),
+                Every(i) if iter % i == 0 => l.0.observe_iter(state, kv),
+                NewBest if state.is_best() => l.0.observe_iter(state, kv),
+                Never | Every(_) | NewBest => Ok(()),
+            }?
         }
         Ok(())
     }
