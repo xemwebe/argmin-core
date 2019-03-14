@@ -261,13 +261,7 @@ where
     }
 
     /// Attaches a observer which implements `ArgminLog` to the solver.
-    pub fn add_observer(mut self, observer: std::sync::Arc<Observe<O>>) -> Self {
-        self.observers.push(observer);
-        self
-    }
-
-    /// Attaches a observer which implements `ArgminLog` to the solver.
-    pub fn add_writer(mut self, observer: std::sync::Arc<Observe<O>>) -> Self {
+    pub fn add_observer<OBS: Observe<O> + 'static>(mut self, observer: OBS) -> Self {
         self.observers.push(observer);
         self
     }

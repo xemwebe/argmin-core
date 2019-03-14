@@ -28,8 +28,8 @@ impl<O: ArgminOp> Observer<O> {
     }
 
     /// Push another `ArgminLog` to the `logger` field
-    pub fn push(&mut self, logger: Arc<Observe<O>>) -> &mut Self {
-        self.logger.push(logger);
+    pub fn push<OBS: Observe<O> + 'static>(&mut self, observer: OBS) -> &mut Self {
+        self.logger.push(Arc::new(observer));
         self
     }
 }

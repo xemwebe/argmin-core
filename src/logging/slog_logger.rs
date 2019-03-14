@@ -15,8 +15,6 @@ use slog_async::OverflowStrategy;
 use slog_json;
 use slog_term;
 use std::fs::OpenOptions;
-// use std::rc::Rc;
-use std::sync::Arc;
 use std::sync::Mutex;
 
 /// A logger based on `slog`
@@ -28,17 +26,17 @@ pub struct ArgminSlogLogger {
 
 impl ArgminSlogLogger {
     /// Log to the terminal in a blocking way
-    pub fn term() -> Arc<Self> {
+    pub fn term() -> Self {
         ArgminSlogLogger::term_internal(OverflowStrategy::Block)
     }
 
     /// Log to the terminal in a non-blocking way (in case of overflow, messages are dropped)
-    pub fn term_noblock() -> Arc<Self> {
+    pub fn term_noblock() -> Self {
         ArgminSlogLogger::term_internal(OverflowStrategy::Drop)
     }
 
     /// Actual implementation of the logging to the terminal
-    fn term_internal(overflow_strategy: OverflowStrategy) -> Arc<Self> {
+    fn term_internal(overflow_strategy: OverflowStrategy) -> Self {
         let decorator = slog_term::TermDecorator::new().build();
         let drain = slog_term::FullFormat::new(decorator)
             .use_original_order()
@@ -48,23 +46,23 @@ impl ArgminSlogLogger {
             .overflow_strategy(overflow_strategy)
             .build()
             .fuse();
-        Arc::new(ArgminSlogLogger {
+        ArgminSlogLogger {
             logger: slog::Logger::root(drain, o!()),
-        })
+        }
     }
 
     /// Log JSON to a file in a blocking way
-    pub fn file(file: &str) -> Result<Arc<Self>, Error> {
+    pub fn file(file: &str) -> Result<Self, Error> {
         ArgminSlogLogger::file_internal(file, OverflowStrategy::Block)
     }
 
     /// Log JSON to a file in a non-blocking way (in case of overflow, messages are dropped)
-    pub fn file_noblock(file: &str) -> Result<Arc<Self>, Error> {
+    pub fn file_noblock(file: &str) -> Result<Self, Error> {
         ArgminSlogLogger::file_internal(file, OverflowStrategy::Drop)
     }
 
     /// Actual implementaiton of logging JSON to file
-    fn file_internal(file: &str, overflow_strategy: OverflowStrategy) -> Result<Arc<Self>, Error> {
+    fn file_internal(file: &str, overflow_strategy: OverflowStrategy) -> Result<Self, Error> {
         // Logging to file
         let file = OpenOptions::new()
             .create(true)
@@ -76,9 +74,9 @@ impl ArgminSlogLogger {
             .overflow_strategy(overflow_strategy)
             .build()
             .fuse();
-        Ok(Arc::new(ArgminSlogLogger {
+        Ok(ArgminSlogLogger {
             logger: slog::Logger::root(drain, o!()),
-        }))
+        })
     }
 }
 
