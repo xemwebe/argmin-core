@@ -48,8 +48,12 @@ impl<O: ArgminOp> WriteToFile<O> {
         self.serializer = serializer;
         self
     }
+}
 
-    fn write_to_file(&self, param: &O::Param, iter: u64) -> Result<(), Error> {
+impl<O: ArgminOp> Observe<O> for WriteToFile<O> {
+    fn observe_iter(&self, state: &IterState<O>, _kv: &ArgminKV) -> Result<(), Error> {
+        let param = state.get_param();
+        let iter = state.get_iter();
         let dir = Path::new(&self.dir);
         if !dir.exists() {
             std::fs::create_dir_all(&dir)?
@@ -64,19 +68,13 @@ impl<O: ArgminOp> WriteToFile<O> {
         let f = BufWriter::new(File::create(fname)?);
         match self.serializer {
             WriteToFileSerializer::Bincode => {
-                bincode::serialize_into(f, param)?;
+                bincode::serialize_into(f, &param)?;
             }
             WriteToFileSerializer::JSON => {
-                serde_json::to_writer_pretty(f, param)?;
+                serde_json::to_writer_pretty(f, &param)?;
             }
         }
         Ok(())
-    }
-}
-
-impl<O: ArgminOp> Observe<O> for WriteToFile<O> {
-    fn observe_iter(&self, state: &IterState<O>, _kv: &ArgminKV) -> Result<(), Error> {
-        self.write_to_file(&state.get_param(), state.get_iter())
     }
 }
 
