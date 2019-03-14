@@ -62,16 +62,16 @@ impl<O: ArgminOp> Observe<O> for Observer<O> {
 }
 
 #[derive(Copy, Clone, Serialize, Deserialize, Debug, Eq, PartialEq, Ord, PartialOrd)]
-pub enum WriterMode {
+pub enum ObserverMode {
     Never,
     Always,
     Every(u64),
     NewBest,
 }
 
-impl Default for WriterMode {
-    fn default() -> WriterMode {
-        WriterMode::Always
+impl Default for ObserverMode {
+    fn default() -> ObserverMode {
+        ObserverMode::Always
     }
 }
 
