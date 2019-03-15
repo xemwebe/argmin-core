@@ -5,20 +5,21 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use crate::math::ArgminZero;
+use crate::math::{ArgminZero, ArgminZeroLike};
 
 macro_rules! make_zero {
     ($t:ty) => {
         impl ArgminZero for $t {
             #[allow(clippy::cast_lossless)]
             #[inline]
-            fn zero_like(&self) -> $t {
+            fn zero() -> $t {
                 0 as $t
             }
-
+        }
+        impl ArgminZeroLike for $t {
             #[allow(clippy::cast_lossless)]
             #[inline]
-            fn zero() -> $t {
+            fn zero_like(&self) -> $t {
                 0 as $t
             }
         }

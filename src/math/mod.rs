@@ -61,6 +61,12 @@ mod zero;
 #[cfg(feature = "ndarrayl")]
 mod zero_ndarray;
 mod zero_vec;
+// #[cfg(feature = "ndarrayl")]
+// mod random_ndarray; // TODO
+mod random_vec;
+// #[cfg(feature = "ndarrayl")]
+// mod minmax_ndarray; // TODO
+mod minmax_vec;
 pub use crate::math::add::*;
 #[cfg(feature = "ndarrayl")]
 pub use crate::math::add_ndarray::*;
@@ -105,6 +111,12 @@ pub use crate::math::zero::*;
 #[cfg(feature = "ndarrayl")]
 pub use crate::math::zero_ndarray::*;
 pub use crate::math::zero_vec::*;
+// #[cfg(feature = "ndarrayl")] // TODO
+// pub use crate::math::random_ndarray::*;
+pub use crate::math::random_vec::*;
+// #[cfg(feature = "ndarrayl")] // TODO
+// pub use crate::math::minmax_ndarray::*;
+pub use crate::math::minmax_vec::*;
 
 use crate::Error;
 
@@ -131,9 +143,13 @@ pub trait ArgminWeightedDot<T, U, V> {
 /// Return param vector of all zeros (for now, this is a hack. It should be done better)
 pub trait ArgminZero {
     /// Return zero(s)
-    fn zero_like(&self) -> Self;
-    /// Return zero(s)
     fn zero() -> Self;
+}
+
+/// Zero for dynamically sized objects
+pub trait ArgminZeroLike {
+    /// Return zero(s)
+    fn zero_like(&self) -> Self;
 }
 
 pub trait ArgminEye {
@@ -191,4 +207,15 @@ pub trait ArgminTranspose {
 /// Compute the inverse (`T`) of `self`
 pub trait ArgminInv<T> {
     fn inv(&self) -> Result<T, Error>;
+}
+
+pub trait ArgminRandom {
+    /// Get a random element between min and max,
+    fn rand_from_range(min: &Self, max: &Self) -> Self;
+}
+
+pub trait ArgminMinMax {
+    /// Select piecewise minimum / maximum
+    fn min(x: &Self, y: &Self) -> Self;
+    fn max(x: &Self, y: &Self) -> Self;
 }

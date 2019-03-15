@@ -129,37 +129,26 @@ mod tests {
     use super::*;
     use crate::nooperator::MinimalNoOperator;
     use crate::*;
-    use argmin_codegen::ArgminSolver;
 
-    #[derive(ArgminSolver, Serialize, Deserialize, Clone, Debug)]
-    pub struct PhonySolver<O>
-    where
-        O: ArgminOp,
-    {
-        base: ArgminBase<O>,
-    }
+    #[derive(Serialize, Deserialize, Clone, Debug)]
+    pub struct PhonySolver {}
 
-    impl<O> PhonySolver<O>
-    where
-        O: ArgminOp,
-    {
+    impl PhonySolver {
         /// Constructor
-        pub fn new(op: O, init_param: <O as ArgminOp>::Param) -> Self {
-            PhonySolver {
-                base: ArgminBase::new(op, init_param),
-            }
+        pub fn new() -> Self {
+            PhonySolver {}
         }
     }
 
-    impl<O> ArgminIter for PhonySolver<O>
+    impl<O> Solver<O> for PhonySolver
     where
         O: ArgminOp,
     {
-        type Param = <O as ArgminOp>::Param;
-        type Output = <O as ArgminOp>::Output;
-        type Hessian = <O as ArgminOp>::Hessian;
-
-        fn next_iter(&mut self) -> Result<ArgminIterData<Self::Param>, Error> {
+        fn next_iter(
+            &mut self,
+            op: &mut OpWrapper<O>,
+            state: &IterState<O>,
+        ) -> Result<ArgminIterData<O>, Error> {
             unimplemented!()
         }
     }
@@ -167,12 +156,11 @@ mod tests {
     #[test]
     fn test_store() {
         let op: MinimalNoOperator = MinimalNoOperator::new();
-        let solver = PhonySolver::new(op, vec![0.0, 0.0]);
+        let solver = PhonySolver::new();
         let check = ArgminCheckpoint::new("checkpoints", CheckpointMode::Always).unwrap();
         check.store_cond(&solver, 20).unwrap();
 
-        let loaded: PhonySolver<MinimalNoOperator> =
-            load_checkpoint("checkpoints/solver.arg").unwrap();
+        let loaded: PhonySolver = load_checkpoint("checkpoints/solver.arg").unwrap();
         println!("{:?}", loaded);
     }
 }
