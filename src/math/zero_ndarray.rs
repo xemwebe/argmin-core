@@ -5,37 +5,37 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use crate::math::ArgminZero;
+use crate::math::ArgminZeroLike;
 use num::Zero;
 
-impl<T> ArgminZero for ndarray::Array1<T>
+impl<T> ArgminZeroLike for ndarray::Array1<T>
 where
-    T: Zero + ArgminZero + Clone,
+    T: Zero + ArgminZeroLike + Clone,
 {
     #[inline]
     fn zero_like(&self) -> ndarray::Array1<T> {
         ndarray::Array1::zeros(self.raw_dim())
     }
 
-    #[inline]
-    fn zero() -> ndarray::Array1<T> {
-        ndarray::Array1::zeros(0)
-    }
+    // #[inline]
+    // fn zero() -> ndarray::Array1<T> {
+    //     ndarray::Array1::zeros(0)
+    // }
 }
 
-impl<T> ArgminZero for ndarray::Array2<T>
+impl<T> ArgminZeroLike for ndarray::Array2<T>
 where
-    T: Zero + ArgminZero + Clone,
+    T: Zero + ArgminZeroLike + Clone,
 {
     #[inline]
     fn zero_like(&self) -> ndarray::Array2<T> {
         ndarray::Array2::zeros(self.raw_dim())
     }
 
-    #[inline]
-    fn zero() -> ndarray::Array2<T> {
-        ndarray::Array2::zeros((0, 0))
-    }
+    // #[inline]
+    // fn zero() -> ndarray::Array2<T> {
+    //     ndarray::Array2::zeros((0, 0))
+    // }
 }
 
 #[cfg(test)]
