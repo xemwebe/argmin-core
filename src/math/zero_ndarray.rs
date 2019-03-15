@@ -5,12 +5,12 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use crate::math::ArgminZeroLike;
+use crate::math::{ArgminZero, ArgminZeroLike};
 use num::Zero;
 
 impl<T> ArgminZeroLike for ndarray::Array1<T>
 where
-    T: Zero + ArgminZeroLike + Clone,
+    T: Zero + ArgminZero + Clone,
 {
     #[inline]
     fn zero_like(&self) -> ndarray::Array1<T> {
@@ -25,7 +25,7 @@ where
 
 impl<T> ArgminZeroLike for ndarray::Array2<T>
 where
-    T: Zero + ArgminZeroLike + Clone,
+    T: Zero + ArgminZero + Clone,
 {
     #[inline]
     fn zero_like(&self) -> ndarray::Array2<T> {
