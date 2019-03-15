@@ -146,8 +146,8 @@ mod tests {
     {
         fn next_iter(
             &mut self,
-            op: &mut OpWrapper<O>,
-            state: &IterState<O>,
+            _op: &mut OpWrapper<O>,
+            _state: &IterState<O>,
         ) -> Result<ArgminIterData<O>, Error> {
             unimplemented!()
         }
@@ -155,7 +155,8 @@ mod tests {
 
     #[test]
     fn test_store() {
-        let op: MinimalNoOperator = MinimalNoOperator::new();
+        // TODO: Fix this -- Now the executor needs to serialize, not the solver.
+        let _op: MinimalNoOperator = MinimalNoOperator::new();
         let solver = PhonySolver::new();
         let check = ArgminCheckpoint::new("checkpoints", CheckpointMode::Always).unwrap();
         check.store_cond(&solver, 20).unwrap();

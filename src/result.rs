@@ -110,6 +110,7 @@ impl<O: ArgminOp> PartialOrd for ArgminResult<O> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::MinimalNoOperator;
 
-    send_sync_test!(argmin_result, ArgminResult<Vec<f64>>);
+    send_sync_test!(argmin_result, ArgminResult<MinimalNoOperator>);
 }

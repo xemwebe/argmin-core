@@ -11,23 +11,13 @@ use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
 
 #[derive(Clone, Default, Debug, Serialize, Deserialize)]
-pub struct NoOperator<T, U, H>
-where
-    T: Clone + Default + Debug + Send + Sync + Serialize + DeserializeOwned,
-    U: Clone + Default + Debug + Send + Sync + Serialize + DeserializeOwned,
-    H: Clone + Default + Debug + Send + Sync + Serialize + DeserializeOwned,
-{
+pub struct NoOperator<T, U, H> {
     param: std::marker::PhantomData<T>,
     output: std::marker::PhantomData<U>,
     hessian: std::marker::PhantomData<H>,
 }
 
-impl<T, U, H> NoOperator<T, U, H>
-where
-    T: Clone + Default + Debug + Send + Sync + Serialize + DeserializeOwned,
-    U: Clone + Default + Debug + Send + Sync + Serialize + DeserializeOwned,
-    H: Clone + Default + Debug + Send + Sync + Serialize + DeserializeOwned,
-{
+impl<T, U, H> NoOperator<T, U, H> {
     #[allow(dead_code)]
     pub fn new() -> Self {
         NoOperator {
