@@ -9,6 +9,7 @@ use crate::{ArgminError, Error};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use std::default::Default;
+use std::fmt::Display;
 use std::fs::File;
 use std::io::{BufReader, BufWriter};
 use std::path::Path;
@@ -23,6 +24,16 @@ pub enum CheckpointMode {
 impl Default for CheckpointMode {
     fn default() -> CheckpointMode {
         CheckpointMode::Never
+    }
+}
+
+impl Display for CheckpointMode {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match *self {
+            CheckpointMode::Never => write!(f, "Never"),
+            CheckpointMode::Every(i) => write!(f, "Every({})", i),
+            CheckpointMode::Always => write!(f, "Always"),
+        }
     }
 }
 
@@ -161,7 +172,7 @@ mod tests {
         let check = ArgminCheckpoint::new("checkpoints", CheckpointMode::Always).unwrap();
         check.store_cond(&exec, 20).unwrap();
 
-        let loaded: Executor<MinimalNoOperator, PhonySolver> =
+        let _loaded: Executor<MinimalNoOperator, PhonySolver> =
             load_checkpoint("checkpoints/solver.arg").unwrap();
     }
 }
