@@ -8,9 +8,13 @@
 use crate::{ArgminOp, Error};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
-use std::fmt::Debug;
+use std::fmt::{Debug, Display};
 
-#[derive(Clone, Default, Debug, Serialize, Deserialize)]
+/// Fake Operators for testing
+
+#[derive(
+    Clone, Default, Debug, Serialize, Deserialize, Eq, PartialEq, Ord, PartialOrd, Hash, Copy,
+)]
 pub struct NoOperator<T, U, H> {
     param: std::marker::PhantomData<T>,
     output: std::marker::PhantomData<U>,
@@ -25,6 +29,12 @@ impl<T, U, H> NoOperator<T, U, H> {
             output: std::marker::PhantomData,
             hessian: std::marker::PhantomData,
         }
+    }
+}
+
+impl<T, U, H> Display for NoOperator<T, U, H> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "NoOperator")
     }
 }
 
@@ -55,13 +65,21 @@ where
     }
 }
 
-#[derive(Clone, Default, Debug, Serialize, Deserialize)]
+#[derive(
+    Clone, Default, Debug, Serialize, Deserialize, Eq, PartialEq, Ord, PartialOrd, Hash, Copy,
+)]
 pub struct MinimalNoOperator {}
 
 impl MinimalNoOperator {
     #[allow(dead_code)]
     pub fn new() -> Self {
         MinimalNoOperator {}
+    }
+}
+
+impl Display for MinimalNoOperator {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "MinimalNoOperator")
     }
 }
 
