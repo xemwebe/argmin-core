@@ -11,21 +11,37 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct IterState<O: ArgminOp> {
+    /// Current parameter vector
     param: O::Param,
+    /// Previous parameter vector
     prev_param: O::Param,
+    /// Current best parameter vector
     best_param: O::Param,
+    /// Previous best parameter vector
     prev_best_param: O::Param,
+    /// Current cost function value
     cost: f64,
+    /// Previous cost function value
     prev_cost: f64,
+    /// Current best cost function value
     best_cost: f64,
+    /// Previous best cost function value
     prev_best_cost: f64,
+    /// Target cost function value
     target_cost: f64,
+    /// Current gradient
     grad: Option<O::Param>,
+    /// Previous gradient
     prev_grad: Option<O::Param>,
+    /// Current Hessian
     hessian: Option<O::Hessian>,
+    /// Previous Hessian
     prev_hessian: Option<O::Hessian>,
+    /// Current iteration
     iter: u64,
+    /// Iteration number of last best cost
     last_best_iter: u64,
+    /// Maximum number of iterations
     max_iters: u64,
     /// Number of cost function evaluations so far
     cost_func_count: u64,
@@ -67,6 +83,7 @@ macro_rules! getter {
 }
 
 impl<O: ArgminOp> IterState<O> {
+    /// Create new IterState from `param`
     pub fn new(param: O::Param) -> Self {
         IterState {
             param: param.clone(),
@@ -92,70 +109,106 @@ impl<O: ArgminOp> IterState<O> {
         }
     }
 
+    /// Set parameter vector. This shifts the stored parameter vector to the previous parameter
+    /// vector.
     pub fn param(&mut self, param: O::Param) -> &mut Self {
         std::mem::swap(&mut self.prev_param, &mut self.param);
         self.param = param;
         self
     }
 
+    /// Set best paramater vector. This shifts the stored best parameter vector to the previous
+    /// best parameter vector.
     pub fn best_param(&mut self, param: O::Param) -> &mut Self {
         std::mem::swap(&mut self.prev_best_param, &mut self.best_param);
         self.best_param = param;
         self
     }
 
+    /// Set the current cost function value. This shifts the stored cost function value to the
+    /// previous cost function value.
     pub fn cost(&mut self, cost: f64) -> &mut Self {
         std::mem::swap(&mut self.prev_cost, &mut self.cost);
         self.cost = cost;
         self
     }
 
+    /// Set the current best cost function value. This shifts the stored best cost function value to
+    /// the previous cost function value.
     pub fn best_cost(&mut self, cost: f64) -> &mut Self {
         std::mem::swap(&mut self.prev_best_cost, &mut self.best_cost);
         self.best_cost = cost;
         self
     }
 
+    /// Set gradient. This shifts the stored gradient to the previous gradient.
     pub fn grad(&mut self, grad: O::Param) -> &mut Self {
         std::mem::swap(&mut self.prev_grad, &mut self.grad);
         self.grad = Some(grad);
         self
     }
 
+    /// Set Hessian. This shifts the stored Hessian to the previous Hessian.
     pub fn hessian(&mut self, hessian: O::Hessian) -> &mut Self {
         std::mem::swap(&mut self.prev_hessian, &mut self.hessian);
         self.hessian = Some(hessian);
         self
     }
 
+    /// Set target cost value
     setter!(target_cost, f64);
+    /// Set maximum number of iterations
     setter!(max_iters, u64);
+    /// Set iteration number where the previous best parameter vector was found
     setter!(last_best_iter, u64);
+    /// Returns current parameter vector
     getter!(param, O::Param);
+    /// Returns previous parameter vector
     getter!(prev_param, O::Param);
+    /// Returns best parameter vector
     getter!(best_param, O::Param);
+    /// Returns previous best parameter vector
     getter!(prev_best_param, O::Param);
+    /// Returns current cost function value
     getter!(cost, f64);
+    /// Returns previous cost function value
     getter!(prev_cost, f64);
+    /// Returns current best cost function value
     getter!(best_cost, f64);
+    /// Returns previous best cost function value
     getter!(prev_best_cost, f64);
+    /// Returns target cost
     getter!(target_cost, f64);
+    /// Returns current cost function evaluation count
     getter!(cost_func_count, u64);
+    /// Returns current gradient function evaluation count
     getter!(grad_func_count, u64);
+    /// Returns current Hessian function evaluation count
     getter!(hessian_func_count, u64);
+    /// Returns current Modify function evaluation count
     getter!(modify_func_count, u64);
+    /// Returns iteration number where the last best parameter vector was found
     getter!(last_best_iter, u64);
+    /// Returns gradient
     getter_option!(grad, O::Param);
+    /// Returns previous gradient
     getter_option!(prev_grad, O::Param);
+    /// Returns current Hessian
     getter_option!(hessian, O::Hessian);
+    /// Returns previous Hessian
     getter_option!(prev_hessian, O::Hessian);
+    /// Returns current number of iterations
     getter!(iter, u64);
+    /// Returns maximum number of iterations
     getter!(max_iters, u64);
 
+    /// Increment the number of iterations by one
     pub fn increment_iter(&mut self) {
         self.iter += 1;
     }
 
+    /// Increment all function evaluation counts by the evaluation counts of another operator
+    /// wrapped in `OpWrapper`.
     pub fn increment_func_counts(&mut self, op: &OpWrapper<O>) {
         self.cost_func_count += op.cost_func_count;
         self.grad_func_count += op.grad_func_count;
@@ -163,26 +216,33 @@ impl<O: ArgminOp> IterState<O> {
         self.modify_func_count += op.modify_func_count;
     }
 
+    /// Increment cost function evaluation count by `num`
     pub fn increment_cost_func_count(&mut self, num: u64) {
         self.cost_func_count += num;
     }
 
+    /// Increment gradient function evaluation count by `num`
     pub fn increment_grad_func_count(&mut self, num: u64) {
         self.grad_func_count += num;
     }
 
+    /// Increment Hessian function evaluation count by `num`
     pub fn increment_hessian_func_count(&mut self, num: u64) {
         self.hessian_func_count += num;
     }
 
+    /// Increment modify function evaluation count by `num`
     pub fn increment_modify_func_count(&mut self, num: u64) {
         self.modify_func_count += num;
     }
 
+    /// Indicate that a new best parameter vector was found
     pub fn new_best(&mut self) {
         self.last_best_iter = self.iter;
     }
 
+    /// Returns whether the current parameter vector is also the best parameter vector found so
+    /// far.
     pub fn is_best(&self) -> bool {
         self.last_best_iter == self.iter
     }
