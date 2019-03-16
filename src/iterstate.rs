@@ -247,3 +247,151 @@ impl<O: ArgminOp> IterState<O> {
         self.last_best_iter == self.iter
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::MinimalNoOperator;
+
+    #[test]
+    fn test_iterstate() {
+        let param = vec![1.0, 2.0];
+        let cost = 42.0;
+
+        let mut state: IterState<MinimalNoOperator> = IterState::new(param.clone());
+
+        assert_eq!(state.get_param(), param);
+        assert_eq!(state.get_prev_param(), param);
+        assert_eq!(state.get_best_param(), param);
+        assert_eq!(state.get_prev_best_param(), param);
+        assert_eq!(state.get_cost(), std::f64::INFINITY);
+        assert_eq!(state.get_prev_cost(), std::f64::INFINITY);
+        assert_eq!(state.get_best_cost(), std::f64::INFINITY);
+        assert_eq!(state.get_prev_best_cost(), std::f64::INFINITY);
+        assert_eq!(state.get_target_cost(), std::f64::NEG_INFINITY);
+        assert_eq!(state.get_grad(), None);
+        assert_eq!(state.get_prev_grad(), None);
+        assert_eq!(state.get_hessian(), None);
+        assert_eq!(state.get_prev_hessian(), None);
+        assert_eq!(state.get_iter(), 0);
+        assert_eq!(state.is_best(), true);
+        assert_eq!(state.get_max_iters(), std::u64::MAX);
+        assert_eq!(state.get_cost_func_count(), 0);
+        assert_eq!(state.get_grad_func_count(), 0);
+        assert_eq!(state.get_hessian_func_count(), 0);
+        assert_eq!(state.get_modify_func_count(), 0);
+
+        state.max_iters(42);
+
+        assert_eq!(state.get_max_iters(), 42);
+
+        state.cost(cost);
+
+        assert_eq!(state.get_cost(), cost);
+        assert_eq!(state.get_prev_cost(), std::f64::INFINITY);
+
+        state.best_cost(cost);
+
+        assert_eq!(state.get_best_cost(), cost);
+        assert_eq!(state.get_prev_best_cost(), std::f64::INFINITY);
+
+        let new_param = vec![2.0, 1.0];
+
+        state.param(new_param.clone());
+
+        assert_eq!(state.get_param(), new_param);
+        assert_eq!(state.get_prev_param(), param);
+
+        state.best_param(new_param.clone());
+
+        assert_eq!(state.get_best_param(), new_param);
+        assert_eq!(state.get_prev_best_param(), param);
+
+        let new_cost = 21.0;
+
+        state.cost(new_cost);
+
+        assert_eq!(state.get_cost(), new_cost);
+        assert_eq!(state.get_prev_cost(), cost);
+
+        state.best_cost(new_cost);
+
+        assert_eq!(state.get_best_cost(), new_cost);
+        assert_eq!(state.get_prev_best_cost(), cost);
+
+        state.increment_iter();
+
+        assert_eq!(state.get_iter(), 1);
+
+        assert_eq!(state.is_best(), false);
+
+        state.new_best();
+
+        assert_eq!(state.is_best(), true);
+
+        let grad = vec![1.0, 2.0];
+
+        state.grad(grad.clone());
+        assert_eq!(state.get_grad(), Some(grad.clone()));
+        assert_eq!(state.get_prev_grad(), None);
+
+        let new_grad = vec![2.0, 1.0];
+
+        state.grad(new_grad.clone());
+
+        assert_eq!(state.get_grad(), Some(new_grad.clone()));
+        assert_eq!(state.get_prev_grad(), Some(grad.clone()));
+
+        let hessian = vec![vec![1.0, 2.0], vec![2.0, 1.0]];
+
+        state.hessian(hessian.clone());
+        assert_eq!(state.get_hessian(), Some(hessian.clone()));
+        assert_eq!(state.get_prev_hessian(), None);
+
+        let new_hessian = vec![vec![2.0, 1.0], vec![1.0, 2.0]];
+
+        state.hessian(new_hessian.clone());
+
+        assert_eq!(state.get_hessian(), Some(new_hessian.clone()));
+        assert_eq!(state.get_prev_hessian(), Some(hessian.clone()));
+
+        state.increment_iter();
+
+        assert_eq!(state.get_iter(), 2);
+        assert_eq!(state.get_last_best_iter(), 1);
+        assert_eq!(state.is_best(), false);
+
+        state.increment_cost_func_count(42);
+        assert_eq!(state.get_cost_func_count(), 42);
+        state.increment_grad_func_count(43);
+        assert_eq!(state.get_grad_func_count(), 43);
+        state.increment_hessian_func_count(44);
+        assert_eq!(state.get_hessian_func_count(), 44);
+        state.increment_modify_func_count(45);
+        assert_eq!(state.get_modify_func_count(), 45);
+
+        // check again!
+        assert_eq!(state.get_iter(), 2);
+        assert_eq!(state.get_last_best_iter(), 1);
+        assert_eq!(state.get_max_iters(), 42);
+        assert_eq!(state.is_best(), false);
+        assert_eq!(state.get_cost(), new_cost);
+        assert_eq!(state.get_prev_cost(), cost);
+        assert_eq!(state.get_param(), new_param);
+        assert_eq!(state.get_prev_param(), param);
+        assert_eq!(state.get_best_cost(), new_cost);
+        assert_eq!(state.get_prev_best_cost(), cost);
+        assert_eq!(state.get_best_param(), new_param);
+        assert_eq!(state.get_prev_best_param(), param);
+        assert_eq!(state.get_best_cost(), new_cost);
+        assert_eq!(state.get_prev_best_cost(), cost);
+        assert_eq!(state.get_grad(), Some(new_grad));
+        assert_eq!(state.get_prev_grad(), Some(grad));
+        assert_eq!(state.get_hessian(), Some(new_hessian));
+        assert_eq!(state.get_prev_hessian(), Some(hessian));
+        assert_eq!(state.get_cost_func_count(), 42);
+        assert_eq!(state.get_grad_func_count(), 43);
+        assert_eq!(state.get_hessian_func_count(), 44);
+        assert_eq!(state.get_modify_func_count(), 45);
+    }
+}
