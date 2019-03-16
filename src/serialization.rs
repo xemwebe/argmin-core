@@ -155,13 +155,13 @@ mod tests {
 
     #[test]
     fn test_store() {
-        // TODO: Fix this -- Now the executor needs to serialize, not the solver.
-        let _op: MinimalNoOperator = MinimalNoOperator::new();
+        let op: MinimalNoOperator = MinimalNoOperator::new();
         let solver = PhonySolver::new();
+        let exec = Executor::new(op, solver, vec![0.0f64, 0.0]);
         let check = ArgminCheckpoint::new("checkpoints", CheckpointMode::Always).unwrap();
-        check.store_cond(&solver, 20).unwrap();
+        check.store_cond(&exec, 20).unwrap();
 
-        let loaded: PhonySolver = load_checkpoint("checkpoints/solver.arg").unwrap();
-        println!("{:?}", loaded);
+        let loaded: Executor<MinimalNoOperator, PhonySolver> =
+            load_checkpoint("checkpoints/solver.arg").unwrap();
     }
 }
