@@ -93,11 +93,8 @@ where
     pub fn run(mut self) -> Result<ArgminResult<O>, Error> {
         let total_time = std::time::Instant::now();
 
-        // do the inital logging
-        // let logs = make_kv!("max_iters" => self.max_iters();
-        //                     #(#logs_str => #logs_expr;)*);
+        // TODO: do the initial logging
         let logs = make_kv!("max_iters" => self.state.get_max_iters(););
-        // self.base.log_info(#solver_name, &logs)?;
         self.observers.observe_init(S::NAME, &logs)?;
 
         let running = Arc::new(AtomicBool::new(true));

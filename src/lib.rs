@@ -44,7 +44,6 @@ mod serialization;
 /// Definition of termination reasons
 mod termination;
 
-// TODO: Maybe leave logging/output stuff in its namespace
 pub use crate::errors::*;
 pub use crate::executor::*;
 pub use crate::iterstate::*;
@@ -137,6 +136,15 @@ pub trait Solver<O: ArgminOp>: Serialize {
         Ok(None)
     }
 
+    /// Checks whether basic termination reasons apply.
+    ///
+    /// Terminate if
+    ///
+    /// 1) algorithm was terminated somewhere else in the Executor
+    /// 2) iteration count exceeds maximum number of iterations
+    /// 3) cost is lower than target cost
+    ///
+    /// This can be overwritten in a `Solver` implementation; however it is not advised.
     fn terminate_internal(&mut self, state: &IterState<O>) -> TerminationReason {
         let solver_terminate = self.terminate(state);
         if solver_terminate.terminated() {
@@ -151,23 +159,38 @@ pub trait Solver<O: ArgminOp>: Serialize {
         TerminationReason::NotTerminated
     }
 
+    /// Checks whether the algorithm must be terminated
     fn terminate(&mut self, _state: &IterState<O>) -> TerminationReason {
         TerminationReason::NotTerminated
     }
 }
 
-/// Defince the interface every Observer needs to expose
+/// Defines the interface every Observer needs to expose
 pub trait Observe<O: ArgminOp>: Send + Sync {
-    fn observe_init(&self, _msg: &str, _kv: &ArgminKV) -> Result<(), Error> {
+    /// Called once at the beginning of the execution of the solver.
+    ///
+    /// Parameters:
+    ///
+    /// `name`: Name of the solver
+    /// `kv`: Key-Value storage of initial configurations defined by the `Solver`
+    fn observe_init(&self, _name: &str, _kv: &ArgminKV) -> Result<(), Error> {
         Ok(())
     }
 
+    /// Called at every iteration of the solver
+    ///
+    /// Parameters
+    ///
+    /// `state`: Current state of the solver. See documentation of `IterState` for details.
+    /// `kv`: Key-Value store of relevant variables defined by the `Solver`
     fn observe_iter(&self, _state: &IterState<O>, _kv: &ArgminKV) -> Result<(), Error> {
         Ok(())
     }
 }
 
 /// The datastructure which is returned by the `next_iter` method of the `Solver` trait.
+///
+/// TODO: Rename to IterResult?
 #[derive(Clone, Serialize, Debug, Default)]
 pub struct ArgminIterData<O: ArgminOp> {
     /// Current parameter vector
@@ -180,8 +203,7 @@ pub struct ArgminIterData<O: ArgminOp> {
     hessian: Option<O::Hessian>,
     /// terminationreason
     termination_reason: Option<TerminationReason>,
-    /// Key value pairs which are currently only used to provide additional information for the
-    /// Observers
+    /// Key value pairs which are used to provide additional information for the Observers
     kv: Option<ArgminKV>,
 }
 
@@ -198,21 +220,25 @@ impl<O: ArgminOp> ArgminIterData<O> {
         }
     }
 
+    /// Set parameter vector
     pub fn param(mut self, param: O::Param) -> Self {
         self.param = Some(param);
         self
     }
 
+    /// Set cost function value
     pub fn cost(mut self, cost: f64) -> Self {
         self.cost = Some(cost);
         self
     }
 
+    /// Set gradient
     pub fn grad(mut self, grad: O::Param) -> Self {
         self.grad = Some(grad);
         self
     }
 
+    /// Set hessian
     pub fn hessian(mut self, hessian: O::Hessian) -> Self {
         self.hessian = Some(hessian);
         self
@@ -224,46 +250,44 @@ impl<O: ArgminOp> ArgminIterData<O> {
         self
     }
 
+    /// Set termination reason
     pub fn termination_reason(mut self, reason: TerminationReason) -> Self {
         self.termination_reason = Some(reason);
         self
     }
 
+    /// Get parameter vector
     pub fn get_param(&self) -> Option<O::Param> {
         self.param.clone()
     }
 
+    /// Get cost function value
     pub fn get_cost(&self) -> Option<f64> {
         self.cost
     }
 
+    /// Get gradient
     pub fn get_grad(&self) -> Option<O::Param> {
         self.grad.clone()
     }
 
+    /// Get hessian
     pub fn get_hessian(&self) -> Option<O::Hessian> {
         self.hessian.clone()
     }
 
+    /// Get termination reason
     pub fn get_termination_reason(&self) -> Option<TerminationReason> {
         self.termination_reason
     }
 
-    /// Returns an `ArgminKV`
+    /// Return KV
     pub fn get_kv(&self) -> Option<ArgminKV> {
         self.kv.clone()
     }
 }
 
-/// Defines a common interface to line search methods. Requires that `ArgminSolver` is implemented
-/// for the line search method as well.
-///
-/// The cost function value and the gradient at the starting point can either be provided
-/// (`set_initial_cost` and `set_initial_gradient`) or they can be computed using the operator from
-/// the implementation of `ArgminSolver` (see `calc_initial_cost` and `calc_initial_gradient`). The
-/// former is convenient if cost and gradient at the starting point are already known for some
-/// reason (i.e. the solver which uses the line search has already computed cost and gradient) and
-/// avoids unneccessary computation of those values.
+/// Defines a common interface for line search methods.
 pub trait ArgminLineSearch<P>: Serialize {
     /// Set the search direction
     fn set_search_direction(&mut self, direction: P);
@@ -273,13 +297,13 @@ pub trait ArgminLineSearch<P>: Serialize {
 }
 
 /// Defines a common interface to methods which calculate approximate steps for trust region
-/// methods. Requires that `ArgminSolver` is implemented as well.
+/// methods.
 pub trait ArgminTrustRegion: Clone + Serialize {
     /// Set the initial step length
     fn set_radius(&mut self, radius: f64);
 }
 //
-/// Every method for the update of beta needs to implement this trait.
+/// Common interface for beta update methods (Nonlinear-CG)
 pub trait ArgminNLCGBetaUpdate<T>: Serialize {
     /// Update beta
     /// Parameter 1: \nabla f_k
