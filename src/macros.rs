@@ -57,3 +57,13 @@ macro_rules! send_sync_test {
         }
     };
 }
+
+/// Reuse a list of trait bounds by giving it a name,
+/// e.g. trait_bound!(CopyAndDefault; Copy, Default);
+#[macro_export]
+macro_rules! trait_bound {
+    ($name:ident ; $head:path $(, $tail:path)*) => {
+        pub trait $name : $head $(+ $tail)* {}
+        impl<T> $name for T where T: $head $(+ $tail)* {}
+    };
+}

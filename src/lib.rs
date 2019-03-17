@@ -311,13 +311,3 @@ pub trait ArgminNLCGBetaUpdate<T>: Serialize {
     /// Parameter 3: p_k
     fn update(&self, nabla_f_k: &T, nabla_f_k_p_1: &T, p_k: &T) -> f64;
 }
-
-/// Reuse a list of trait bounds by giving it a name,
-/// e.g. trait_bound!(CopyAndDefault; Copy, Default);
-#[macro_export]
-macro_rules! trait_bound {
-    ($name:ident ; $head:path $(, $tail:path)*) => {
-        pub trait $name : $head $(+ $tail)* {}
-        impl<T> $name for T where T: $head $(+ $tail)* {}
-    };
-}
