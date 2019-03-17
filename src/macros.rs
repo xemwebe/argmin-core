@@ -35,6 +35,7 @@ macro_rules! check_param {
     };
 }
 
+/// Implements a simple send and a simple sync test for a given type.
 #[cfg(test)]
 macro_rules! send_sync_test {
     ($n:ident, $t:ty) => {
