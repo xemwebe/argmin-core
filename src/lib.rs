@@ -204,9 +204,11 @@ pub struct ArgminIterData<O: ArgminOp> {
     /// terminationreason
     termination_reason: Option<TerminationReason>,
     /// Key value pairs which are used to provide additional information for the Observers
-    kv: Option<ArgminKV>,
+    kv: ArgminKV,
 }
 
+// TODO: Many clones are necessary in the getters.. maybe a complete "deconstruct" method would be
+// better?
 impl<O: ArgminOp> ArgminIterData<O> {
     /// Constructor
     pub fn new() -> Self {
@@ -216,7 +218,7 @@ impl<O: ArgminOp> ArgminIterData<O> {
             grad: None,
             hessian: None,
             termination_reason: None,
-            kv: None,
+            kv: make_kv!(),
         }
     }
 
@@ -246,7 +248,7 @@ impl<O: ArgminOp> ArgminIterData<O> {
 
     /// Adds an `ArgminKV`
     pub fn kv(mut self, kv: ArgminKV) -> Self {
-        self.kv = Some(kv);
+        self.kv = kv;
         self
     }
 
@@ -282,7 +284,7 @@ impl<O: ArgminOp> ArgminIterData<O> {
     }
 
     /// Return KV
-    pub fn get_kv(&self) -> Option<ArgminKV> {
+    pub fn get_kv(&self) -> ArgminKV {
         self.kv.clone()
     }
 }

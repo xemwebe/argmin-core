@@ -93,10 +93,6 @@ where
     pub fn run(mut self) -> Result<ArgminResult<O>, Error> {
         let total_time = std::time::Instant::now();
 
-        // TODO: do the initial logging
-        let logs = make_kv!("max_iters" => self.state.get_max_iters(););
-        self.observers.observe_init(S::NAME, &logs)?;
-
         let running = Arc::new(AtomicBool::new(true));
 
         #[cfg(feature = "ctrlc")]
@@ -122,10 +118,16 @@ where
         let mut op_wrapper = OpWrapper::new(&self.op);
         let init_data = self.solver.init(&mut op_wrapper, &self.state)?;
 
+        let mut logs = make_kv!("max_iters" => self.state.get_max_iters(););
+
         // If init() returned something, deal with it
         if let Some(data) = init_data {
             self.update(&data)?;
+            logs = logs.merge(&mut data.get_kv());
         }
+
+        // Observe after init
+        self.observers.observe_init(S::NAME, &logs)?;
 
         self.state.increment_func_counts(&op_wrapper);
 
@@ -156,15 +158,10 @@ where
 
             self.update(&data)?;
 
-            // logging
-            let mut log = make_kv!();
-            if let Some(ref mut iter_log) = data.get_kv() {
-                iter_log.push(
-                    "time",
-                    duration.as_secs() as f64 + f64::from(duration.subsec_nanos()) * 1e-9,
-                );
-                log.merge(&mut iter_log.clone());
-            }
+            let log = data.get_kv().merge(&mut make_kv!(
+                "time" => duration.as_secs() as f64 + f64::from(duration.subsec_nanos()) * 1e-9;
+            ));
+
             self.observers.observe_iter(&self.state, &log)?;
 
             // increment iteration number

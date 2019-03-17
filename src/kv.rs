@@ -50,9 +50,7 @@ impl ArgminKV {
     }
 
     /// Merge another `kv` into `self.kv`
-    ///
-    /// TODO: Probably not used anymore (?)
-    pub fn merge(&mut self, other: &mut ArgminKV) -> &mut Self {
+    pub fn merge(mut self, other: &mut ArgminKV) -> Self {
         self.kv.append(&mut other.kv);
         self
     }
