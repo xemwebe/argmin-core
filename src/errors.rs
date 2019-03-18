@@ -7,10 +7,7 @@
 
 //! # Errors
 //!
-//! Predefined errors.
-//!
-//! TODOs:
-//!   * Provide an `impl` to make it easier to create such errors.
+//! Gigantic TODO: Remove `failure` dependency and implement own error handling.
 
 use failure_derive::Fail;
 

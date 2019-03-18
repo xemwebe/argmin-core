@@ -9,16 +9,15 @@
 //!
 //! Return type of the solvers. Includes the final parameter vector, the final cost, the number of
 //! iterations, whether it terminated and the reason of termination.
-//!
-//! TODO:
-//!   * Maybe it is more appropriate to return the `base` struct?
 
 use crate::termination::TerminationReason;
 use crate::ArgminOp;
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 
-/// Return struct for all solvers.
+/// This is returned by the `Executor` after the solver is run on the operator.
+///
+/// TODO: Think about removing this, as returning the IterState may be much better
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct ArgminResult<O: ArgminOp> {
     /// Final parameter vector

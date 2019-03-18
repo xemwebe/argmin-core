@@ -12,16 +12,21 @@ use std::fmt::{Debug, Display};
 
 /// Fake Operators for testing
 
+/// No-op operator with free choice of the types
 #[derive(
     Clone, Default, Debug, Serialize, Deserialize, Eq, PartialEq, Ord, PartialOrd, Hash, Copy,
 )]
 pub struct NoOperator<T, U, H> {
+    /// Fake parameter
     param: std::marker::PhantomData<T>,
+    /// Fake output
     output: std::marker::PhantomData<U>,
+    /// Fake Hessian
     hessian: std::marker::PhantomData<H>,
 }
 
 impl<T, U, H> NoOperator<T, U, H> {
+    /// Constructor
     #[allow(dead_code)]
     pub fn new() -> Self {
         NoOperator {
@@ -48,18 +53,22 @@ where
     type Output = U;
     type Hessian = H;
 
+    /// Do nothing, really.
     fn apply(&self, _p: &Self::Param) -> Result<Self::Output, Error> {
         Ok(Self::Output::default())
     }
 
+    /// Do nothing, really.
     fn gradient(&self, _p: &Self::Param) -> Result<Self::Param, Error> {
         Ok(Self::Param::default())
     }
 
+    /// Do nothing, really.
     fn hessian(&self, _p: &Self::Param) -> Result<Self::Hessian, Error> {
         Ok(Self::Hessian::default())
     }
 
+    /// Do nothing, really.
     fn modify(&self, _p: &Self::Param, _t: f64) -> Result<Self::Param, Error> {
         Ok(Self::Param::default())
     }
@@ -70,7 +79,9 @@ where
 )]
 pub struct MinimalNoOperator {}
 
+/// No-op operator with fixed types (See `ArgminOp` impl on `MinimalNoOperator`)
 impl MinimalNoOperator {
+    /// Constructor
     #[allow(dead_code)]
     pub fn new() -> Self {
         MinimalNoOperator {}
@@ -88,18 +99,22 @@ impl ArgminOp for MinimalNoOperator {
     type Output = f64;
     type Hessian = Vec<Vec<f64>>;
 
+    /// Do nothing, really.
     fn apply(&self, _p: &Self::Param) -> Result<Self::Output, Error> {
         unimplemented!()
     }
 
+    /// Do nothing, really.
     fn gradient(&self, _p: &Self::Param) -> Result<Self::Param, Error> {
         unimplemented!()
     }
 
+    /// Do nothing, really.
     fn hessian(&self, _p: &Self::Param) -> Result<Self::Hessian, Error> {
         unimplemented!()
     }
 
+    /// Do nothing, really.
     fn modify(&self, _p: &Self::Param, _t: f64) -> Result<Self::Param, Error> {
         unimplemented!()
     }
