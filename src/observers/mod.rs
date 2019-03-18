@@ -5,9 +5,11 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! # Logging
+//! # Observers
 //!
-//! Provides logging functionality for solvers.
+//! Observers are called after an iteration of a solver was performed and enable the user to observe
+//! the current state of the optimization. This can be used for logging or writing the current
+//! parameter vector to disk.
 
 pub mod file;
 pub mod slog_logger;
@@ -95,6 +97,9 @@ impl<O: ArgminOp> Observe<O> for Observer<O> {
     }
 }
 
+/// This is used to indicate how often the observer will observe the status. `Never` deactivates
+/// the observer, `Always` and `Every(i)` will call the observer in every or every ith iteration,
+/// respectively. `NewBest` will call the observer only, if a new best solution is found.
 #[derive(Copy, Clone, Serialize, Deserialize, Debug, Eq, PartialEq, Ord, PartialOrd)]
 pub enum ObserverMode {
     Never,
