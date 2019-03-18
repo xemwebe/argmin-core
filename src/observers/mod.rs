@@ -12,13 +12,36 @@
 pub mod file;
 pub mod slog_logger;
 
-use crate::{ArgminKV, ArgminOp, Error, IterState, Observe};
+use crate::{ArgminKV, ArgminOp, Error, IterState};
 use serde::{Deserialize, Serialize};
 use std::default::Default;
 use std::sync::Arc;
 
 pub use file::*;
 pub use slog_logger::*;
+
+/// Defines the interface every Observer needs to expose
+pub trait Observe<O: ArgminOp>: Send + Sync {
+    /// Called once at the beginning of the execution of the solver.
+    ///
+    /// Parameters:
+    ///
+    /// `name`: Name of the solver
+    /// `kv`: Key-Value storage of initial configurations defined by the `Solver`
+    fn observe_init(&self, _name: &str, _kv: &ArgminKV) -> Result<(), Error> {
+        Ok(())
+    }
+
+    /// Called at every iteration of the solver
+    ///
+    /// Parameters
+    ///
+    /// `state`: Current state of the solver. See documentation of `IterState` for details.
+    /// `kv`: Key-Value store of relevant variables defined by the `Solver`
+    fn observe_iter(&self, _state: &IterState<O>, _kv: &ArgminKV) -> Result<(), Error> {
+        Ok(())
+    }
+}
 
 /// Container for Observers
 #[derive(Clone, Default)]
