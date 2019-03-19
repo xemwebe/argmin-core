@@ -51,6 +51,8 @@ pub struct IterState<O: ArgminOp> {
     hessian_func_count: u64,
     /// Number of modify evaluations so far
     modify_func_count: u64,
+    /// Time required so far
+    time: std::time::Duration,
     /// Reason of termination
     termination_reason: TerminationReason,
 }
@@ -108,6 +110,7 @@ impl<O: ArgminOp> IterState<O> {
             grad_func_count: 0,
             hessian_func_count: 0,
             modify_func_count: 0,
+            time: std::time::Duration::new(0, 0),
             termination_reason: TerminationReason::NotTerminated,
         }
     }
@@ -166,6 +169,8 @@ impl<O: ArgminOp> IterState<O> {
     setter!(last_best_iter, u64);
     /// Set termination_reston
     setter!(termination_reason, TerminationReason);
+    /// Set time required so far
+    setter!(time, std::time::Duration);
     /// Returns current parameter vector
     getter!(param, O::Param);
     /// Returns previous parameter vector
@@ -196,6 +201,8 @@ impl<O: ArgminOp> IterState<O> {
     getter!(last_best_iter, u64);
     /// Get termination_reason
     getter!(termination_reason, TerminationReason);
+    /// Get time required so far
+    getter!(time, std::time::Duration);
     /// Returns gradient
     getter_option!(grad, O::Param);
     /// Returns previous gradient

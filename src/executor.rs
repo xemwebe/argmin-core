@@ -26,8 +26,6 @@ pub struct Executor<O: ArgminOp, S> {
     op: O,
     /// State
     state: IterState<O>,
-    /// Total time the solver required.
-    total_time: std::time::Duration,
     /// Storage for observers
     #[serde(skip)]
     observers: Observer<O>,
@@ -48,7 +46,6 @@ where
             solver,
             op,
             state,
-            total_time: std::time::Duration::new(0, 0),
             observers: Observer::new(),
             checkpoint: ArgminCheckpoint::default(),
         }
@@ -167,6 +164,8 @@ where
 
             self.checkpoint.store_cond(&self, self.state.get_iter())?;
 
+            self.state.time(total_time.elapsed());
+
             // Check if termination occured inside next_iter()
             if self.state.terminated() {
                 break;
@@ -179,15 +178,13 @@ where
             self.state.termination_reason(TerminationReason::Aborted);
         }
 
-        self.total_time = total_time.elapsed();
-
         Ok(ArgminResult::new(
             self.state.get_best_param(),
             self.state.get_best_cost(),
             self.state.get_iter(),
             self.state.get_termination_reason(),
             self.op,
-            self.total_time,
+            self.state.get_time(),
         ))
     }
 
@@ -233,13 +230,13 @@ where
 
             self.checkpoint.store_cond(&self, self.state.get_iter())?;
 
+            self.state.time(total_time.elapsed());
+
             // Check if termination occured inside next_iter()
             if self.state.terminated() {
                 break;
             }
         }
-
-        self.total_time = total_time.elapsed();
 
         Ok(ArgminResult::new(
             self.state.get_best_param(),
@@ -247,7 +244,7 @@ where
             self.state.get_iter(),
             self.state.get_termination_reason(),
             self.op,
-            self.total_time,
+            self.state.get_time(),
         ))
     }
 
