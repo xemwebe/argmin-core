@@ -26,8 +26,6 @@ pub struct Executor<O: ArgminOp, S> {
     op: O,
     /// State
     state: IterState<O>,
-    /// Reason of termination
-    termination_reason: TerminationReason,
     /// Total time the solver required.
     total_time: std::time::Duration,
     /// Storage for observers
@@ -50,7 +48,6 @@ where
             solver,
             op,
             state,
-            termination_reason: TerminationReason::NotTerminated,
             total_time: std::time::Duration::new(0, 0),
             observers: Observer::new(),
             checkpoint: ArgminCheckpoint::default(),
@@ -85,7 +82,7 @@ where
             self.state.hessian(hessian);
         }
         if let Some(termination_reason) = data.get_termination_reason() {
-            self.termination_reason = termination_reason;
+            self.state.termination_reason(termination_reason);
         }
         Ok(())
     }
@@ -138,11 +135,12 @@ where
             // stopping criteria. If `self.terminate()` is called without the checking
             // whether it has terminated already, then it may overwrite a termination set
             // within `next_iter()`!
-            if !self.termination_reason.terminated() {
-                self.termination_reason = self.solver.terminate_internal(&self.state);
+            if !self.state.terminated() {
+                self.state
+                    .termination_reason(self.solver.terminate_internal(&self.state));
             }
             // Now check once more if the algorithm has terminated. If yes, then break.
-            if self.termination_reason.terminated() {
+            if self.state.terminated() {
                 break;
             }
 
@@ -170,17 +168,15 @@ where
             self.checkpoint.store_cond(&self, self.state.get_iter())?;
 
             // Check if termination occured inside next_iter()
-            if self.termination_reason.terminated() {
+            if self.state.terminated() {
                 break;
             }
         }
 
         // in case it stopped prematurely and `termination_reason` is still `NotTerminated`,
         // someone must have pulled the handbrake
-        if self.state.get_iter() < self.state.get_max_iters()
-            && !self.termination_reason.terminated()
-        {
-            self.termination_reason = TerminationReason::Aborted;
+        if self.state.get_iter() < self.state.get_max_iters() && !self.state.terminated() {
+            self.state.termination_reason(TerminationReason::Aborted);
         }
 
         self.total_time = total_time.elapsed();
@@ -189,7 +185,7 @@ where
             self.state.get_best_param(),
             self.state.get_best_cost(),
             self.state.get_iter(),
-            self.termination_reason,
+            self.state.get_termination_reason(),
             self.op,
             self.total_time,
         ))
@@ -217,11 +213,12 @@ where
             // stopping criteria. If `self.terminate()` is called without the checking
             // whether it has terminated already, then it may overwrite a termination set
             // within `next_iter()`!
-            if !self.termination_reason.terminated() {
-                self.termination_reason = self.solver.terminate_internal(&self.state);
+            if !self.state.terminated() {
+                self.state
+                    .termination_reason(self.solver.terminate_internal(&self.state));
             }
             // Now check once more if the algorithm has terminated. If yes, then break.
-            if self.termination_reason.terminated() {
+            if self.state.terminated() {
                 break;
             }
 
@@ -237,7 +234,7 @@ where
             self.checkpoint.store_cond(&self, self.state.get_iter())?;
 
             // Check if termination occured inside next_iter()
-            if self.termination_reason.terminated() {
+            if self.state.terminated() {
                 break;
             }
         }
@@ -248,7 +245,7 @@ where
             self.state.get_best_param(),
             self.state.get_best_cost(),
             self.state.get_iter(),
-            self.termination_reason,
+            self.state.get_termination_reason(),
             self.op,
             self.total_time,
         ))

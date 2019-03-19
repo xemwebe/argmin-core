@@ -5,7 +5,7 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use crate::{ArgminOp, OpWrapper};
+use crate::{ArgminOp, OpWrapper, TerminationReason};
 use paste::item;
 use serde::{Deserialize, Serialize};
 
@@ -51,6 +51,8 @@ pub struct IterState<O: ArgminOp> {
     hessian_func_count: u64,
     /// Number of modify evaluations so far
     modify_func_count: u64,
+    /// Reason of termination
+    termination_reason: TerminationReason,
 }
 
 macro_rules! setter {
@@ -106,6 +108,7 @@ impl<O: ArgminOp> IterState<O> {
             grad_func_count: 0,
             hessian_func_count: 0,
             modify_func_count: 0,
+            termination_reason: TerminationReason::NotTerminated,
         }
     }
 
@@ -161,6 +164,8 @@ impl<O: ArgminOp> IterState<O> {
     setter!(max_iters, u64);
     /// Set iteration number where the previous best parameter vector was found
     setter!(last_best_iter, u64);
+    /// Set termination_reston
+    setter!(termination_reason, TerminationReason);
     /// Returns current parameter vector
     getter!(param, O::Param);
     /// Returns previous parameter vector
@@ -189,6 +194,8 @@ impl<O: ArgminOp> IterState<O> {
     getter!(modify_func_count, u64);
     /// Returns iteration number where the last best parameter vector was found
     getter!(last_best_iter, u64);
+    /// Get termination_reason
+    getter!(termination_reason, TerminationReason);
     /// Returns gradient
     getter_option!(grad, O::Param);
     /// Returns previous gradient
@@ -245,6 +252,11 @@ impl<O: ArgminOp> IterState<O> {
     /// far.
     pub fn is_best(&self) -> bool {
         self.last_best_iter == self.iter
+    }
+
+    /// Return whether the algorithm has terminated or not
+    pub fn terminated(&self) -> bool {
+        self.termination_reason.terminated()
     }
 }
 
