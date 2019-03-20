@@ -178,14 +178,7 @@ where
             self.state.termination_reason(TerminationReason::Aborted);
         }
 
-        Ok(ArgminResult::new(
-            self.state.get_best_param(),
-            self.state.get_best_cost(),
-            self.state.get_iter(),
-            self.state.get_termination_reason(),
-            self.op,
-            self.state.get_time(),
-        ))
+        Ok(ArgminResult::new(self.op, self.state))
     }
 
     pub fn run_fast(mut self) -> Result<ArgminResult<O>, Error> {
@@ -238,14 +231,7 @@ where
             }
         }
 
-        Ok(ArgminResult::new(
-            self.state.get_best_param(),
-            self.state.get_best_cost(),
-            self.state.get_iter(),
-            self.state.get_termination_reason(),
-            self.op,
-            self.state.get_time(),
-        ))
+        Ok(ArgminResult::new(self.op, self.state))
     }
 
     /// Attaches a observer which implements `ArgminLog` to the solver.

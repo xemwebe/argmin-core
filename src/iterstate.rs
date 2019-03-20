@@ -12,49 +12,49 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct IterState<O: ArgminOp> {
     /// Current parameter vector
-    param: O::Param,
+    pub param: O::Param,
     /// Previous parameter vector
-    prev_param: O::Param,
+    pub prev_param: O::Param,
     /// Current best parameter vector
-    best_param: O::Param,
+    pub best_param: O::Param,
     /// Previous best parameter vector
-    prev_best_param: O::Param,
+    pub prev_best_param: O::Param,
     /// Current cost function value
-    cost: f64,
+    pub cost: f64,
     /// Previous cost function value
-    prev_cost: f64,
+    pub prev_cost: f64,
     /// Current best cost function value
-    best_cost: f64,
+    pub best_cost: f64,
     /// Previous best cost function value
-    prev_best_cost: f64,
+    pub prev_best_cost: f64,
     /// Target cost function value
-    target_cost: f64,
+    pub target_cost: f64,
     /// Current gradient
-    grad: Option<O::Param>,
+    pub grad: Option<O::Param>,
     /// Previous gradient
-    prev_grad: Option<O::Param>,
+    pub prev_grad: Option<O::Param>,
     /// Current Hessian
-    hessian: Option<O::Hessian>,
+    pub hessian: Option<O::Hessian>,
     /// Previous Hessian
-    prev_hessian: Option<O::Hessian>,
+    pub prev_hessian: Option<O::Hessian>,
     /// Current iteration
-    iter: u64,
+    pub iter: u64,
     /// Iteration number of last best cost
-    last_best_iter: u64,
+    pub last_best_iter: u64,
     /// Maximum number of iterations
-    max_iters: u64,
+    pub max_iters: u64,
     /// Number of cost function evaluations so far
-    cost_func_count: u64,
+    pub cost_func_count: u64,
     /// Number of gradient evaluations so far
-    grad_func_count: u64,
+    pub grad_func_count: u64,
     /// Number of gradient evaluations so far
-    hessian_func_count: u64,
+    pub hessian_func_count: u64,
     /// Number of modify evaluations so far
-    modify_func_count: u64,
+    pub modify_func_count: u64,
     /// Time required so far
-    time: std::time::Duration,
+    pub time: std::time::Duration,
     /// Reason of termination
-    termination_reason: TerminationReason,
+    pub termination_reason: TerminationReason,
 }
 
 macro_rules! setter {
@@ -84,6 +84,15 @@ macro_rules! getter {
             }
         }
     };
+}
+
+impl<O: ArgminOp> std::default::Default for IterState<O>
+where
+    O::Param: Default,
+{
+    fn default() -> Self {
+        IterState::new(O::Param::default())
+    }
 }
 
 impl<O: ArgminOp> IterState<O> {

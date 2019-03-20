@@ -10,56 +10,25 @@
 //! Return type of the solvers. Includes the final parameter vector, the final cost, the number of
 //! iterations, whether it terminated and the reason of termination.
 
-use crate::termination::TerminationReason;
-use crate::ArgminOp;
+use crate::{ArgminOp, IterState};
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 
 /// This is returned by the `Executor` after the solver is run on the operator.
 ///
 /// TODO: Think about removing this, as returning the IterState may be much better
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct ArgminResult<O: ArgminOp> {
-    /// Final parameter vector
-    pub param: O::Param,
-    /// Final cost value
-    pub cost: f64,
-    /// Number of iterations
-    pub iters: u64,
-    /// Indicated whether it terminated or not
-    pub terminated: bool,
-    /// Reason of termination
-    pub termination_reason: TerminationReason,
     /// operator
     pub operator: O,
-    /// total time
-    pub total_time: std::time::Duration,
+    /// iteration state
+    pub state: IterState<O>,
 }
 
 impl<O: ArgminOp> ArgminResult<O> {
     /// Constructor
-    ///
-    /// `param`: Final (best) parameter vector
-    /// `cost`: Final (best) cost function value
-    /// `iters`: Number of iterations
-    /// `termination_reason`: Reason of termination
-    pub fn new(
-        param: O::Param,
-        cost: f64,
-        iters: u64,
-        termination_reason: TerminationReason,
-        operator: O,
-        total_time: std::time::Duration,
-    ) -> Self {
-        ArgminResult {
-            param,
-            cost,
-            iters,
-            terminated: termination_reason.terminated(),
-            termination_reason,
-            operator,
-            total_time,
-        }
+    pub fn new(operator: O, state: IterState<O>) -> Self {
+        ArgminResult { operator, state }
     }
 }
 
@@ -70,18 +39,22 @@ where
 {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         writeln!(f, "ArgminResult:")?;
-        writeln!(f, "    param:       {:?}", self.param)?;
-        writeln!(f, "    cost:        {}", self.cost)?;
-        writeln!(f, "    iters:       {}", self.iters)?;
-        writeln!(f, "    termination: {}", self.termination_reason)?;
-        writeln!(f, "    time:        {:?}", self.total_time)?;
+        writeln!(f, "    param:       {:?}", self.state.get_param())?;
+        writeln!(f, "    cost:        {}", self.state.get_cost())?;
+        writeln!(f, "    iters:       {}", self.state.get_iter())?;
+        writeln!(
+            f,
+            "    termination: {}",
+            self.state.get_termination_reason()
+        )?;
+        writeln!(f, "    time:        {:?}", self.state.get_time())?;
         Ok(())
     }
 }
 
 impl<O: ArgminOp> PartialEq for ArgminResult<O> {
     fn eq(&self, other: &ArgminResult<O>) -> bool {
-        (self.cost - other.cost).abs() < std::f64::EPSILON
+        (self.state.get_cost() - other.state.get_cost()).abs() < std::f64::EPSILON
     }
 }
 
@@ -89,7 +62,7 @@ impl<O: ArgminOp> Eq for ArgminResult<O> {}
 
 impl<O: ArgminOp> Ord for ArgminResult<O> {
     fn cmp(&self, other: &ArgminResult<O>) -> Ordering {
-        let t = self.cost - other.cost;
+        let t = self.state.get_cost() - other.state.get_cost();
         if t.abs() < std::f64::EPSILON {
             Ordering::Equal
         } else if t > 0.0 {
