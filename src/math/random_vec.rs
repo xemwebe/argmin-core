@@ -14,7 +14,7 @@ where
     T: SampleUniform + std::cmp::PartialOrd + Clone,
 {
     fn rand_from_range(min: &Self, max: &Self) -> Vec<T> {
-        assert!(min.len() > 0);
+        assert!(!min.is_empty());
         assert_eq!(min.len(), max.len());
 
         let mut rng = rand::thread_rng();

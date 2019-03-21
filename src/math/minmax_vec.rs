@@ -12,7 +12,7 @@ where
     T: std::cmp::PartialOrd + Clone,
 {
     fn min(x: &Self, y: &Self) -> Vec<T> {
-        assert!(x.len() > 0);
+        assert!(!x.is_empty());
         assert_eq!(x.len(), y.len());
 
         x.iter()
@@ -22,7 +22,7 @@ where
     }
 
     fn max(x: &Self, y: &Self) -> Vec<T> {
-        assert!(x.len() > 0);
+        assert!(!x.is_empty());
         assert_eq!(x.len(), y.len());
 
         x.iter()
