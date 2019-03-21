@@ -31,6 +31,8 @@ pub struct Executor<O: ArgminOp, S> {
     observers: Observer<O>,
     /// Checkpoint
     checkpoint: ArgminCheckpoint,
+    /// Indicates whether Ctrl-C functionality should be active or not
+    ctrlc: bool,
 }
 
 impl<O, S> Executor<O, S>
@@ -48,6 +50,7 @@ where
             state,
             observers: Observer::new(),
             checkpoint: ArgminCheckpoint::default(),
+            ctrlc: true,
         }
     }
 
@@ -89,24 +92,26 @@ where
 
         let running = Arc::new(AtomicBool::new(true));
 
-        #[cfg(feature = "ctrlc")]
-        {
-            // Set up the Ctrl-C handler
-            use ctrlc;
-            let r = running.clone();
-            // This is currently a hack to allow checkpoints to be run again within the
-            // same program (usually not really a usecase anyway). Unfortunately, this
-            // means that any subsequent run started afterwards will have not Ctrl-C
-            // handling available... This should also be a problem in case one tries to run
-            // two consecutive optimizations. There is ongoing work in the ctrlc crate
-            // (channels and such) which may solve this problem. So far, we have to live
-            // with this.
-            match ctrlc::set_handler(move || {
-                r.store(false, Ordering::SeqCst);
-            }) {
-                Err(ctrlc::Error::MultipleHandlers) => Ok(()),
-                r => r,
-            }?;
+        if self.ctrlc {
+            #[cfg(feature = "ctrlc")]
+            {
+                // Set up the Ctrl-C handler
+                use ctrlc;
+                let r = running.clone();
+                // This is currently a hack to allow checkpoints to be run again within the
+                // same program (usually not really a usecase anyway). Unfortunately, this
+                // means that any subsequent run started afterwards will have not Ctrl-C
+                // handling available... This should also be a problem in case one tries to run
+                // two consecutive optimizations. There is ongoing work in the ctrlc crate
+                // (channels and such) which may solve this problem. So far, we have to live
+                // with this.
+                match ctrlc::set_handler(move || {
+                    r.store(false, Ordering::SeqCst);
+                }) {
+                    Err(ctrlc::Error::MultipleHandlers) => Ok(()),
+                    r => r,
+                }?;
+            }
         }
 
         // let mut op_wrapper = OpWrapper::new(&self.op);
@@ -181,62 +186,6 @@ where
         Ok(ArgminResult::new(self.op.get_op(), self.state))
     }
 
-    /// Runs the executor without observers, checkpoints and Ctrl-C support. Particularly the
-    /// latter necessitates this method. If a Executor is run within another Executor, Ctrl-C will
-    /// not work as it tries to register another handler. Therefore the inner Executor has to be
-    /// run via `run_fast()`. This will probably be solved differently in the future (TODO).
-    pub fn run_fast(mut self) -> Result<ArgminResult<O>, Error> {
-        let total_time = std::time::Instant::now();
-
-        let init_data = self.solver.init(&mut self.op, &self.state)?;
-
-        // If init() returned something, deal with it
-        if let Some(data) = init_data {
-            self.update(&data)?;
-        }
-
-        self.state.set_func_counts(&self.op);
-
-        loop {
-            // let state = self.to_state();
-
-            // check first if it has already terminated
-            // This should probably be solved better.
-            // First, check if it isn't already terminated. If it isn't, evaluate the
-            // stopping criteria. If `self.terminate()` is called without the checking
-            // whether it has terminated already, then it may overwrite a termination set
-            // within `next_iter()`!
-            if !self.state.terminated() {
-                self.state
-                    .termination_reason(self.solver.terminate_internal(&self.state));
-            }
-            // Now check once more if the algorithm has terminated. If yes, then break.
-            if self.state.terminated() {
-                break;
-            }
-
-            let data = self.solver.next_iter(&mut self.op, &self.state)?;
-
-            self.state.set_func_counts(&self.op);
-
-            self.update(&data)?;
-
-            // increment iteration number
-            self.state.increment_iter();
-
-            // self.checkpoint.store_cond(&self, self.state.get_iter())?;
-
-            self.state.time(total_time.elapsed());
-
-            // Check if termination occured inside next_iter()
-            if self.state.terminated() {
-                break;
-            }
-        }
-
-        Ok(ArgminResult::new(self.op.get_op(), self.state))
-    }
-
     /// Attaches a observer which implements `ArgminLog` to the solver.
     pub fn add_observer<OBS: Observe<O> + 'static>(
         mut self,
@@ -291,6 +240,12 @@ where
 
     pub fn checkpoint_mode(mut self, mode: CheckpointMode) -> Self {
         self.checkpoint.set_mode(mode);
+        self
+    }
+
+    /// Turn Ctrl-C handling on or off (default: on)
+    pub fn ctrlc(mut self, ctrlc: bool) -> Self {
+        self.ctrlc = ctrlc;
         self
     }
 }
