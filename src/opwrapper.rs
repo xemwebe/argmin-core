@@ -63,12 +63,16 @@ impl<O: ArgminOp> OpWrapper<O> {
         self
     }
 
-    pub fn get_op(&self) -> O {
+    pub fn get_op(self) -> O {
+        self.op
+    }
+
+    pub fn clone_op(&self) -> O {
         self.op.clone()
     }
 
     pub fn new_from_op(op: &OpWrapper<O>) -> Self {
-        Self::new(&op.get_op())
+        Self::new(&op.clone_op())
     }
 }
 

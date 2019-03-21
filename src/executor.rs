@@ -23,7 +23,7 @@ pub struct Executor<O: ArgminOp, S> {
     /// solver
     solver: S,
     /// operator
-    op: O,
+    op: OpWrapper<O>,
     /// State
     state: IterState<O>,
     /// Storage for observers
@@ -44,7 +44,7 @@ where
         let state = IterState::new(init_param);
         Executor {
             solver,
-            op,
+            op: OpWrapper::new(&op),
             state,
             observers: Observer::new(),
             checkpoint: ArgminCheckpoint::default(),
@@ -109,8 +109,8 @@ where
             }?;
         }
 
-        let mut op_wrapper = OpWrapper::new(&self.op);
-        let init_data = self.solver.init(&mut op_wrapper, &self.state)?;
+        // let mut op_wrapper = OpWrapper::new(&self.op);
+        let init_data = self.solver.init(&mut self.op, &self.state)?;
 
         let mut logs = make_kv!("max_iters" => self.state.get_max_iters(););
 
@@ -123,7 +123,7 @@ where
         // Observe after init
         self.observers.observe_init(S::NAME, &logs)?;
 
-        self.state.increment_func_counts(&op_wrapper);
+        self.state.set_func_counts(&self.op);
 
         while running.load(Ordering::SeqCst) {
             // check first if it has already terminated
@@ -144,9 +144,9 @@ where
             // Start time measurement
             let start = std::time::Instant::now();
 
-            let data = self.solver.next_iter(&mut op_wrapper, &self.state)?;
+            let data = self.solver.next_iter(&mut self.op, &self.state)?;
 
-            self.state.increment_func_counts(&op_wrapper);
+            self.state.set_func_counts(&self.op);
 
             // End time measurement
             let duration = start.elapsed();
@@ -178,7 +178,7 @@ where
             self.state.termination_reason(TerminationReason::Aborted);
         }
 
-        Ok(ArgminResult::new(self.op, self.state))
+        Ok(ArgminResult::new(self.op.get_op(), self.state))
     }
 
     /// Runs the executor without observers, checkpoints and Ctrl-C support. Particularly the
@@ -188,15 +188,14 @@ where
     pub fn run_fast(mut self) -> Result<ArgminResult<O>, Error> {
         let total_time = std::time::Instant::now();
 
-        let mut op_wrapper = OpWrapper::new(&self.op);
-        let init_data = self.solver.init(&mut op_wrapper, &self.state)?;
+        let init_data = self.solver.init(&mut self.op, &self.state)?;
 
         // If init() returned something, deal with it
         if let Some(data) = init_data {
             self.update(&data)?;
         }
 
-        self.state.increment_func_counts(&op_wrapper);
+        self.state.set_func_counts(&self.op);
 
         loop {
             // let state = self.to_state();
@@ -216,9 +215,9 @@ where
                 break;
             }
 
-            let data = self.solver.next_iter(&mut op_wrapper, &self.state)?;
+            let data = self.solver.next_iter(&mut self.op, &self.state)?;
 
-            self.state.increment_func_counts(&op_wrapper);
+            self.state.set_func_counts(&self.op);
 
             self.update(&data)?;
 
@@ -235,7 +234,7 @@ where
             }
         }
 
-        Ok(ArgminResult::new(self.op, self.state))
+        Ok(ArgminResult::new(self.op.get_op(), self.state))
     }
 
     /// Attaches a observer which implements `ArgminLog` to the solver.

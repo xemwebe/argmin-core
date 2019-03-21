@@ -239,6 +239,15 @@ impl<O: ArgminOp> IterState<O> {
         self.modify_func_count += op.modify_func_count;
     }
 
+    /// Set all function evaluation counts to the evaluation counts of another operator
+    /// wrapped in `OpWrapper`.
+    pub fn set_func_counts(&mut self, op: &OpWrapper<O>) {
+        self.cost_func_count = op.cost_func_count;
+        self.grad_func_count = op.grad_func_count;
+        self.hessian_func_count = op.hessian_func_count;
+        self.modify_func_count = op.modify_func_count;
+    }
+
     /// Increment cost function evaluation count by `num`
     pub fn increment_cost_func_count(&mut self, num: u64) {
         self.cost_func_count += num;
