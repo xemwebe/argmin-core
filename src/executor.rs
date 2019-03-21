@@ -181,6 +181,10 @@ where
         Ok(ArgminResult::new(self.op, self.state))
     }
 
+    /// Runs the executor without observers, checkpoints and Ctrl-C support. Particularly the
+    /// latter necessitates this method. If a Executor is run within another Executor, Ctrl-C will
+    /// not work as it tries to register another handler. Therefore the inner Executor has to be
+    /// run via `run_fast()`. This will probably be solved differently in the future (TODO).
     pub fn run_fast(mut self) -> Result<ArgminResult<O>, Error> {
         let total_time = std::time::Instant::now();
 
@@ -221,7 +225,7 @@ where
             // increment iteration number
             self.state.increment_iter();
 
-            self.checkpoint.store_cond(&self, self.state.get_iter())?;
+            // self.checkpoint.store_cond(&self, self.state.get_iter())?;
 
             self.state.time(total_time.elapsed());
 
@@ -244,26 +248,31 @@ where
         self
     }
 
+    /// Set maximum number of iterations
     pub fn max_iters(mut self, iters: u64) -> Self {
         self.state.max_iters(iters);
         self
     }
 
+    /// Set target cost value
     pub fn target_cost(mut self, cost: f64) -> Self {
         self.state.target_cost(cost);
         self
     }
 
+    /// Set cost value
     pub fn cost(mut self, cost: f64) -> Self {
         self.state.cost(cost);
         self
     }
 
+    /// Set Gradient
     pub fn grad(mut self, grad: O::Param) -> Self {
         self.state.grad(grad);
         self
     }
 
+    /// Set Hessian
     pub fn hessian(mut self, hessian: O::Hessian) -> Self {
         self.state.hessian(hessian);
         self
