@@ -8,6 +8,10 @@
 use crate::{ArgminOp, Error};
 use serde::{Deserialize, Serialize};
 
+/// This wraps an operator and keeps track of how often the cost, gradient and Hessian have been
+/// computed and how often the modify function has been called. Usually, this is an implementation
+/// detail unless a solver is needed within another solver (such as a line search within a gradient
+/// descent method), then it may be necessary to wrap the operator in an OpWrapper.
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct OpWrapper<O: ArgminOp> {
     op: O,
@@ -18,6 +22,7 @@ pub struct OpWrapper<O: ArgminOp> {
 }
 
 impl<O: ArgminOp> OpWrapper<O> {
+    /// Constructor
     pub fn new(op: &O) -> Self {
         OpWrapper {
             op: op.clone(),
@@ -28,33 +33,40 @@ impl<O: ArgminOp> OpWrapper<O> {
         }
     }
 
+    /// Calls the `apply` method of `op` and increments `cost_func_count`.
     pub fn apply(&mut self, param: &O::Param) -> Result<O::Output, Error> {
         self.cost_func_count += 1;
         self.op.apply(param)
     }
 
+    /// Calls the `gradient` method of `op` and increments `gradient_func_count`.
     pub fn gradient(&mut self, param: &O::Param) -> Result<O::Param, Error> {
         self.grad_func_count += 1;
         self.op.gradient(param)
     }
 
+    /// Calls the `hessian` method of `op` and increments `hessian_func_count`.
     pub fn hessian(&mut self, param: &O::Param) -> Result<O::Hessian, Error> {
         self.hessian_func_count += 1;
         self.op.hessian(param)
     }
 
+    /// Calls the `modify` method of `op` and increments `modify_func_count`.
     pub fn modify(&mut self, param: &O::Param, extent: f64) -> Result<O::Param, Error> {
         self.modify_func_count += 1;
         self.op.modify(param, extent)
     }
 
-    pub fn consume_op<O2: ArgminOp>(&mut self, other: OpWrapper<O2>) {
+    /// Consumes an operator by increasing the function call counts of `self` by the ones in
+    /// `other`.
+    pub fn consume_op(&mut self, other: OpWrapper<O>) {
         self.cost_func_count += other.cost_func_count;
         self.grad_func_count += other.grad_func_count;
         self.hessian_func_count += other.hessian_func_count;
         self.modify_func_count += other.modify_func_count;
     }
 
+    /// Reset the cost function counts to zero
     pub fn reset(mut self) -> Self {
         self.cost_func_count = 0;
         self.grad_func_count = 0;
@@ -63,19 +75,24 @@ impl<O: ArgminOp> OpWrapper<O> {
         self
     }
 
+    /// Returns the operator `op` by taking ownership of `self`.
     pub fn get_op(self) -> O {
         self.op
     }
 
+    /// Returns a clone of the operator `op`.
     pub fn clone_op(&self) -> O {
         self.op.clone()
     }
 
+    /// Creates a new `OpWrapper<O>` from another `OpWrapper<O>` by cloning the `op` and
+    /// initializing all counts with `0`.
     pub fn new_from_op(op: &OpWrapper<O>) -> Self {
         Self::new(&op.clone_op())
     }
 }
 
+/// The OpWrapper<O> should behave just like any other `ArgminOp`
 impl<O: ArgminOp> ArgminOp for OpWrapper<O> {
     type Param = O::Param;
     type Output = O::Output;
