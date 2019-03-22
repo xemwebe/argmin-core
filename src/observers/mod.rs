@@ -45,46 +45,50 @@ pub trait Observe<O: ArgminOp>: Send + Sync {
     }
 }
 
-/// Container for Observers
+/// Container for observers which acts just like a single `Observe`r by implementing `Observe` on
+/// it.
 #[derive(Clone, Default)]
 pub struct Observer<O> {
-    /// Vector of boxed types which implement `ArgminLog`
-    logger: Vec<(Arc<Observe<O>>, ObserverMode)>,
+    /// Vector of `Observe`rs with the corresponding `ObserverMode`
+    observers: Vec<(Arc<Observe<O>>, ObserverMode)>,
 }
 
 impl<O: ArgminOp> Observer<O> {
     /// Constructor
     pub fn new() -> Self {
-        Observer { logger: vec![] }
+        Observer { observers: vec![] }
     }
 
-    /// Push another `ArgminLog` to the `logger` field
+    /// Push another `Observe` to the `observer` field
     pub fn push<OBS: Observe<O> + 'static>(
         &mut self,
         observer: OBS,
         mode: ObserverMode,
     ) -> &mut Self {
-        self.logger.push((Arc::new(observer), mode));
+        self.observers.push((Arc::new(observer), mode));
         self
     }
 }
 
-/// By implementing `ArgminLog` for `ArgminLogger` we basically allow a set of `ArgminLog`gers to
-/// be used just like a single `ArgminLog`ger.
+/// By implementing `Observe` for `Observer` we basically allow a set of `Observer`s to be used
+/// just like a single `Observe`r.
 impl<O: ArgminOp> Observe<O> for Observer<O> {
-    /// Log general info
+    /// Initial observation
+    /// This is called after the initialization in an `Executor` and gets the name of the solver as
+    /// string and a `ArgminKV` which includes some solver-specific information.
     fn observe_init(&self, msg: &str, kv: &ArgminKV) -> Result<(), Error> {
-        for l in self.logger.iter() {
+        for l in self.observers.iter() {
             l.0.observe_init(msg, kv)?
         }
         Ok(())
     }
 
-    /// This should be used to log iteration data only (because this is what may be saved in a CSV
-    /// file or a database)
+    /// This is called after every iteration and gets the current `state` of the solver as well as
+    /// a `KV` which can include solver-specific information
+    /// This respects the `ObserverMode`: Every `Observe`r is only called as often as specified.
     fn observe_iter(&self, state: &IterState<O>, kv: &ArgminKV) -> Result<(), Error> {
         use ObserverMode::*;
-        for l in self.logger.iter() {
+        for l in self.observers.iter() {
             let iter = state.get_iter();
             match l.1 {
                 Always => l.0.observe_iter(state, kv),
@@ -109,6 +113,7 @@ pub enum ObserverMode {
 }
 
 impl Default for ObserverMode {
+    /// The default is `Always`
     fn default() -> ObserverMode {
         ObserverMode::Always
     }
