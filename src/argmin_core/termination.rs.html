@@ -79,6 +79,9 @@
 <span id="79">79</span>
 <span id="80">80</span>
 <span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -99,7 +102,7 @@
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 
 <span class="doccomment">/// Indicates why the optimization algorithm stopped</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Ord</span>, <span class="ident">PartialOrd</span>, <span class="ident">Hash</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Ord</span>, <span class="ident">PartialOrd</span>, <span class="ident">Hash</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">TerminationReason</span> {
     <span class="doccomment">/// In case it has not terminated yet</span>
     <span class="ident">NotTerminated</span>,
@@ -109,6 +112,8 @@
     <span class="ident">TargetCostReached</span>,
     <span class="doccomment">/// Target precision reached</span>
     <span class="ident">TargetPrecisionReached</span>,
+    <span class="doccomment">/// Cost function value did not change</span>
+    <span class="ident">NoChangeInCost</span>,
     <span class="doccomment">/// Acceped stall iter exceeded</span>
     <span class="ident">AcceptedStallIterExceeded</span>,
     <span class="doccomment">/// Best stall iter exceeded</span>
@@ -121,8 +126,8 @@
 
 <span class="kw">impl</span> <span class="ident">TerminationReason</span> {
     <span class="doccomment">/// Returns `true` if a solver terminated and `false` otherwise</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">terminated</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">terminated</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">TerminationReason</span>::<span class="ident">NotTerminated</span> <span class="op">=&gt;</span> <span class="bool-val">false</span>,
             <span class="kw">_</span> <span class="op">=&gt;</span> <span class="bool-val">true</span>,
         }
@@ -135,6 +140,7 @@
             <span class="ident">TerminationReason</span>::<span class="ident">MaxItersReached</span> <span class="op">=&gt;</span> <span class="string">&quot;Maximum number of iterations reached&quot;</span>,
             <span class="ident">TerminationReason</span>::<span class="ident">TargetCostReached</span> <span class="op">=&gt;</span> <span class="string">&quot;Target cost value reached&quot;</span>,
             <span class="ident">TerminationReason</span>::<span class="ident">TargetPrecisionReached</span> <span class="op">=&gt;</span> <span class="string">&quot;Target precision reached&quot;</span>,
+            <span class="ident">TerminationReason</span>::<span class="ident">NoChangeInCost</span> <span class="op">=&gt;</span> <span class="string">&quot;No change in cost function value&quot;</span>,
             <span class="ident">TerminationReason</span>::<span class="ident">AcceptedStallIterExceeded</span> <span class="op">=&gt;</span> <span class="string">&quot;Accepted stall iterations exceeded&quot;</span>,
             <span class="ident">TerminationReason</span>::<span class="ident">BestStallIterExceeded</span> <span class="op">=&gt;</span> <span class="string">&quot;Best stall iterations exceeded&quot;</span>,
             <span class="ident">TerminationReason</span>::<span class="ident">LineSearchConditionMet</span> <span class="op">=&gt;</span> <span class="string">&quot;Line search condition met&quot;</span>,

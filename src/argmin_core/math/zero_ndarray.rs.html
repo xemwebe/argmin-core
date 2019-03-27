@@ -127,10 +127,10 @@
 <span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
 <span class="comment">// copied, modified, or distributed except according to those terms.</span>
 
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">math</span>::<span class="ident">ArgminZero</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">math</span>::{<span class="ident">ArgminZero</span>, <span class="ident">ArgminZeroLike</span>};
 <span class="kw">use</span> <span class="ident">num</span>::<span class="ident">Zero</span>;
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">ArgminZero</span> <span class="kw">for</span> <span class="ident">ndarray</span>::<span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">ArgminZeroLike</span> <span class="kw">for</span> <span class="ident">ndarray</span>::<span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">Zero</span> <span class="op">+</span> <span class="ident">ArgminZero</span> <span class="op">+</span> <span class="ident">Clone</span>,
 {
@@ -139,13 +139,13 @@
         <span class="ident">ndarray</span>::<span class="ident">Array1</span>::<span class="ident">zeros</span>(<span class="self">self</span>.<span class="ident">raw_dim</span>())
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">zero</span>() <span class="op">-&gt;</span> <span class="ident">ndarray</span>::<span class="ident">Array1</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="ident">ndarray</span>::<span class="ident">Array1</span>::<span class="ident">zeros</span>(<span class="number">0</span>)
-    }
+    <span class="comment">// #[inline]</span>
+    <span class="comment">// fn zero() -&gt; ndarray::Array1&lt;T&gt; {</span>
+    <span class="comment">//     ndarray::Array1::zeros(0)</span>
+    <span class="comment">// }</span>
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">ArgminZero</span> <span class="kw">for</span> <span class="ident">ndarray</span>::<span class="ident">Array2</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">ArgminZeroLike</span> <span class="kw">for</span> <span class="ident">ndarray</span>::<span class="ident">Array2</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">Zero</span> <span class="op">+</span> <span class="ident">ArgminZero</span> <span class="op">+</span> <span class="ident">Clone</span>,
 {
@@ -154,10 +154,10 @@
         <span class="ident">ndarray</span>::<span class="ident">Array2</span>::<span class="ident">zeros</span>(<span class="self">self</span>.<span class="ident">raw_dim</span>())
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">zero</span>() <span class="op">-&gt;</span> <span class="ident">ndarray</span>::<span class="ident">Array2</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="ident">ndarray</span>::<span class="ident">Array2</span>::<span class="ident">zeros</span>((<span class="number">0</span>, <span class="number">0</span>))
-    }
+    <span class="comment">// #[inline]</span>
+    <span class="comment">// fn zero() -&gt; ndarray::Array2&lt;T&gt; {</span>
+    <span class="comment">//     ndarray::Array2::zeros((0, 0))</span>
+    <span class="comment">// }</span>
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
@@ -168,14 +168,14 @@
 
     <span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">make_test</span> {
         (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>) <span class="op">=&gt;</span> {
-            <span class="macro">item</span><span class="macro">!</span> {
-                <span class="attribute">#[<span class="ident">test</span>]</span>
-                <span class="kw">fn</span> [<span class="op">&lt;</span><span class="ident">test_zero_</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span>]() {
-                    <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">Array1</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">ArgminZero</span><span class="op">&gt;</span>::<span class="ident">zero</span>();
-                    <span class="kw">let</span> <span class="ident">b</span>: <span class="ident">Array1</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">array</span><span class="macro">!</span>[];
-                    <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">a</span>, <span class="ident">b</span>);
-                }
-            }
+            <span class="comment">// item! {</span>
+            <span class="comment">//     #[test]</span>
+            <span class="comment">//     fn [&lt;test_zero_ $t&gt;]() {</span>
+            <span class="comment">//         let a = &lt;Array1&lt;$t&gt; as ArgminZero&gt;::zero();</span>
+            <span class="comment">//         let b: Array1&lt;$t&gt; = array![];</span>
+            <span class="comment">//         assert_eq!(a, b);</span>
+            <span class="comment">//     }</span>
+            <span class="comment">// }</span>
 
             <span class="macro">item</span><span class="macro">!</span> {
                 <span class="attribute">#[<span class="ident">test</span>]</span>
@@ -196,14 +196,14 @@
                 }
             }
 
-            <span class="macro">item</span><span class="macro">!</span> {
-                <span class="attribute">#[<span class="ident">test</span>]</span>
-                <span class="kw">fn</span> [<span class="op">&lt;</span><span class="ident">test_2d_zero_</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span>]() {
-                    <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">Array2</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">ArgminZero</span><span class="op">&gt;</span>::<span class="ident">zero</span>();
-                    <span class="kw">let</span> <span class="ident">b</span>: <span class="ident">Array2</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Array2</span>::<span class="ident">zeros</span>((<span class="number">0</span>, <span class="number">0</span>));
-                    <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">a</span>, <span class="ident">b</span>);
-                }
-            }
+            <span class="comment">// item! {</span>
+            <span class="comment">//     #[test]</span>
+            <span class="comment">//     fn [&lt;test_2d_zero_ $t&gt;]() {</span>
+            <span class="comment">//         let a = &lt;Array2&lt;$t&gt; as ArgminZero&gt;::zero();</span>
+            <span class="comment">//         let b: Array2&lt;$t&gt; = Array2::zeros((0, 0));</span>
+            <span class="comment">//         assert_eq!(a, b);</span>
+            <span class="comment">//     }</span>
+            <span class="comment">// }</span>
 
             <span class="macro">item</span><span class="macro">!</span> {
                 <span class="attribute">#[<span class="ident">test</span>]</span>
