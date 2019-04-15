@@ -96,7 +96,6 @@ where
             #[cfg(feature = "ctrlc")]
             {
                 // Set up the Ctrl-C handler
-                use ctrlc;
                 let r = running.clone();
                 // This is currently a hack to allow checkpoints to be run again within the
                 // same program (usually not really a usecase anyway). Unfortunately, this
