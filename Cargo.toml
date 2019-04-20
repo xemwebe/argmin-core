@@ -1,6 +1,6 @@
 [package]
 name = "argmin_core"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["Stefan Kroboth <stefan.kroboth@gmail.com>"]
 edition = "2018"
 license = "MIT OR Apache-2.0"
@@ -9,7 +9,7 @@ documentation = "https://docs.rs/argmin_core/latest/argmin_core/"
 homepage = "http://argmin-rs.org"
 repository = "https://github.com/argmin-rs/argmin-core"
 readme = "README.md"
-keywords = ["optimization", "math", "science", "HPC"]
+keywords = ["optimization", "math", "science"]
 categories = ["science"]
 #license-file = "LICENSE-APACHE"
 exclude = [
