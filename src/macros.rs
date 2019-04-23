@@ -64,6 +64,7 @@ macro_rules! send_sync_test {
 #[macro_export]
 macro_rules! trait_bound {
     ($name:ident ; $head:path $(, $tail:path)*) => {
+        #[allow(missing_docs)]
         pub trait $name : $head $(+ $tail)* {}
         impl<T> $name for T where T: $head $(+ $tail)* {}
     };
