@@ -16,16 +16,18 @@ use std::fmt::{Debug, Display};
 #[derive(
     Clone, Default, Debug, Serialize, Deserialize, Eq, PartialEq, Ord, PartialOrd, Hash, Copy,
 )]
-pub struct NoOperator<T, U, H> {
+pub struct NoOperator<T, U, H, J> {
     /// Fake parameter
     param: std::marker::PhantomData<T>,
     /// Fake output
     output: std::marker::PhantomData<U>,
     /// Fake Hessian
     hessian: std::marker::PhantomData<H>,
+    /// Fake Jacobian
+    jacobian: std::marker::PhantomData<J>,
 }
 
-impl<T, U, H> NoOperator<T, U, H> {
+impl<T, U, H, J> NoOperator<T, U, H, J> {
     /// Constructor
     #[allow(dead_code)]
     pub fn new() -> Self {
@@ -33,25 +35,28 @@ impl<T, U, H> NoOperator<T, U, H> {
             param: std::marker::PhantomData,
             output: std::marker::PhantomData,
             hessian: std::marker::PhantomData,
+            jacobian: std::marker::PhantomData,
         }
     }
 }
 
-impl<T, U, H> Display for NoOperator<T, U, H> {
+impl<T, U, H, J> Display for NoOperator<T, U, H, J> {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "NoOperator")
     }
 }
 
-impl<T, U, H> ArgminOp for NoOperator<T, U, H>
+impl<T, U, H, J> ArgminOp for NoOperator<T, U, H, J>
 where
     T: Clone + Default + Debug + Send + Sync + Serialize + DeserializeOwned,
     U: Clone + Default + Debug + Send + Sync + Serialize + DeserializeOwned,
     H: Clone + Default + Debug + Send + Sync + Serialize + DeserializeOwned,
+    J: Clone + Default + Debug + Send + Sync + Serialize + DeserializeOwned,
 {
     type Param = T;
     type Output = U;
     type Hessian = H;
+    type Jacobian = J;
 
     /// Do nothing, really.
     fn apply(&self, _p: &Self::Param) -> Result<Self::Output, Error> {
@@ -98,6 +103,7 @@ impl ArgminOp for MinimalNoOperator {
     type Param = Vec<f64>;
     type Output = f64;
     type Hessian = Vec<Vec<f64>>;
+    type Jacobian = ();
 
     /// Do nothing, really.
     fn apply(&self, _p: &Self::Param) -> Result<Self::Output, Error> {

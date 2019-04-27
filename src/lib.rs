@@ -70,12 +70,16 @@ pub mod finitediff {
 /// been implemented. Those methods (`gradient` and `modify`) only need to be implemented if the
 /// uses solver requires it.
 pub trait ArgminOp: Clone + Send + Sync + Serialize {
+    // TODO: Once associated type defaults are stable, it hopefully will be possible to define
+    // default types for `Hessian` and `Jacobian`.
     /// Type of the parameter vector
     type Param: Clone + Serialize + DeserializeOwned;
     /// Output of the operator
     type Output;
     /// Type of Hessian
     type Hessian: Clone + Serialize + DeserializeOwned;
+    /// Type of Jacobian
+    type Jacobian: Clone + Serialize + DeserializeOwned;
 
     /// Applies the operator/cost function to parameters
     fn apply(&self, _param: &Self::Param) -> Result<Self::Output, Error> {
@@ -97,6 +101,14 @@ pub trait ArgminOp: Clone + Send + Sync + Serialize {
     fn hessian(&self, _param: &Self::Param) -> Result<Self::Hessian, Error> {
         Err(ArgminError::NotImplemented {
             text: "Method `hessian` of ArgminOp trait not implemented!".to_string(),
+        }
+        .into())
+    }
+
+    /// Computes the hessian at the given parameters
+    fn jacobian(&self, _param: &Self::Param) -> Result<Self::Jacobian, Error> {
+        Err(ArgminError::NotImplemented {
+            text: "Method `jacobian` of ArgminOp trait not implemented!".to_string(),
         }
         .into())
     }
