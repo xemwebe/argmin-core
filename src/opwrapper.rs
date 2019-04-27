@@ -18,6 +18,7 @@ pub struct OpWrapper<O: ArgminOp> {
     pub cost_func_count: u64,
     pub grad_func_count: u64,
     pub hessian_func_count: u64,
+    pub jacobian_func_count: u64,
     pub modify_func_count: u64,
 }
 
@@ -29,6 +30,7 @@ impl<O: ArgminOp> OpWrapper<O> {
             cost_func_count: 0,
             grad_func_count: 0,
             hessian_func_count: 0,
+            jacobian_func_count: 0,
             modify_func_count: 0,
         }
     }
@@ -51,6 +53,12 @@ impl<O: ArgminOp> OpWrapper<O> {
         self.op.hessian(param)
     }
 
+    /// Calls the `jacobian` method of `op` and increments `jacobian_func_count`.
+    pub fn jacobian(&mut self, param: &O::Param) -> Result<O::Jacobian, Error> {
+        self.jacobian_func_count += 1;
+        self.op.jacobian(param)
+    }
+
     /// Calls the `modify` method of `op` and increments `modify_func_count`.
     pub fn modify(&mut self, param: &O::Param, extent: f64) -> Result<O::Param, Error> {
         self.modify_func_count += 1;
@@ -63,6 +71,7 @@ impl<O: ArgminOp> OpWrapper<O> {
         self.cost_func_count += other.cost_func_count;
         self.grad_func_count += other.grad_func_count;
         self.hessian_func_count += other.hessian_func_count;
+        self.jacobian_func_count += other.jacobian_func_count;
         self.modify_func_count += other.modify_func_count;
     }
 
@@ -71,6 +80,7 @@ impl<O: ArgminOp> OpWrapper<O> {
         self.cost_func_count = 0;
         self.grad_func_count = 0;
         self.hessian_func_count = 0;
+        self.jacobian_func_count = 0;
         self.modify_func_count = 0;
         self
     }
@@ -109,6 +119,10 @@ impl<O: ArgminOp> ArgminOp for OpWrapper<O> {
 
     fn hessian(&self, param: &Self::Param) -> Result<Self::Hessian, Error> {
         self.op.hessian(param)
+    }
+
+    fn jacobian(&self, param: &Self::Param) -> Result<Self::Jacobian, Error> {
+        self.op.jacobian(param)
     }
 
     fn modify(&self, param: &Self::Param, extent: f64) -> Result<Self::Param, Error> {

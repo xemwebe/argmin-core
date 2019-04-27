@@ -103,7 +103,7 @@ impl ArgminOp for MinimalNoOperator {
     type Param = Vec<f64>;
     type Output = f64;
     type Hessian = Vec<Vec<f64>>;
-    type Jacobian = ();
+    type Jacobian = Vec<f64>;
 
     /// Do nothing, really.
     fn apply(&self, _p: &Self::Param) -> Result<Self::Output, Error> {

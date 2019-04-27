@@ -37,6 +37,10 @@ pub struct IterState<O: ArgminOp> {
     pub hessian: Option<O::Hessian>,
     /// Previous Hessian
     pub prev_hessian: Option<O::Hessian>,
+    /// Current Jacobian
+    pub jacobian: Option<O::Jacobian>,
+    /// Previous Jacobian
+    pub prev_jacobian: Option<O::Jacobian>,
     /// Current iteration
     pub iter: u64,
     /// Iteration number of last best cost
@@ -47,8 +51,10 @@ pub struct IterState<O: ArgminOp> {
     pub cost_func_count: u64,
     /// Number of gradient evaluations so far
     pub grad_func_count: u64,
-    /// Number of gradient evaluations so far
+    /// Number of Hessian evaluations so far
     pub hessian_func_count: u64,
+    /// Number of Jacobian evaluations so far
+    pub jacobian_func_count: u64,
     /// Number of modify evaluations so far
     pub modify_func_count: u64,
     /// Time required so far
@@ -112,12 +118,15 @@ impl<O: ArgminOp> IterState<O> {
             prev_grad: None,
             hessian: None,
             prev_hessian: None,
+            jacobian: None,
+            prev_jacobian: None,
             iter: 0,
             last_best_iter: 0,
             max_iters: std::u64::MAX,
             cost_func_count: 0,
             grad_func_count: 0,
             hessian_func_count: 0,
+            jacobian_func_count: 0,
             modify_func_count: 0,
             time: std::time::Duration::new(0, 0),
             termination_reason: TerminationReason::NotTerminated,
@@ -170,6 +179,13 @@ impl<O: ArgminOp> IterState<O> {
         self
     }
 
+    /// Set Jacobian. This shifts the stored Jacobian to the previous Jacobian.
+    pub fn jacobian(&mut self, jacobian: O::Jacobian) -> &mut Self {
+        std::mem::swap(&mut self.prev_jacobian, &mut self.jacobian);
+        self.jacobian = Some(jacobian);
+        self
+    }
+
     /// Set target cost value
     setter!(target_cost, f64);
     /// Set maximum number of iterations
@@ -204,6 +220,8 @@ impl<O: ArgminOp> IterState<O> {
     getter!(grad_func_count, u64);
     /// Returns current Hessian function evaluation count
     getter!(hessian_func_count, u64);
+    /// Returns current Jacobian function evaluation count
+    getter!(jacobian_func_count, u64);
     /// Returns current Modify function evaluation count
     getter!(modify_func_count, u64);
     /// Returns iteration number where the last best parameter vector was found
@@ -220,6 +238,10 @@ impl<O: ArgminOp> IterState<O> {
     getter_option!(hessian, O::Hessian);
     /// Returns previous Hessian
     getter_option!(prev_hessian, O::Hessian);
+    /// Returns current Jacobian
+    getter_option!(jacobian, O::Jacobian);
+    /// Returns previous Jacobian
+    getter_option!(prev_jacobian, O::Jacobian);
     /// Returns current number of iterations
     getter!(iter, u64);
     /// Returns maximum number of iterations
@@ -236,6 +258,7 @@ impl<O: ArgminOp> IterState<O> {
         self.cost_func_count += op.cost_func_count;
         self.grad_func_count += op.grad_func_count;
         self.hessian_func_count += op.hessian_func_count;
+        self.jacobian_func_count += op.jacobian_func_count;
         self.modify_func_count += op.modify_func_count;
     }
 
@@ -245,6 +268,7 @@ impl<O: ArgminOp> IterState<O> {
         self.cost_func_count = op.cost_func_count;
         self.grad_func_count = op.grad_func_count;
         self.hessian_func_count = op.hessian_func_count;
+        self.jacobian_func_count = op.jacobian_func_count;
         self.modify_func_count = op.modify_func_count;
     }
 
@@ -261,6 +285,11 @@ impl<O: ArgminOp> IterState<O> {
     /// Increment Hessian function evaluation count by `num`
     pub fn increment_hessian_func_count(&mut self, num: u64) {
         self.hessian_func_count += num;
+    }
+
+    /// Increment Jacobian function evaluation count by `num`
+    pub fn increment_jacobian_func_count(&mut self, num: u64) {
+        self.jacobian_func_count += num;
     }
 
     /// Increment modify function evaluation count by `num`
@@ -310,12 +339,15 @@ mod tests {
         assert_eq!(state.get_prev_grad(), None);
         assert_eq!(state.get_hessian(), None);
         assert_eq!(state.get_prev_hessian(), None);
+        assert_eq!(state.get_jacobian(), None);
+        assert_eq!(state.get_prev_jacobian(), None);
         assert_eq!(state.get_iter(), 0);
         assert_eq!(state.is_best(), true);
         assert_eq!(state.get_max_iters(), std::u64::MAX);
         assert_eq!(state.get_cost_func_count(), 0);
         assert_eq!(state.get_grad_func_count(), 0);
         assert_eq!(state.get_hessian_func_count(), 0);
+        assert_eq!(state.get_jacobian_func_count(), 0);
         assert_eq!(state.get_modify_func_count(), 0);
 
         state.max_iters(42);
@@ -392,6 +424,19 @@ mod tests {
         assert_eq!(state.get_hessian(), Some(new_hessian.clone()));
         assert_eq!(state.get_prev_hessian(), Some(hessian.clone()));
 
+        let jacobian = vec![1.0, 2.0];
+
+        state.jacobian(jacobian.clone());
+        assert_eq!(state.get_jacobian(), Some(jacobian.clone()));
+        assert_eq!(state.get_prev_jacobian(), None);
+
+        let new_jacobian = vec![2.0, 1.0];
+
+        state.jacobian(new_jacobian.clone());
+
+        assert_eq!(state.get_jacobian(), Some(new_jacobian.clone()));
+        assert_eq!(state.get_prev_jacobian(), Some(jacobian.clone()));
+
         state.increment_iter();
 
         assert_eq!(state.get_iter(), 2);
@@ -404,6 +449,8 @@ mod tests {
         assert_eq!(state.get_grad_func_count(), 43);
         state.increment_hessian_func_count(44);
         assert_eq!(state.get_hessian_func_count(), 44);
+        state.increment_jacobian_func_count(46);
+        assert_eq!(state.get_jacobian_func_count(), 46);
         state.increment_modify_func_count(45);
         assert_eq!(state.get_modify_func_count(), 45);
 
@@ -426,9 +473,12 @@ mod tests {
         assert_eq!(state.get_prev_grad(), Some(grad));
         assert_eq!(state.get_hessian(), Some(new_hessian));
         assert_eq!(state.get_prev_hessian(), Some(hessian));
+        assert_eq!(state.get_jacobian(), Some(new_jacobian));
+        assert_eq!(state.get_prev_jacobian(), Some(jacobian));
         assert_eq!(state.get_cost_func_count(), 42);
         assert_eq!(state.get_grad_func_count(), 43);
         assert_eq!(state.get_hessian_func_count(), 44);
+        assert_eq!(state.get_jacobian_func_count(), 46);
         assert_eq!(state.get_modify_func_count(), 45);
     }
 }
