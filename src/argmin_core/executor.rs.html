@@ -248,6 +248,15 @@
 <span id="248">248</span>
 <span id="249">249</span>
 <span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -331,6 +340,9 @@
         }
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">hessian</span>) <span class="op">=</span> <span class="ident">data</span>.<span class="ident">get_hessian</span>() {
             <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">hessian</span>(<span class="ident">hessian</span>);
+        }
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">jacobian</span>) <span class="op">=</span> <span class="ident">data</span>.<span class="ident">get_jacobian</span>() {
+            <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">jacobian</span>(<span class="ident">jacobian</span>);
         }
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">termination_reason</span>) <span class="op">=</span> <span class="ident">data</span>.<span class="ident">get_termination_reason</span>() {
             <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">termination_reason</span>(<span class="ident">termination_reason</span>);
@@ -473,6 +485,12 @@
     <span class="doccomment">/// Set Hessian</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hessian</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">hessian</span>: <span class="ident">O</span>::<span class="ident">Hessian</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">hessian</span>(<span class="ident">hessian</span>);
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Set Jacobian</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">jacobian</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">jacobian</span>: <span class="ident">O</span>::<span class="ident">Jacobian</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">jacobian</span>(<span class="ident">jacobian</span>);
         <span class="self">self</span>
     }
 

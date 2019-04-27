@@ -432,6 +432,56 @@
 <span id="432">432</span>
 <span id="433">433</span>
 <span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -472,6 +522,10 @@
     <span class="kw">pub</span> <span class="ident">hessian</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Hessian</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Previous Hessian</span>
     <span class="kw">pub</span> <span class="ident">prev_hessian</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Hessian</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Current Jacobian</span>
+    <span class="kw">pub</span> <span class="ident">jacobian</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Jacobian</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Previous Jacobian</span>
+    <span class="kw">pub</span> <span class="ident">prev_jacobian</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">O</span>::<span class="ident">Jacobian</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Current iteration</span>
     <span class="kw">pub</span> <span class="ident">iter</span>: <span class="ident">u64</span>,
     <span class="doccomment">/// Iteration number of last best cost</span>
@@ -482,8 +536,10 @@
     <span class="kw">pub</span> <span class="ident">cost_func_count</span>: <span class="ident">u64</span>,
     <span class="doccomment">/// Number of gradient evaluations so far</span>
     <span class="kw">pub</span> <span class="ident">grad_func_count</span>: <span class="ident">u64</span>,
-    <span class="doccomment">/// Number of gradient evaluations so far</span>
+    <span class="doccomment">/// Number of Hessian evaluations so far</span>
     <span class="kw">pub</span> <span class="ident">hessian_func_count</span>: <span class="ident">u64</span>,
+    <span class="doccomment">/// Number of Jacobian evaluations so far</span>
+    <span class="kw">pub</span> <span class="ident">jacobian_func_count</span>: <span class="ident">u64</span>,
     <span class="doccomment">/// Number of modify evaluations so far</span>
     <span class="kw">pub</span> <span class="ident">modify_func_count</span>: <span class="ident">u64</span>,
     <span class="doccomment">/// Time required so far</span>
@@ -547,12 +603,15 @@
             <span class="ident">prev_grad</span>: <span class="prelude-val">None</span>,
             <span class="ident">hessian</span>: <span class="prelude-val">None</span>,
             <span class="ident">prev_hessian</span>: <span class="prelude-val">None</span>,
+            <span class="ident">jacobian</span>: <span class="prelude-val">None</span>,
+            <span class="ident">prev_jacobian</span>: <span class="prelude-val">None</span>,
             <span class="ident">iter</span>: <span class="number">0</span>,
             <span class="ident">last_best_iter</span>: <span class="number">0</span>,
             <span class="ident">max_iters</span>: <span class="ident">std</span>::<span class="ident">u64</span>::<span class="ident">MAX</span>,
             <span class="ident">cost_func_count</span>: <span class="number">0</span>,
             <span class="ident">grad_func_count</span>: <span class="number">0</span>,
             <span class="ident">hessian_func_count</span>: <span class="number">0</span>,
+            <span class="ident">jacobian_func_count</span>: <span class="number">0</span>,
             <span class="ident">modify_func_count</span>: <span class="number">0</span>,
             <span class="ident">time</span>: <span class="ident">std</span>::<span class="ident">time</span>::<span class="ident">Duration</span>::<span class="ident">new</span>(<span class="number">0</span>, <span class="number">0</span>),
             <span class="ident">termination_reason</span>: <span class="ident">TerminationReason</span>::<span class="ident">NotTerminated</span>,
@@ -605,6 +664,13 @@
         <span class="self">self</span>
     }
 
+    <span class="doccomment">/// Set Jacobian. This shifts the stored Jacobian to the previous Jacobian.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">jacobian</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">jacobian</span>: <span class="ident">O</span>::<span class="ident">Jacobian</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+        <span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">swap</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">prev_jacobian</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">jacobian</span>);
+        <span class="self">self</span>.<span class="ident">jacobian</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">jacobian</span>);
+        <span class="self">self</span>
+    }
+
     <span class="doccomment">/// Set target cost value</span>
     <span class="macro">setter</span><span class="macro">!</span>(<span class="ident">target_cost</span>, <span class="ident">f64</span>);
     <span class="doccomment">/// Set maximum number of iterations</span>
@@ -639,6 +705,8 @@
     <span class="macro">getter</span><span class="macro">!</span>(<span class="ident">grad_func_count</span>, <span class="ident">u64</span>);
     <span class="doccomment">/// Returns current Hessian function evaluation count</span>
     <span class="macro">getter</span><span class="macro">!</span>(<span class="ident">hessian_func_count</span>, <span class="ident">u64</span>);
+    <span class="doccomment">/// Returns current Jacobian function evaluation count</span>
+    <span class="macro">getter</span><span class="macro">!</span>(<span class="ident">jacobian_func_count</span>, <span class="ident">u64</span>);
     <span class="doccomment">/// Returns current Modify function evaluation count</span>
     <span class="macro">getter</span><span class="macro">!</span>(<span class="ident">modify_func_count</span>, <span class="ident">u64</span>);
     <span class="doccomment">/// Returns iteration number where the last best parameter vector was found</span>
@@ -655,6 +723,10 @@
     <span class="macro">getter_option</span><span class="macro">!</span>(<span class="ident">hessian</span>, <span class="ident">O</span>::<span class="ident">Hessian</span>);
     <span class="doccomment">/// Returns previous Hessian</span>
     <span class="macro">getter_option</span><span class="macro">!</span>(<span class="ident">prev_hessian</span>, <span class="ident">O</span>::<span class="ident">Hessian</span>);
+    <span class="doccomment">/// Returns current Jacobian</span>
+    <span class="macro">getter_option</span><span class="macro">!</span>(<span class="ident">jacobian</span>, <span class="ident">O</span>::<span class="ident">Jacobian</span>);
+    <span class="doccomment">/// Returns previous Jacobian</span>
+    <span class="macro">getter_option</span><span class="macro">!</span>(<span class="ident">prev_jacobian</span>, <span class="ident">O</span>::<span class="ident">Jacobian</span>);
     <span class="doccomment">/// Returns current number of iterations</span>
     <span class="macro">getter</span><span class="macro">!</span>(<span class="ident">iter</span>, <span class="ident">u64</span>);
     <span class="doccomment">/// Returns maximum number of iterations</span>
@@ -671,6 +743,7 @@
         <span class="self">self</span>.<span class="ident">cost_func_count</span> <span class="op">+=</span> <span class="ident">op</span>.<span class="ident">cost_func_count</span>;
         <span class="self">self</span>.<span class="ident">grad_func_count</span> <span class="op">+=</span> <span class="ident">op</span>.<span class="ident">grad_func_count</span>;
         <span class="self">self</span>.<span class="ident">hessian_func_count</span> <span class="op">+=</span> <span class="ident">op</span>.<span class="ident">hessian_func_count</span>;
+        <span class="self">self</span>.<span class="ident">jacobian_func_count</span> <span class="op">+=</span> <span class="ident">op</span>.<span class="ident">jacobian_func_count</span>;
         <span class="self">self</span>.<span class="ident">modify_func_count</span> <span class="op">+=</span> <span class="ident">op</span>.<span class="ident">modify_func_count</span>;
     }
 
@@ -680,6 +753,7 @@
         <span class="self">self</span>.<span class="ident">cost_func_count</span> <span class="op">=</span> <span class="ident">op</span>.<span class="ident">cost_func_count</span>;
         <span class="self">self</span>.<span class="ident">grad_func_count</span> <span class="op">=</span> <span class="ident">op</span>.<span class="ident">grad_func_count</span>;
         <span class="self">self</span>.<span class="ident">hessian_func_count</span> <span class="op">=</span> <span class="ident">op</span>.<span class="ident">hessian_func_count</span>;
+        <span class="self">self</span>.<span class="ident">jacobian_func_count</span> <span class="op">=</span> <span class="ident">op</span>.<span class="ident">jacobian_func_count</span>;
         <span class="self">self</span>.<span class="ident">modify_func_count</span> <span class="op">=</span> <span class="ident">op</span>.<span class="ident">modify_func_count</span>;
     }
 
@@ -696,6 +770,11 @@
     <span class="doccomment">/// Increment Hessian function evaluation count by `num`</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">increment_hessian_func_count</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">num</span>: <span class="ident">u64</span>) {
         <span class="self">self</span>.<span class="ident">hessian_func_count</span> <span class="op">+=</span> <span class="ident">num</span>;
+    }
+
+    <span class="doccomment">/// Increment Jacobian function evaluation count by `num`</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">increment_jacobian_func_count</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">num</span>: <span class="ident">u64</span>) {
+        <span class="self">self</span>.<span class="ident">jacobian_func_count</span> <span class="op">+=</span> <span class="ident">num</span>;
     }
 
     <span class="doccomment">/// Increment modify function evaluation count by `num`</span>
@@ -745,12 +824,15 @@
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">state</span>.<span class="ident">get_prev_grad</span>(), <span class="prelude-val">None</span>);
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">state</span>.<span class="ident">get_hessian</span>(), <span class="prelude-val">None</span>);
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">state</span>.<span class="ident">get_prev_hessian</span>(), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">state</span>.<span class="ident">get_jacobian</span>(), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">state</span>.<span class="ident">get_prev_jacobian</span>(), <span class="prelude-val">None</span>);
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">state</span>.<span class="ident">get_iter</span>(), <span class="number">0</span>);
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">state</span>.<span class="ident">is_best</span>(), <span class="bool-val">true</span>);
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">state</span>.<span class="ident">get_max_iters</span>(), <span class="ident">std</span>::<span class="ident">u64</span>::<span class="ident">MAX</span>);
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">state</span>.<span class="ident">get_cost_func_count</span>(), <span class="number">0</span>);
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">state</span>.<span class="ident">get_grad_func_count</span>(), <span class="number">0</span>);
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">state</span>.<span class="ident">get_hessian_func_count</span>(), <span class="number">0</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">state</span>.<span class="ident">get_jacobian_func_count</span>(), <span class="number">0</span>);
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">state</span>.<span class="ident">get_modify_func_count</span>(), <span class="number">0</span>);
 
         <span class="ident">state</span>.<span class="ident">max_iters</span>(<span class="number">42</span>);
@@ -827,6 +909,19 @@
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">state</span>.<span class="ident">get_hessian</span>(), <span class="prelude-val">Some</span>(<span class="ident">new_hessian</span>.<span class="ident">clone</span>()));
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">state</span>.<span class="ident">get_prev_hessian</span>(), <span class="prelude-val">Some</span>(<span class="ident">hessian</span>.<span class="ident">clone</span>()));
 
+        <span class="kw">let</span> <span class="ident">jacobian</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[<span class="number">1.0</span>, <span class="number">2.0</span>];
+
+        <span class="ident">state</span>.<span class="ident">jacobian</span>(<span class="ident">jacobian</span>.<span class="ident">clone</span>());
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">state</span>.<span class="ident">get_jacobian</span>(), <span class="prelude-val">Some</span>(<span class="ident">jacobian</span>.<span class="ident">clone</span>()));
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">state</span>.<span class="ident">get_prev_jacobian</span>(), <span class="prelude-val">None</span>);
+
+        <span class="kw">let</span> <span class="ident">new_jacobian</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[<span class="number">2.0</span>, <span class="number">1.0</span>];
+
+        <span class="ident">state</span>.<span class="ident">jacobian</span>(<span class="ident">new_jacobian</span>.<span class="ident">clone</span>());
+
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">state</span>.<span class="ident">get_jacobian</span>(), <span class="prelude-val">Some</span>(<span class="ident">new_jacobian</span>.<span class="ident">clone</span>()));
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">state</span>.<span class="ident">get_prev_jacobian</span>(), <span class="prelude-val">Some</span>(<span class="ident">jacobian</span>.<span class="ident">clone</span>()));
+
         <span class="ident">state</span>.<span class="ident">increment_iter</span>();
 
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">state</span>.<span class="ident">get_iter</span>(), <span class="number">2</span>);
@@ -839,6 +934,8 @@
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">state</span>.<span class="ident">get_grad_func_count</span>(), <span class="number">43</span>);
         <span class="ident">state</span>.<span class="ident">increment_hessian_func_count</span>(<span class="number">44</span>);
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">state</span>.<span class="ident">get_hessian_func_count</span>(), <span class="number">44</span>);
+        <span class="ident">state</span>.<span class="ident">increment_jacobian_func_count</span>(<span class="number">46</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">state</span>.<span class="ident">get_jacobian_func_count</span>(), <span class="number">46</span>);
         <span class="ident">state</span>.<span class="ident">increment_modify_func_count</span>(<span class="number">45</span>);
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">state</span>.<span class="ident">get_modify_func_count</span>(), <span class="number">45</span>);
 
@@ -861,9 +958,12 @@
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">state</span>.<span class="ident">get_prev_grad</span>(), <span class="prelude-val">Some</span>(<span class="ident">grad</span>));
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">state</span>.<span class="ident">get_hessian</span>(), <span class="prelude-val">Some</span>(<span class="ident">new_hessian</span>));
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">state</span>.<span class="ident">get_prev_hessian</span>(), <span class="prelude-val">Some</span>(<span class="ident">hessian</span>));
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">state</span>.<span class="ident">get_jacobian</span>(), <span class="prelude-val">Some</span>(<span class="ident">new_jacobian</span>));
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">state</span>.<span class="ident">get_prev_jacobian</span>(), <span class="prelude-val">Some</span>(<span class="ident">jacobian</span>));
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">state</span>.<span class="ident">get_cost_func_count</span>(), <span class="number">42</span>);
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">state</span>.<span class="ident">get_grad_func_count</span>(), <span class="number">43</span>);
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">state</span>.<span class="ident">get_hessian_func_count</span>(), <span class="number">44</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">state</span>.<span class="ident">get_jacobian_func_count</span>(), <span class="number">46</span>);
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">state</span>.<span class="ident">get_modify_func_count</span>(), <span class="number">45</span>);
     }
 }
