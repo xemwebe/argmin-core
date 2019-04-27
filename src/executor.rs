@@ -81,6 +81,9 @@ where
         if let Some(hessian) = data.get_hessian() {
             self.state.hessian(hessian);
         }
+        if let Some(jacobian) = data.get_jacobian() {
+            self.state.jacobian(jacobian);
+        }
         if let Some(termination_reason) = data.get_termination_reason() {
             self.state.termination_reason(termination_reason);
         }
@@ -222,6 +225,12 @@ where
     /// Set Hessian
     pub fn hessian(mut self, hessian: O::Hessian) -> Self {
         self.state.hessian(hessian);
+        self
+    }
+
+    /// Set Jacobian
+    pub fn jacobian(mut self, jacobian: O::Jacobian) -> Self {
+        self.state.jacobian(jacobian);
         self
     }
 

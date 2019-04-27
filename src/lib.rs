@@ -97,7 +97,7 @@ pub trait ArgminOp: Clone + Send + Sync + Serialize {
         .into())
     }
 
-    /// Computes the hessian at the given parameters
+    /// Computes the Hessian at the given parameters
     fn hessian(&self, _param: &Self::Param) -> Result<Self::Hessian, Error> {
         Err(ArgminError::NotImplemented {
             text: "Method `hessian` of ArgminOp trait not implemented!".to_string(),
@@ -105,7 +105,7 @@ pub trait ArgminOp: Clone + Send + Sync + Serialize {
         .into())
     }
 
-    /// Computes the hessian at the given parameters
+    /// Computes the Hessian at the given parameters
     fn jacobian(&self, _param: &Self::Param) -> Result<Self::Jacobian, Error> {
         Err(ArgminError::NotImplemented {
             text: "Method `jacobian` of ArgminOp trait not implemented!".to_string(),
@@ -185,8 +185,10 @@ pub struct ArgminIterData<O: ArgminOp> {
     cost: Option<f64>,
     /// Current gradient
     grad: Option<O::Param>,
-    /// Current gradient
+    /// Current Hessian
     hessian: Option<O::Hessian>,
+    /// Current Jacobian
+    jacobian: Option<O::Jacobian>,
     /// terminationreason
     termination_reason: Option<TerminationReason>,
     /// Key value pairs which are used to provide additional information for the Observers
@@ -203,6 +205,7 @@ impl<O: ArgminOp> ArgminIterData<O> {
             cost: None,
             grad: None,
             hessian: None,
+            jacobian: None,
             termination_reason: None,
             kv: make_kv!(),
         }
@@ -226,9 +229,15 @@ impl<O: ArgminOp> ArgminIterData<O> {
         self
     }
 
-    /// Set hessian
+    /// Set Hessian
     pub fn hessian(mut self, hessian: O::Hessian) -> Self {
         self.hessian = Some(hessian);
+        self
+    }
+
+    /// Set Jacobian
+    pub fn jacobian(mut self, jacobian: O::Jacobian) -> Self {
+        self.jacobian = Some(jacobian);
         self
     }
 
@@ -259,9 +268,14 @@ impl<O: ArgminOp> ArgminIterData<O> {
         self.grad.clone()
     }
 
-    /// Get hessian
+    /// Get Hessian
     pub fn get_hessian(&self) -> Option<O::Hessian> {
         self.hessian.clone()
+    }
+
+    /// Get Jacobian
+    pub fn get_jacobian(&self) -> Option<O::Jacobian> {
+        self.jacobian.clone()
     }
 
     /// Get termination reason
