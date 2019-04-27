@@ -68,6 +68,7 @@
 <span id="68">68</span>
 <span id="69">69</span>
 <span id="70">70</span>
+<span id="71">71</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -135,6 +136,7 @@
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
 <span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">trait_bound</span> {
     (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span> ; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">head</span>:<span class="ident">path</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">path</span>)<span class="kw-2">*</span>) <span class="op">=&gt;</span> {
+        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
         <span class="kw">pub</span> <span class="kw">trait</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">head</span> $(<span class="op">+</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>)<span class="op">*</span> {}
         <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> <span class="kw">for</span> <span class="ident">T</span> <span class="kw">where</span> <span class="ident">T</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">head</span> $(<span class="op">+</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>)<span class="op">*</span> {}
     };
