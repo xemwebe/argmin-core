@@ -35,6 +35,18 @@ impl<O: ArgminOp> OpWrapper<O> {
         }
     }
 
+    /// Constructor (moves op)
+    pub fn new_move(op: O) -> Self {
+        OpWrapper {
+            op: op,
+            cost_func_count: 0,
+            grad_func_count: 0,
+            hessian_func_count: 0,
+            jacobian_func_count: 0,
+            modify_func_count: 0,
+        }
+    }
+
     /// Calls the `apply` method of `op` and increments `cost_func_count`.
     pub fn apply(&mut self, param: &O::Param) -> Result<O::Output, Error> {
         self.cost_func_count += 1;
@@ -67,7 +79,7 @@ impl<O: ArgminOp> OpWrapper<O> {
 
     /// Consumes an operator by increasing the function call counts of `self` by the ones in
     /// `other`.
-    pub fn consume_op(&mut self, other: OpWrapper<O>) {
+    pub fn consume_op<O2: ArgminOp>(&mut self, other: OpWrapper<O2>) {
         self.cost_func_count += other.cost_func_count;
         self.grad_func_count += other.grad_func_count;
         self.hessian_func_count += other.hessian_func_count;
