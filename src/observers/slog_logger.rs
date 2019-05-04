@@ -102,6 +102,10 @@ impl<O: ArgminOp> KV for IterState<O> {
         serializer.emit_str("cost_func_count", &self.get_cost_func_count().to_string())?;
         serializer.emit_str("grad_func_count", &self.get_grad_func_count().to_string())?;
         serializer.emit_str(
+            "jacobian_func_count",
+            &self.get_jacobian_func_count().to_string(),
+        )?;
+        serializer.emit_str(
             "hessian_func_count",
             &self.get_hessian_func_count().to_string(),
         )?;
