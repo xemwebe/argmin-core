@@ -140,6 +140,10 @@
 <span id="140">140</span>
 <span id="141">141</span>
 <span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -244,6 +248,10 @@
         <span class="ident">serializer</span>.<span class="ident">emit_str</span>(<span class="string">&quot;iter&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">get_iter</span>().<span class="ident">to_string</span>())<span class="question-mark">?</span>;
         <span class="ident">serializer</span>.<span class="ident">emit_str</span>(<span class="string">&quot;cost_func_count&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">get_cost_func_count</span>().<span class="ident">to_string</span>())<span class="question-mark">?</span>;
         <span class="ident">serializer</span>.<span class="ident">emit_str</span>(<span class="string">&quot;grad_func_count&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">get_grad_func_count</span>().<span class="ident">to_string</span>())<span class="question-mark">?</span>;
+        <span class="ident">serializer</span>.<span class="ident">emit_str</span>(
+            <span class="string">&quot;jacobian_func_count&quot;</span>,
+            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">get_jacobian_func_count</span>().<span class="ident">to_string</span>(),
+        )<span class="question-mark">?</span>;
         <span class="ident">serializer</span>.<span class="ident">emit_str</span>(
             <span class="string">&quot;hessian_func_count&quot;</span>,
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">get_hessian_func_count</span>().<span class="ident">to_string</span>(),
