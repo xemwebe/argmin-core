@@ -38,7 +38,7 @@ impl<O: ArgminOp> OpWrapper<O> {
     /// Constructor (moves op)
     pub fn new_move(op: O) -> Self {
         OpWrapper {
-            op: op,
+            op,
             cost_func_count: 0,
             grad_func_count: 0,
             hessian_func_count: 0,
