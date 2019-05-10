@@ -96,23 +96,23 @@ impl KV for ArgminSlogKV {
 
 impl<O: ArgminOp> KV for IterState<O> {
     fn serialize(&self, _record: &Record, serializer: &mut Serializer) -> slog::Result {
-        serializer.emit_str("best_cost", &self.get_best_cost().to_string())?;
-        serializer.emit_str("cost", &self.get_cost().to_string())?;
-        serializer.emit_str("iter", &self.get_iter().to_string())?;
-        serializer.emit_str("cost_func_count", &self.get_cost_func_count().to_string())?;
-        serializer.emit_str("grad_func_count", &self.get_grad_func_count().to_string())?;
         serializer.emit_str(
-            "jacobian_func_count",
-            &self.get_jacobian_func_count().to_string(),
+            "modify_func_count",
+            &self.get_modify_func_count().to_string(),
         )?;
         serializer.emit_str(
             "hessian_func_count",
             &self.get_hessian_func_count().to_string(),
         )?;
         serializer.emit_str(
-            "modify_func_count",
-            &self.get_modify_func_count().to_string(),
+            "jacobian_func_count",
+            &self.get_jacobian_func_count().to_string(),
         )?;
+        serializer.emit_str("grad_func_count", &self.get_grad_func_count().to_string())?;
+        serializer.emit_str("cost_func_count", &self.get_cost_func_count().to_string())?;
+        serializer.emit_str("best_cost", &self.get_best_cost().to_string())?;
+        serializer.emit_str("cost", &self.get_cost().to_string())?;
+        serializer.emit_str("iter", &self.get_iter().to_string())?;
         Ok(())
     }
 }
