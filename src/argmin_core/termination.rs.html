@@ -82,6 +82,9 @@
 <span id="82">82</span>
 <span id="83">83</span>
 <span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -120,6 +123,8 @@
     <span class="ident">BestStallIterExceeded</span>,
     <span class="doccomment">/// Condition for Line search met</span>
     <span class="ident">LineSearchConditionMet</span>,
+    <span class="doccomment">/// Target tolerance reached</span>
+    <span class="ident">TargetToleranceReached</span>,
     <span class="doccomment">/// Aborted</span>
     <span class="ident">Aborted</span>,
 }
@@ -144,6 +149,7 @@
             <span class="ident">TerminationReason</span>::<span class="ident">AcceptedStallIterExceeded</span> <span class="op">=&gt;</span> <span class="string">&quot;Accepted stall iterations exceeded&quot;</span>,
             <span class="ident">TerminationReason</span>::<span class="ident">BestStallIterExceeded</span> <span class="op">=&gt;</span> <span class="string">&quot;Best stall iterations exceeded&quot;</span>,
             <span class="ident">TerminationReason</span>::<span class="ident">LineSearchConditionMet</span> <span class="op">=&gt;</span> <span class="string">&quot;Line search condition met&quot;</span>,
+            <span class="ident">TerminationReason</span>::<span class="ident">TargetToleranceReached</span> <span class="op">=&gt;</span> <span class="string">&quot;Target tolerance reached&quot;</span>,
             <span class="ident">TerminationReason</span>::<span class="ident">Aborted</span> <span class="op">=&gt;</span> <span class="string">&quot;Optimization aborted&quot;</span>,
         }
     }

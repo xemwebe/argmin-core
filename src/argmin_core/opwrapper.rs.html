@@ -182,7 +182,7 @@
     <span class="doccomment">/// Constructor (moves op)</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_move</span>(<span class="ident">op</span>: <span class="ident">O</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
         <span class="ident">OpWrapper</span> {
-            <span class="ident">op</span>: <span class="ident">op</span>,
+            <span class="ident">op</span>,
             <span class="ident">cost_func_count</span>: <span class="number">0</span>,
             <span class="ident">grad_func_count</span>: <span class="number">0</span>,
             <span class="ident">hessian_func_count</span>: <span class="number">0</span>,
