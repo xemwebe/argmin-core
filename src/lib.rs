@@ -75,7 +75,7 @@ pub trait ArgminOp: Clone + Send + Sync + Serialize {
     /// Type of the parameter vector
     type Param: Clone + Serialize + DeserializeOwned;
     /// Output of the operator
-    type Output;
+    type Output: Clone + Serialize + DeserializeOwned;
     /// Type of Hessian
     type Hessian: Clone + Serialize + DeserializeOwned;
     /// Type of Jacobian
