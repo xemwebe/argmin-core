@@ -51,7 +51,7 @@ impl<O: ArgminOp> WriteToFile<O> {
 }
 
 impl<O: ArgminOp> Observe<O> for WriteToFile<O> {
-    fn observe_iter(&self, state: &IterState<O>, _kv: &ArgminKV) -> Result<(), Error> {
+    fn observe_iter(&mut self, state: &IterState<O>, _kv: &ArgminKV) -> Result<(), Error> {
         let param = state.get_param();
         let iter = state.get_iter();
         let dir = Path::new(&self.dir);

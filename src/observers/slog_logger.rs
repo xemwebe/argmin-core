@@ -132,7 +132,7 @@ impl<O: ArgminOp> Observe<O> for ArgminSlogLogger {
 
     /// This should be used to log iteration data only (because this is what may be saved in a CSV
     /// file or a database)
-    fn observe_iter(&self, state: &IterState<O>, kv: &ArgminKV) -> Result<(), Error> {
+    fn observe_iter(&mut self, state: &IterState<O>, kv: &ArgminKV) -> Result<(), Error> {
         info!(self.logger, ""; state, ArgminSlogKV::from(kv));
         Ok(())
     }

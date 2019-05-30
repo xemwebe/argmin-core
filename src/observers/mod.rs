@@ -17,7 +17,7 @@ pub mod slog_logger;
 use crate::{ArgminKV, ArgminOp, Error, IterState};
 use serde::{Deserialize, Serialize};
 use std::default::Default;
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 
 pub use file::*;
 pub use slog_logger::*;
@@ -40,7 +40,7 @@ pub trait Observe<O: ArgminOp>: Send + Sync {
     ///
     /// `state`: Current state of the solver. See documentation of `IterState` for details.
     /// `kv`: Key-Value store of relevant variables defined by the `Solver`
-    fn observe_iter(&self, _state: &IterState<O>, _kv: &ArgminKV) -> Result<(), Error> {
+    fn observe_iter(&mut self, _state: &IterState<O>, _kv: &ArgminKV) -> Result<(), Error> {
         Ok(())
     }
 }
@@ -50,7 +50,7 @@ pub trait Observe<O: ArgminOp>: Send + Sync {
 #[derive(Clone, Default)]
 pub struct Observer<O> {
     /// Vector of `Observe`rs with the corresponding `ObserverMode`
-    observers: Vec<(Arc<Observe<O>>, ObserverMode)>,
+    observers: Vec<(Arc<Mutex<Observe<O>>>, ObserverMode)>,
 }
 
 impl<O: ArgminOp> Observer<O> {
@@ -65,7 +65,7 @@ impl<O: ArgminOp> Observer<O> {
         observer: OBS,
         mode: ObserverMode,
     ) -> &mut Self {
-        self.observers.push((Arc::new(observer), mode));
+        self.observers.push((Arc::new(Mutex::new(observer)), mode));
         self
     }
 }
@@ -78,7 +78,7 @@ impl<O: ArgminOp> Observe<O> for Observer<O> {
     /// string and a `ArgminKV` which includes some solver-specific information.
     fn observe_init(&self, msg: &str, kv: &ArgminKV) -> Result<(), Error> {
         for l in self.observers.iter() {
-            l.0.observe_init(msg, kv)?
+            l.0.lock().unwrap().observe_init(msg, kv)?
         }
         Ok(())
     }
@@ -86,14 +86,15 @@ impl<O: ArgminOp> Observe<O> for Observer<O> {
     /// This is called after every iteration and gets the current `state` of the solver as well as
     /// a `KV` which can include solver-specific information
     /// This respects the `ObserverMode`: Every `Observe`r is only called as often as specified.
-    fn observe_iter(&self, state: &IterState<O>, kv: &ArgminKV) -> Result<(), Error> {
+    fn observe_iter(&mut self, state: &IterState<O>, kv: &ArgminKV) -> Result<(), Error> {
         use ObserverMode::*;
-        for l in self.observers.iter() {
+        for l in self.observers.iter_mut() {
             let iter = state.get_iter();
+            let observer = &mut l.0.lock().unwrap();
             match l.1 {
-                Always => l.0.observe_iter(state, kv),
-                Every(i) if iter % i == 0 => l.0.observe_iter(state, kv),
-                NewBest if state.is_best() => l.0.observe_iter(state, kv),
+                Always => observer.observe_iter(state, kv),
+                Every(i) if iter % i == 0 => observer.observe_iter(state, kv),
+                NewBest if state.is_best() => observer.observe_iter(state, kv),
                 Never | Every(_) | NewBest => Ok(()),
             }?
         }
