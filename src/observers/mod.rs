@@ -50,7 +50,7 @@ pub trait Observe<O: ArgminOp>: Send + Sync {
 #[derive(Clone, Default)]
 pub struct Observer<O> {
     /// Vector of `Observe`rs with the corresponding `ObserverMode`
-    observers: Vec<(Arc<Observe<O>>, ObserverMode)>,
+    observers: Vec<(Arc<dyn Observe<O>>, ObserverMode)>,
 }
 
 impl<O: ArgminOp> Observer<O> {
