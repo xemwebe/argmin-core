@@ -75,10 +75,85 @@ macro_rules! make_dot_ndarray {
     };
 }
 
+macro_rules! make_dot_complex_ndarray {
+    ($t:ty) => {
+        impl ArgminDot<Array1<Complex<$t>>, Complex<$t>> for Array1<Complex<$t>> {
+            #[inline]
+            fn dot(&self, other: &Array1<Complex<$t>>) -> Complex<$t> {
+                ndarray::Array1::dot(self, other)
+            }
+        }
+
+        impl ArgminDot<Array1<Complex<$t>>, $t> for Array1<Complex<$t>> {
+            #[inline]
+            // Careful: This returns the norm of the computed dot product!
+            // Todo: Check if this makes sense at all.
+            fn dot(&self, other: &Array1<Complex<$t>>) -> $t {
+                ndarray::Array1::dot(self, other).norm()
+            }
+        }
+
+        impl ArgminDot<Complex<$t>, Array1<Complex<$t>>> for Array1<Complex<$t>> {
+            #[inline]
+            fn dot(&self, other: &Complex<$t>) -> Array1<Complex<$t>> {
+                *other * self
+            }
+        }
+
+        impl<'a> ArgminDot<Array1<Complex<$t>>, Array1<Complex<$t>>> for Complex<$t> {
+            #[inline]
+            fn dot(&self, other: &Array1<Complex<$t>>) -> Array1<Complex<$t>> {
+                other * *self
+            }
+        }
+
+        impl ArgminDot<Array1<Complex<$t>>, Array2<Complex<$t>>> for Array1<Complex<$t>> {
+            #[inline]
+            fn dot(&self, other: &Array1<Complex<$t>>) -> Array2<Complex<$t>> {
+                let mut out = Array2::zeros((self.len(), other.len()));
+                for i in 0..self.len() {
+                    for j in 0..other.len() {
+                        out[(i, j)] = self[i] * other[j];
+                    }
+                }
+                out
+            }
+        }
+
+        impl ArgminDot<Array1<Complex<$t>>, Array1<Complex<$t>>> for Array2<Complex<$t>> {
+            #[inline]
+            fn dot(&self, other: &Array1<Complex<$t>>) -> Array1<Complex<$t>> {
+                ndarray::Array2::dot(self, other)
+            }
+        }
+
+        impl ArgminDot<Array2<Complex<$t>>, Array2<Complex<$t>>> for Array2<Complex<$t>> {
+            #[inline]
+            fn dot(&self, other: &Array2<Complex<$t>>) -> Array2<Complex<$t>> {
+                ndarray::Array2::dot(self, other)
+            }
+        }
+
+        impl ArgminDot<Complex<$t>, Array2<Complex<$t>>> for Array2<Complex<$t>> {
+            #[inline]
+            fn dot(&self, other: &Complex<$t>) -> Array2<Complex<$t>> {
+                *other * self
+            }
+        }
+
+        impl<'a> ArgminDot<Array2<Complex<$t>>, Array2<Complex<$t>>> for Complex<$t> {
+            #[inline]
+            fn dot(&self, other: &Array2<Complex<$t>>) -> Array2<Complex<$t>> {
+                other * *self
+            }
+        }
+    };
+}
+
 make_dot_ndarray!(f32);
 make_dot_ndarray!(f64);
-make_dot_ndarray!(Complex<f32>);
-make_dot_ndarray!(Complex<f64>);
+make_dot_complex_ndarray!(f32);
+make_dot_complex_ndarray!(f64);
 make_dot_ndarray!(i8);
 make_dot_ndarray!(i16);
 make_dot_ndarray!(i32);
