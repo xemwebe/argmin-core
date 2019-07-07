@@ -375,6 +375,19 @@
 <span id="375">375</span>
 <span id="376">376</span>
 <span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
+<span id="380">380</span>
+<span id="381">381</span>
+<span id="382">382</span>
+<span id="383">383</span>
+<span id="384">384</span>
+<span id="385">385</span>
+<span id="386">386</span>
+<span id="387">387</span>
+<span id="388">388</span>
+<span id="389">389</span>
+<span id="390">390</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -385,6 +398,7 @@
 
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">math</span>::<span class="ident">ArgminDot</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">math</span>::<span class="ident">ArgminTranspose</span>;
+<span class="kw">use</span> <span class="ident">num_complex</span>::<span class="ident">Complex</span>;
 
 <span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">make_dot_vec</span> {
     (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>) <span class="op">=&gt;</span> {
@@ -487,6 +501,18 @@
 <span class="macro">make_dot_vec</span><span class="macro">!</span>(<span class="ident">u64</span>);
 <span class="macro">make_dot_vec</span><span class="macro">!</span>(<span class="ident">isize</span>);
 <span class="macro">make_dot_vec</span><span class="macro">!</span>(<span class="ident">usize</span>);
+<span class="macro">make_dot_vec</span><span class="macro">!</span>(<span class="ident">Complex</span><span class="op">&lt;</span><span class="ident">f32</span><span class="op">&gt;</span>);
+<span class="macro">make_dot_vec</span><span class="macro">!</span>(<span class="ident">Complex</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>);
+<span class="macro">make_dot_vec</span><span class="macro">!</span>(<span class="ident">Complex</span><span class="op">&lt;</span><span class="ident">i8</span><span class="op">&gt;</span>);
+<span class="macro">make_dot_vec</span><span class="macro">!</span>(<span class="ident">Complex</span><span class="op">&lt;</span><span class="ident">i16</span><span class="op">&gt;</span>);
+<span class="macro">make_dot_vec</span><span class="macro">!</span>(<span class="ident">Complex</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>);
+<span class="macro">make_dot_vec</span><span class="macro">!</span>(<span class="ident">Complex</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>);
+<span class="macro">make_dot_vec</span><span class="macro">!</span>(<span class="ident">Complex</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>);
+<span class="macro">make_dot_vec</span><span class="macro">!</span>(<span class="ident">Complex</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>);
+<span class="macro">make_dot_vec</span><span class="macro">!</span>(<span class="ident">Complex</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>);
+<span class="macro">make_dot_vec</span><span class="macro">!</span>(<span class="ident">Complex</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>);
+<span class="macro">make_dot_vec</span><span class="macro">!</span>(<span class="ident">Complex</span><span class="op">&lt;</span><span class="ident">isize</span><span class="op">&gt;</span>);
+<span class="macro">make_dot_vec</span><span class="macro">!</span>(<span class="ident">Complex</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>);
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {

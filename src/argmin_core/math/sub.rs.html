@@ -63,6 +63,19 @@
 <span id="63">63</span>
 <span id="64">64</span>
 <span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -72,6 +85,7 @@
 <span class="comment">// copied, modified, or distributed except according to those terms.</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">math</span>::<span class="ident">ArgminSub</span>;
+<span class="kw">use</span> <span class="ident">num_complex</span>::<span class="ident">Complex</span>;
 
 <span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">make_sub</span> {
     (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>) <span class="op">=&gt;</span> {
@@ -96,6 +110,18 @@
 <span class="macro">make_sub</span><span class="macro">!</span>(<span class="ident">u64</span>);
 <span class="macro">make_sub</span><span class="macro">!</span>(<span class="ident">f32</span>);
 <span class="macro">make_sub</span><span class="macro">!</span>(<span class="ident">f64</span>);
+<span class="macro">make_sub</span><span class="macro">!</span>(<span class="ident">Complex</span><span class="op">&lt;</span><span class="ident">isize</span><span class="op">&gt;</span>);
+<span class="macro">make_sub</span><span class="macro">!</span>(<span class="ident">Complex</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>);
+<span class="macro">make_sub</span><span class="macro">!</span>(<span class="ident">Complex</span><span class="op">&lt;</span><span class="ident">i8</span><span class="op">&gt;</span>);
+<span class="macro">make_sub</span><span class="macro">!</span>(<span class="ident">Complex</span><span class="op">&lt;</span><span class="ident">i16</span><span class="op">&gt;</span>);
+<span class="macro">make_sub</span><span class="macro">!</span>(<span class="ident">Complex</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>);
+<span class="macro">make_sub</span><span class="macro">!</span>(<span class="ident">Complex</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>);
+<span class="macro">make_sub</span><span class="macro">!</span>(<span class="ident">Complex</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>);
+<span class="macro">make_sub</span><span class="macro">!</span>(<span class="ident">Complex</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>);
+<span class="macro">make_sub</span><span class="macro">!</span>(<span class="ident">Complex</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>);
+<span class="macro">make_sub</span><span class="macro">!</span>(<span class="ident">Complex</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>);
+<span class="macro">make_sub</span><span class="macro">!</span>(<span class="ident">Complex</span><span class="op">&lt;</span><span class="ident">f32</span><span class="op">&gt;</span>);
+<span class="macro">make_sub</span><span class="macro">!</span>(<span class="ident">Complex</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>);
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {

@@ -180,7 +180,7 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Observer</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Vector of `Observe`rs with the corresponding `ObserverMode`</span>
-    <span class="ident">observers</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Observe</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;&gt;</span>, <span class="ident">ObserverMode</span>)<span class="op">&gt;</span>,
+    <span class="ident">observers</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Observe</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;&gt;</span>, <span class="ident">ObserverMode</span>)<span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>: <span class="ident">ArgminOp</span><span class="op">&gt;</span> <span class="ident">Observer</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> {

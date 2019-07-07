@@ -115,6 +115,9 @@
 <span id="115">115</span>
 <span id="116">116</span>
 <span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018 Stefan Kroboth</span>
 <span class="comment">//</span>
@@ -128,6 +131,7 @@
 
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">math</span>::<span class="ident">ArgminTranspose</span>;
 <span class="kw">use</span> <span class="ident">ndarray</span>::{<span class="ident">Array1</span>, <span class="ident">Array2</span>};
+<span class="kw">use</span> <span class="ident">num_complex</span>::<span class="ident">Complex</span>;
 
 <span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">make_add</span> {
     (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>) <span class="op">=&gt;</span> {
@@ -157,6 +161,8 @@
 <span class="macro">make_add</span><span class="macro">!</span>(<span class="ident">u64</span>);
 <span class="macro">make_add</span><span class="macro">!</span>(<span class="ident">f32</span>);
 <span class="macro">make_add</span><span class="macro">!</span>(<span class="ident">f64</span>);
+<span class="macro">make_add</span><span class="macro">!</span>(<span class="ident">Complex</span><span class="op">&lt;</span><span class="ident">f32</span><span class="op">&gt;</span>);
+<span class="macro">make_add</span><span class="macro">!</span>(<span class="ident">Complex</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>);
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
