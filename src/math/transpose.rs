@@ -6,6 +6,7 @@
 // copied, modified, or distributed except according to those terms.
 
 use crate::math::ArgminTranspose;
+use num_complex::Complex;
 
 macro_rules! make_transpose {
     ($t:ty) => {
@@ -30,6 +31,18 @@ make_transpose!(u32);
 make_transpose!(u64);
 make_transpose!(f32);
 make_transpose!(f64);
+make_transpose!(Complex<isize>);
+make_transpose!(Complex<usize>);
+make_transpose!(Complex<i8>);
+make_transpose!(Complex<i16>);
+make_transpose!(Complex<i32>);
+make_transpose!(Complex<i64>);
+make_transpose!(Complex<u8>);
+make_transpose!(Complex<u16>);
+make_transpose!(Complex<u32>);
+make_transpose!(Complex<u64>);
+make_transpose!(Complex<f32>);
+make_transpose!(Complex<f64>);
 
 #[cfg(test)]
 mod tests {

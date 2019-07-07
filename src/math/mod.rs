@@ -14,6 +14,10 @@
 //! traits are defined and implemented. These will be extended as needed. They are also already
 //! implemented for basic `Vec`s, and will in the future also be implemented for types defined by
 //! `ndarray` and `nalgebra`.
+//!
+//! # TODO
+//!
+//! * Implement tests for Complex<T> impls
 
 mod add;
 #[cfg(feature = "ndarrayl")]

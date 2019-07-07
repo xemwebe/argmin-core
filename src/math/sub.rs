@@ -6,6 +6,7 @@
 // copied, modified, or distributed except according to those terms.
 
 use crate::math::ArgminSub;
+use num_complex::Complex;
 
 macro_rules! make_sub {
     ($t:ty) => {
@@ -30,6 +31,18 @@ make_sub!(u32);
 make_sub!(u64);
 make_sub!(f32);
 make_sub!(f64);
+make_sub!(Complex<isize>);
+make_sub!(Complex<usize>);
+make_sub!(Complex<i8>);
+make_sub!(Complex<i16>);
+make_sub!(Complex<i32>);
+make_sub!(Complex<i64>);
+make_sub!(Complex<u8>);
+make_sub!(Complex<u16>);
+make_sub!(Complex<u32>);
+make_sub!(Complex<u64>);
+make_sub!(Complex<f32>);
+make_sub!(Complex<f64>);
 
 #[cfg(test)]
 mod tests {

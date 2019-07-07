@@ -7,6 +7,7 @@
 
 use crate::math::ArgminDot;
 use ndarray::{Array1, Array2};
+use num_complex::Complex;
 
 macro_rules! make_dot_ndarray {
     ($t:ty) => {
@@ -76,6 +77,8 @@ macro_rules! make_dot_ndarray {
 
 make_dot_ndarray!(f32);
 make_dot_ndarray!(f64);
+make_dot_ndarray!(Complex<f32>);
+make_dot_ndarray!(Complex<f64>);
 make_dot_ndarray!(i8);
 make_dot_ndarray!(i16);
 make_dot_ndarray!(i32);

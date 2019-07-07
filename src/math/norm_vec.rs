@@ -7,6 +7,7 @@
 
 use crate::math::ArgminNorm;
 use num::integer::Roots;
+use num_complex::Complex;
 
 macro_rules! make_norm_float {
     ($t:ty) => {
@@ -14,6 +15,17 @@ macro_rules! make_norm_float {
             #[inline]
             fn norm(&self) -> $t {
                 self.iter().map(|a| a.powi(2)).sum::<$t>().sqrt()
+            }
+        }
+    };
+}
+
+macro_rules! make_norm_complex_float {
+    ($t:ty) => {
+        impl ArgminNorm<Complex<$t>> for Vec<Complex<$t>> {
+            #[inline]
+            fn norm(&self) -> Complex<$t> {
+                self.iter().map(|a| a.powf(2.0)).sum::<Complex<$t>>().sqrt()
             }
         }
     };
@@ -42,6 +54,8 @@ make_norm_integer!(u32);
 make_norm_integer!(u64);
 make_norm_float!(f32);
 make_norm_float!(f64);
+make_norm_complex_float!(f32);
+make_norm_complex_float!(f64);
 
 #[cfg(test)]
 mod tests {

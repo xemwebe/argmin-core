@@ -9,8 +9,9 @@
 // ArrayViews, which would probably make it more efficient.
 
 use crate::math::ArgminTranspose;
+use num_complex::Complex;
 
-macro_rules! make_add {
+macro_rules! make_transpose {
     ($t:ty) => {
         impl ArgminTranspose for Vec<Vec<$t>> {
             fn t(self) -> Self {
@@ -33,18 +34,30 @@ macro_rules! make_add {
     };
 }
 
-make_add!(isize);
-make_add!(usize);
-make_add!(i8);
-make_add!(u8);
-make_add!(i16);
-make_add!(u16);
-make_add!(i32);
-make_add!(u32);
-make_add!(i64);
-make_add!(u64);
-make_add!(f32);
-make_add!(f64);
+make_transpose!(isize);
+make_transpose!(usize);
+make_transpose!(i8);
+make_transpose!(u8);
+make_transpose!(i16);
+make_transpose!(u16);
+make_transpose!(i32);
+make_transpose!(u32);
+make_transpose!(i64);
+make_transpose!(u64);
+make_transpose!(f32);
+make_transpose!(f64);
+make_transpose!(Complex<isize>);
+make_transpose!(Complex<usize>);
+make_transpose!(Complex<i8>);
+make_transpose!(Complex<u8>);
+make_transpose!(Complex<i16>);
+make_transpose!(Complex<u16>);
+make_transpose!(Complex<i32>);
+make_transpose!(Complex<u32>);
+make_transpose!(Complex<i64>);
+make_transpose!(Complex<u64>);
+make_transpose!(Complex<f32>);
+make_transpose!(Complex<f64>);
 
 #[cfg(test)]
 mod tests {

@@ -13,6 +13,7 @@ macro_rules! make_eye {
         impl ArgminEye for Array2<$t> {
             #[inline]
             fn eye_like(&self) -> Array2<$t> {
+                // TODO: Should return an error!
                 assert!(self.is_square());
                 ndarray::Array2::eye(self.dim().0)
             }

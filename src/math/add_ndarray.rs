@@ -7,6 +7,7 @@
 
 use crate::math::ArgminAdd;
 use ndarray::{Array1, Array2};
+use num_complex::Complex;
 
 macro_rules! make_add {
     ($t:ty) => {
@@ -57,6 +58,8 @@ make_add!(u32);
 make_add!(u64);
 make_add!(f32);
 make_add!(f64);
+make_add!(Complex<f32>);
+make_add!(Complex<f64>);
 
 #[cfg(test)]
 mod tests {
