@@ -84,15 +84,6 @@ macro_rules! make_dot_complex_ndarray {
             }
         }
 
-        impl ArgminDot<Array1<Complex<$t>>, $t> for Array1<Complex<$t>> {
-            #[inline]
-            // Careful: This returns the norm of the computed dot product!
-            // Todo: Check if this makes sense at all.
-            fn dot(&self, other: &Array1<Complex<$t>>) -> $t {
-                ndarray::Array1::dot(self, other).norm()
-            }
-        }
-
         impl ArgminDot<Complex<$t>, Array1<Complex<$t>>> for Array1<Complex<$t>> {
             #[inline]
             fn dot(&self, other: &Complex<$t>) -> Array1<Complex<$t>> {
