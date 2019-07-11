@@ -24,6 +24,8 @@ mod add;
 mod add_ndarray;
 mod add_vec;
 mod conj;
+#[cfg(feature = "ndarrayl")]
+mod conj_ndarray;
 mod conj_vec;
 mod div;
 #[cfg(feature = "ndarrayl")]
@@ -78,6 +80,8 @@ pub use crate::math::add::*;
 pub use crate::math::add_ndarray::*;
 pub use crate::math::add_vec::*;
 pub use crate::math::conj::*;
+#[cfg(feature = "ndarrayl")]
+pub use crate::math::conj_ndarray::*;
 pub use crate::math::conj_vec::*;
 #[cfg(feature = "ndarrayl")]
 pub use crate::math::div_ndarray::*;

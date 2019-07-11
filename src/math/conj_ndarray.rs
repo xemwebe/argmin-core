@@ -5,24 +5,32 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
+// TODO: Tests for Array2 impl
+
 use crate::math::ArgminConj;
+use ndarray::{Array1, Array2};
 use num_complex::Complex;
 
 macro_rules! make_conj {
     ($t:ty) => {
-        impl ArgminConj for Vec<$t> {
+        impl ArgminConj for Array1<$t> {
             #[inline]
-            fn conj(&self) -> Vec<$t> {
+            fn conj(&self) -> Array1<$t> {
                 self.iter().map(|a| <$t as ArgminConj>::conj(a)).collect()
             }
         }
 
-        impl ArgminConj for Vec<Vec<$t>> {
+        impl ArgminConj for Array2<$t> {
             #[inline]
-            fn conj(&self) -> Vec<Vec<$t>> {
-                self.iter()
-                    .map(|a| a.iter().map(|b| <$t as ArgminConj>::conj(b)).collect())
-                    .collect()
+            fn conj(&self) -> Array2<$t> {
+                let n = self.shape();
+                let mut out = self.clone();
+                for i in 0..n[0] {
+                    for j in 0..n[1] {
+                        out[(i, j)] = out[(i, j)].conj();
+                    }
+                }
+                out
             }
         }
     };
@@ -52,18 +60,18 @@ mod tests {
         ($t:ty) => {
             item! {
                 #[test]
-                fn [<test_conj_complex_vec_ $t>]() {
-                    let a = vec![
+                fn [<test_conj_complex_ndarray_ $t>]() {
+                    let a = Array1::from_vec(vec![
                         Complex::new(1 as $t, 2 as $t),
                         Complex::new(4 as $t, -3 as $t),
                         Complex::new(8 as $t, 0 as $t)
-                    ];
+                    ]);
                     let b = vec![
                         Complex::new(1 as $t, -2 as $t),
                         Complex::new(4 as $t, 3 as $t),
                         Complex::new(8 as $t, 0 as $t)
                     ];
-                    let res = <Vec<Complex<$t>> as ArgminConj>::conj(&a);
+                    let res = <Array1<Complex<$t>> as ArgminConj>::conj(&a);
                     for i in 0..3 {
                         let tmp = b[i] - res[i];
                         let norm = ((tmp.re * tmp.re + tmp.im * tmp.im) as f64).sqrt();
@@ -74,51 +82,13 @@ mod tests {
 
             item! {
                 #[test]
-                fn [<test_conj_vec_ $t>]() {
+                fn [<test_conj_ndarray_ $t>]() {
                     let a = vec![1 as $t, 4 as $t, 8 as $t];
                     let b = vec![1 as $t, 4 as $t, 8 as $t];
                     let res = <Vec<$t> as ArgminConj>::conj(&a);
                     for i in 0..3 {
                         let diff = (b[i] as f64 - res[i] as f64).abs();
                         assert!(diff  < std::f64::EPSILON);
-                    }
-                }
-            }
-
-            item! {
-                #[test]
-                fn [<test_conj_complex_vec_vec_ $t>]() {
-                    let a = vec![
-                        vec![
-                            Complex::new(1 as $t, 2 as $t),
-                            Complex::new(4 as $t, -3 as $t),
-                            Complex::new(8 as $t, 0 as $t)
-                        ],
-                        vec![
-                            Complex::new(1 as $t, -5 as $t),
-                            Complex::new(4 as $t, 6 as $t),
-                            Complex::new(8 as $t, 0 as $t)
-                        ],
-                    ];
-                    let b = vec![
-                        vec![
-                            Complex::new(1 as $t, -2 as $t),
-                            Complex::new(4 as $t, 3 as $t),
-                            Complex::new(8 as $t, 0 as $t)
-                        ],
-                        vec![
-                            Complex::new(1 as $t, 5 as $t),
-                            Complex::new(4 as $t, -6 as $t),
-                            Complex::new(8 as $t, 0 as $t)
-                        ],
-                    ];
-                    let res = <Vec<Vec<Complex<$t>>> as ArgminConj>::conj(&a);
-                    for i in 0..2 {
-                        for j in 0..3 {
-                            let tmp = b[i][j] - res[i][j];
-                            let norm = ((tmp.re * tmp.re + tmp.im * tmp.im) as f64).sqrt();
-                            assert!(norm  < std::f64::EPSILON);
-                        }
                     }
                 }
             }
