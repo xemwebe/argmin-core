@@ -23,6 +23,7 @@ mod add;
 #[cfg(feature = "ndarrayl")]
 mod add_ndarray;
 mod add_vec;
+mod conj;
 mod div;
 #[cfg(feature = "ndarrayl")]
 mod div_ndarray;
@@ -75,6 +76,7 @@ pub use crate::math::add::*;
 #[cfg(feature = "ndarrayl")]
 pub use crate::math::add_ndarray::*;
 pub use crate::math::add_vec::*;
+pub use crate::math::conj::*;
 #[cfg(feature = "ndarrayl")]
 pub use crate::math::div_ndarray::*;
 pub use crate::math::dot::*;
@@ -148,6 +150,12 @@ pub trait ArgminWeightedDot<T, U, V> {
 pub trait ArgminZero {
     /// Return zero(s)
     fn zero() -> Self;
+}
+
+/// Return the conjugate
+pub trait ArgminConj {
+    /// Return conjugate
+    fn conj(&self) -> Self;
 }
 
 /// Zero for dynamically sized objects
