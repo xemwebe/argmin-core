@@ -43,15 +43,10 @@ make_conj!(u64);
 make_conj!(f32);
 make_conj!(f64);
 make_complex_conj!(Complex<isize>);
-// make_complex_conj!(Complex<usize>);
 make_complex_conj!(Complex<i8>);
 make_complex_conj!(Complex<i16>);
 make_complex_conj!(Complex<i32>);
 make_complex_conj!(Complex<i64>);
-// make_complex_conj!(Complex<u8>);
-// make_complex_conj!(Complex<u16>);
-// make_complex_conj!(Complex<u32>);
-// make_complex_conj!(Complex<u64>);
 make_complex_conj!(Complex<f32>);
 make_complex_conj!(Complex<f64>);
 
