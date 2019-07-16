@@ -22,5 +22,6 @@ addons:
       - libdw-dev
       - binutils-dev
       - libiberty-dev
+      - liblapacke-dev
       - libopenblas-dev
       - gcc
