@@ -10,7 +10,7 @@ rust:
 cache: cargo
 script:
   - cargo build --verbose --all --all-features
-  - cargo test --verbose --all --all-features
+  - cargo test --verbose --all --all-features --features "ndarray-linalg/netlib"
 
 addons:
   apt:
