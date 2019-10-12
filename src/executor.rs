@@ -75,6 +75,7 @@ where
             self.state.best_param(param).best_cost(cost);
             self.state.new_best();
         }
+
         if let Some(grad) = data.get_grad() {
             self.state.grad(grad);
         }
@@ -84,6 +85,10 @@ where
         if let Some(jacobian) = data.get_jacobian() {
             self.state.jacobian(jacobian);
         }
+        if let Some(population) = data.get_population() {
+            self.state.population(population.clone());
+        }
+
         if let Some(termination_reason) = data.get_termination_reason() {
             self.state.termination_reason(termination_reason);
         }

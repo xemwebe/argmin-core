@@ -41,6 +41,8 @@ pub struct IterState<O: ArgminOp> {
     pub jacobian: Option<O::Jacobian>,
     /// Previous Jacobian
     pub prev_jacobian: Option<O::Jacobian>,
+    /// All members for population-based algorithms as (param, cost) tuples
+    pub population: Option<Vec<(O::Param, f64)>>,
     /// Current iteration
     pub iter: u64,
     /// Iteration number of last best cost
@@ -120,6 +122,7 @@ impl<O: ArgminOp> IterState<O> {
             prev_hessian: None,
             jacobian: None,
             prev_jacobian: None,
+            population: None,
             iter: 0,
             last_best_iter: 0,
             max_iters: std::u64::MAX,
@@ -186,6 +189,11 @@ impl<O: ArgminOp> IterState<O> {
         self
     }
 
+    pub fn population(&mut self, population: Vec<(O::Param, f64)>) -> &mut Self {
+        self.population = Some(population);
+        self
+    }
+
     /// Set target cost value
     setter!(target_cost, f64);
     /// Set maximum number of iterations
@@ -246,6 +254,14 @@ impl<O: ArgminOp> IterState<O> {
     getter!(iter, u64);
     /// Returns maximum number of iterations
     getter!(max_iters, u64);
+
+    /// Returns population
+    pub fn get_population(&self) -> Option<&Vec<(O::Param, f64)>> {
+        match &self.population {
+            Some(population) => Some(&population),
+            None => None,
+        }
+    }
 
     /// Increment the number of iterations by one
     pub fn increment_iter(&mut self) {

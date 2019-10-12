@@ -189,6 +189,7 @@ pub struct ArgminIterData<O: ArgminOp> {
     hessian: Option<O::Hessian>,
     /// Current Jacobian
     jacobian: Option<O::Jacobian>,
+    population: Option<Vec<(O::Param, f64)>>,
     /// terminationreason
     termination_reason: Option<TerminationReason>,
     /// Key value pairs which are used to provide additional information for the Observers
@@ -207,6 +208,7 @@ impl<O: ArgminOp> ArgminIterData<O> {
             hessian: None,
             jacobian: None,
             termination_reason: None,
+            population: None,
             kv: make_kv!(),
         }
     }
@@ -238,6 +240,12 @@ impl<O: ArgminOp> ArgminIterData<O> {
     /// Set Jacobian
     pub fn jacobian(mut self, jacobian: O::Jacobian) -> Self {
         self.jacobian = Some(jacobian);
+        self
+    }
+
+    /// Set Population
+    pub fn population(mut self, population: Vec<(O::Param, f64)>) -> Self {
+        self.population = Some(population);
         self
     }
 
@@ -276,6 +284,14 @@ impl<O: ArgminOp> ArgminIterData<O> {
     /// Get Jacobian
     pub fn get_jacobian(&self) -> Option<O::Jacobian> {
         self.jacobian.clone()
+    }
+
+    /// Get reference to population
+    pub fn get_population(&self) -> Option<&Vec<(O::Param, f64)>> {
+        match &self.population {
+            Some(population) => Some(&population),
+            None => None,
+        }
     }
 
     /// Get termination reason
