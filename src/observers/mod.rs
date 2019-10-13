@@ -13,6 +13,8 @@
 
 pub mod file;
 pub mod slog_logger;
+#[cfg(feature = "visualizer")]
+pub mod visualizer;
 
 use crate::{ArgminKV, ArgminOp, Error, IterState};
 use serde::{Deserialize, Serialize};
@@ -21,6 +23,8 @@ use std::sync::{Arc, Mutex};
 
 pub use file::*;
 pub use slog_logger::*;
+#[cfg(feature = "visualizer")]
+pub use visualizer::*;
 
 /// Defines the interface every Observer needs to expose
 pub trait Observe<O: ArgminOp>: Send + Sync {
