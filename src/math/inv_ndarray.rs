@@ -9,6 +9,7 @@ use crate::math::ArgminInv;
 use crate::Error;
 use ndarray::Array2;
 use ndarray_linalg::Inverse;
+use num_complex::Complex;
 
 macro_rules! make_inv {
     ($t:ty) => {
@@ -27,6 +28,8 @@ macro_rules! make_inv {
 
 make_inv!(f32);
 make_inv!(f64);
+make_inv!(Complex<f32>);
+make_inv!(Complex<f64>);
 
 #[cfg(test)]
 mod tests {

@@ -6,6 +6,7 @@
 // copied, modified, or distributed except according to those terms.
 
 use crate::math::ArgminDiv;
+use num_complex::Complex;
 
 macro_rules! make_div {
     ($t:ty) => {
@@ -69,6 +70,18 @@ make_div!(i64);
 make_div!(u64);
 make_div!(f32);
 make_div!(f64);
+make_div!(Complex<isize>);
+make_div!(Complex<usize>);
+make_div!(Complex<i8>);
+make_div!(Complex<u8>);
+make_div!(Complex<i16>);
+make_div!(Complex<u16>);
+make_div!(Complex<i32>);
+make_div!(Complex<u32>);
+make_div!(Complex<i64>);
+make_div!(Complex<u64>);
+make_div!(Complex<f32>);
+make_div!(Complex<f64>);
 
 #[cfg(test)]
 mod tests {

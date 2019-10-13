@@ -7,6 +7,7 @@
 
 use crate::math::ArgminSub;
 use ndarray::{Array1, Array2};
+use num_complex::Complex;
 
 macro_rules! make_sub {
     ($t:ty) => {
@@ -57,6 +58,8 @@ make_sub!(u32);
 make_sub!(u64);
 make_sub!(f32);
 make_sub!(f64);
+make_sub!(Complex<f32>);
+make_sub!(Complex<f64>);
 
 #[cfg(test)]
 mod tests {

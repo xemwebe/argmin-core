@@ -7,6 +7,7 @@
 
 use crate::math::ArgminMul;
 use ndarray::{Array1, Array2};
+use num_complex::Complex;
 
 macro_rules! make_mul {
     ($t:ty) => {
@@ -54,6 +55,73 @@ macro_rules! make_mul {
     };
 }
 
+macro_rules! make_complex_mul {
+    ($t:ty) => {
+        impl ArgminMul<Complex<$t>, Array1<Complex<$t>>> for Array1<Complex<$t>> {
+            #[inline]
+            fn mul(&self, other: &Complex<$t>) -> Array1<Complex<$t>> {
+                self * *other
+            }
+        }
+
+        impl ArgminMul<$t, Array1<Complex<$t>>> for Array1<Complex<$t>> {
+            #[inline]
+            fn mul(&self, other: &$t) -> Array1<Complex<$t>> {
+                self * *other
+            }
+        }
+
+        impl ArgminMul<Array1<Complex<$t>>, Array1<Complex<$t>>> for Complex<$t> {
+            #[inline]
+            fn mul(&self, other: &Array1<Complex<$t>>) -> Array1<Complex<$t>> {
+                *self * other
+            }
+        }
+
+        impl ArgminMul<Array1<Complex<$t>>, Array1<Complex<$t>>> for $t {
+            #[inline]
+            fn mul(&self, other: &Array1<Complex<$t>>) -> Array1<Complex<$t>> {
+                Complex::new(*self, 0 as $t) * other
+            }
+        }
+
+        impl ArgminMul<Array1<Complex<$t>>, Array1<Complex<$t>>> for Array1<Complex<$t>> {
+            #[inline]
+            fn mul(&self, other: &Array1<Complex<$t>>) -> Array1<Complex<$t>> {
+                self * other
+            }
+        }
+
+        impl ArgminMul<Array2<Complex<$t>>, Array2<Complex<$t>>> for Array2<Complex<$t>> {
+            #[inline]
+            fn mul(&self, other: &Array2<Complex<$t>>) -> Array2<Complex<$t>> {
+                self * other
+            }
+        }
+
+        impl ArgminMul<Complex<$t>, Array2<Complex<$t>>> for Array2<Complex<$t>> {
+            #[inline]
+            fn mul(&self, other: &Complex<$t>) -> Array2<Complex<$t>> {
+                self * *other
+            }
+        }
+
+        impl ArgminMul<$t, Array2<Complex<$t>>> for Array2<Complex<$t>> {
+            #[inline]
+            fn mul(&self, other: &$t) -> Array2<Complex<$t>> {
+                self * *other
+            }
+        }
+
+        impl ArgminMul<Array2<Complex<$t>>, Array2<Complex<$t>>> for Complex<$t> {
+            #[inline]
+            fn mul(&self, other: &Array2<Complex<$t>>) -> Array2<Complex<$t>> {
+                *self * other
+            }
+        }
+    };
+}
+
 make_mul!(i8);
 make_mul!(u8);
 make_mul!(i16);
@@ -64,6 +132,8 @@ make_mul!(i64);
 make_mul!(u64);
 make_mul!(f32);
 make_mul!(f64);
+make_complex_mul!(f32);
+make_complex_mul!(f64);
 
 #[cfg(test)]
 mod tests {

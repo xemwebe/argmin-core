@@ -6,6 +6,7 @@
 // copied, modified, or distributed except according to those terms.
 
 use crate::math::ArgminNorm;
+use num_complex::Complex;
 
 macro_rules! make_norm_unsigned {
     ($t:ty) => {
@@ -29,6 +30,17 @@ macro_rules! make_norm {
     };
 }
 
+macro_rules! make_norm_complex {
+    ($t:ty) => {
+        impl ArgminNorm<$t> for Complex<$t> {
+            #[inline]
+            fn norm(&self) -> $t {
+                (*self).re.hypot((*self).im)
+            }
+        }
+    };
+}
+
 make_norm!(isize);
 make_norm_unsigned!(usize);
 make_norm!(i8);
@@ -41,6 +53,9 @@ make_norm_unsigned!(u32);
 make_norm_unsigned!(u64);
 make_norm!(f32);
 make_norm!(f64);
+
+make_norm_complex!(f32);
+make_norm_complex!(f64);
 
 #[cfg(test)]
 mod tests {

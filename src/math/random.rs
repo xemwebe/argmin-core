@@ -6,6 +6,7 @@
 // copied, modified, or distributed except according to those terms.
 
 use crate::math::ArgminRandom;
+use num_complex::Complex;
 
 macro_rules! make_random {
     ($t:ty) => {
@@ -30,5 +31,17 @@ make_random!(u32);
 make_random!(u64);
 make_random!(isize);
 make_random!(usize);
+make_random!(Complex<f32>);
+make_random!(Complex<f64>);
+make_random!(Complex<i8>);
+make_random!(Complex<i16>);
+make_random!(Complex<i32>);
+make_random!(Complex<i64>);
+make_random!(Complex<u8>);
+make_random!(Complex<u16>);
+make_random!(Complex<u32>);
+make_random!(Complex<u64>);
+make_random!(Complex<isize>);
+make_random!(Complex<usize>);
 
-// TODO:  test
+// TODO:  tests!!!

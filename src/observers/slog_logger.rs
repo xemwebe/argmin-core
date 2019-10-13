@@ -86,7 +86,7 @@ pub struct ArgminSlogKV {
 }
 
 impl KV for ArgminSlogKV {
-    fn serialize(&self, _record: &Record, serializer: &mut Serializer) -> slog::Result {
+    fn serialize(&self, _record: &Record, serializer: &mut dyn Serializer) -> slog::Result {
         for idx in self.kv.clone().iter().rev() {
             serializer.emit_str(idx.0, &idx.1.to_string())?;
         }
@@ -95,7 +95,7 @@ impl KV for ArgminSlogKV {
 }
 
 impl<O: ArgminOp> KV for IterState<O> {
-    fn serialize(&self, _record: &Record, serializer: &mut Serializer) -> slog::Result {
+    fn serialize(&self, _record: &Record, serializer: &mut dyn Serializer) -> slog::Result {
         serializer.emit_str(
             "modify_func_count",
             &self.get_modify_func_count().to_string(),

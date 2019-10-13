@@ -6,6 +6,7 @@
 // copied, modified, or distributed except according to those terms.
 
 use crate::math::ArgminDot;
+use num_complex::Complex;
 
 macro_rules! make_dot_vec {
     ($t:ty) => {
@@ -30,6 +31,18 @@ make_dot_vec!(u32);
 make_dot_vec!(u64);
 make_dot_vec!(isize);
 make_dot_vec!(usize);
+make_dot_vec!(Complex<f32>);
+make_dot_vec!(Complex<f64>);
+make_dot_vec!(Complex<i8>);
+make_dot_vec!(Complex<i16>);
+make_dot_vec!(Complex<i32>);
+make_dot_vec!(Complex<i64>);
+make_dot_vec!(Complex<u8>);
+make_dot_vec!(Complex<u16>);
+make_dot_vec!(Complex<u32>);
+make_dot_vec!(Complex<u64>);
+make_dot_vec!(Complex<isize>);
+make_dot_vec!(Complex<usize>);
 
 #[cfg(test)]
 mod tests {
