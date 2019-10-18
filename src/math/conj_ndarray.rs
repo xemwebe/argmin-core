@@ -61,7 +61,7 @@ mod tests {
             item! {
                 #[test]
                 fn [<test_conj_complex_ndarray_ $t>]() {
-                    let a = Array1::from_vec(vec![
+                    let a = Array1::from(vec![
                         Complex::new(1 as $t, 2 as $t),
                         Complex::new(4 as $t, -3 as $t),
                         Complex::new(8 as $t, 0 as $t)
