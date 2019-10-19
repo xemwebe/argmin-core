@@ -96,7 +96,8 @@ impl Visualizer3d {
             )
             .set_view(30.0, 30.0); // TODO: do not reset view on new iteration
 
-        figure.show();
+        // TODO: unwrap evil
+        figure.show().unwrap();
 
         if let Some(delay) = self.delay {
             std::thread::sleep(delay);
