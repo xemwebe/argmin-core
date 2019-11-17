@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/argmin-rs/argmin-core.svg?branch=master)](https://travis-ci.org/argmin-rs/argmin-core)
+[![Gitter chat](https://badges.gitter.im/argmin-rs/community.png)](https://gitter.im/argmin-rs/community)
 
 # argmin-core: argmin optimization toolbox core
 
