@@ -6,5 +6,4 @@ implementors["argmin_core"] = [{text:"impl&lt;O:&nbsp;<a class=\"trait\" href=\"
             } else {
                 window.pending_implementors = implementors;
             }
-        
-})()
+        })()

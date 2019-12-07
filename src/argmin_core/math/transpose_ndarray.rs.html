@@ -134,17 +134,17 @@
 <span class="kw">use</span> <span class="ident">num_complex</span>::<span class="ident">Complex</span>;
 
 <span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">make_add</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>) <span class="op">=&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>) <span class="op">=</span><span class="op">&gt;</span> {
         <span class="kw">impl</span> <span class="ident">ArgminTranspose</span> <span class="kw">for</span> <span class="ident">Array1</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> {
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">t</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Array1</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">t</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Array1</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> {
                 <span class="self">self</span>.<span class="ident">reversed_axes</span>()
             }
         }
 
         <span class="kw">impl</span> <span class="ident">ArgminTranspose</span> <span class="kw">for</span> <span class="ident">Array2</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> {
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">t</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Array2</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">t</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Array2</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> {
                 <span class="self">self</span>.<span class="ident">reversed_axes</span>()
             }
         }
@@ -171,7 +171,7 @@
     <span class="kw">use</span> <span class="ident">paste</span>::<span class="ident">item</span>;
 
     <span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">make_test</span> {
-        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>) <span class="op">=&gt;</span> {
+        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>) <span class="op">=</span><span class="op">&gt;</span> {
             <span class="macro">item</span><span class="macro">!</span> {
                 <span class="comment">// not sure if this is such a smart test :D</span>
                 <span class="attribute">#[<span class="ident">test</span>]</span>

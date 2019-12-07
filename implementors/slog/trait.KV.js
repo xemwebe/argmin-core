@@ -6,5 +6,4 @@ implementors["argmin_core"] = [{text:"impl KV for <a class=\"struct\" href=\"arg
             } else {
                 window.pending_implementors = implementors;
             }
-        
-})()
+        })()

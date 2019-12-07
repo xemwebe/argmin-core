@@ -173,17 +173,17 @@
 
 <span class="kw">impl</span> <span class="ident">ArgminSlogLogger</span> {
     <span class="doccomment">/// Log to the terminal in a blocking way</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">term</span>() <span class="op">-&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">term</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="ident">ArgminSlogLogger</span>::<span class="ident">term_internal</span>(<span class="ident">OverflowStrategy</span>::<span class="ident">Block</span>)
     }
 
     <span class="doccomment">/// Log to the terminal in a non-blocking way (in case of overflow, messages are dropped)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">term_noblock</span>() <span class="op">-&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">term_noblock</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="ident">ArgminSlogLogger</span>::<span class="ident">term_internal</span>(<span class="ident">OverflowStrategy</span>::<span class="ident">Drop</span>)
     }
 
     <span class="doccomment">/// Actual implementation of the logging to the terminal</span>
-    <span class="kw">fn</span> <span class="ident">term_internal</span>(<span class="ident">overflow_strategy</span>: <span class="ident">OverflowStrategy</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">term_internal</span>(<span class="ident">overflow_strategy</span>: <span class="ident">OverflowStrategy</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">decorator</span> <span class="op">=</span> <span class="ident">slog_term</span>::<span class="ident">TermDecorator</span>::<span class="ident">new</span>().<span class="ident">build</span>();
         <span class="kw">let</span> <span class="ident">drain</span> <span class="op">=</span> <span class="ident">slog_term</span>::<span class="ident">FullFormat</span>::<span class="ident">new</span>(<span class="ident">decorator</span>)
             .<span class="ident">use_original_order</span>()
@@ -199,17 +199,17 @@
     }
 
     <span class="doccomment">/// Log JSON to a file in a blocking way</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">file</span>(<span class="ident">file</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">file</span>(<span class="ident">file</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="ident">ArgminSlogLogger</span>::<span class="ident">file_internal</span>(<span class="ident">file</span>, <span class="ident">OverflowStrategy</span>::<span class="ident">Block</span>)
     }
 
     <span class="doccomment">/// Log JSON to a file in a non-blocking way (in case of overflow, messages are dropped)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">file_noblock</span>(<span class="ident">file</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">file_noblock</span>(<span class="ident">file</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="ident">ArgminSlogLogger</span>::<span class="ident">file_internal</span>(<span class="ident">file</span>, <span class="ident">OverflowStrategy</span>::<span class="ident">Drop</span>)
     }
 
     <span class="doccomment">/// Actual implementaiton of logging JSON to file</span>
-    <span class="kw">fn</span> <span class="ident">file_internal</span>(<span class="ident">file</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">overflow_strategy</span>: <span class="ident">OverflowStrategy</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">file_internal</span>(<span class="ident">file</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">overflow_strategy</span>: <span class="ident">OverflowStrategy</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="comment">// Logging to file</span>
         <span class="kw">let</span> <span class="ident">file</span> <span class="op">=</span> <span class="ident">OpenOptions</span>::<span class="ident">new</span>()
             .<span class="ident">create</span>(<span class="bool-val">true</span>)
@@ -233,7 +233,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">KV</span> <span class="kw">for</span> <span class="ident">ArgminSlogKV</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_record</span>: <span class="kw-2">&amp;</span><span class="ident">Record</span>, <span class="ident">serializer</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">Serializer</span>) <span class="op">-&gt;</span> <span class="ident">slog</span>::<span class="prelude-ty">Result</span> {
+    <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_record</span>: <span class="kw-2">&amp;</span><span class="ident">Record</span>, <span class="ident">serializer</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">Serializer</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">slog</span>::<span class="prelude-ty">Result</span> {
         <span class="kw">for</span> <span class="ident">idx</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">kv</span>.<span class="ident">clone</span>().<span class="ident">iter</span>().<span class="ident">rev</span>() {
             <span class="ident">serializer</span>.<span class="ident">emit_str</span>(<span class="ident">idx</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">idx</span>.<span class="number">1</span>.<span class="ident">to_string</span>())<span class="question-mark">?</span>;
         }
@@ -242,7 +242,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>: <span class="ident">ArgminOp</span><span class="op">&gt;</span> <span class="ident">KV</span> <span class="kw">for</span> <span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_record</span>: <span class="kw-2">&amp;</span><span class="ident">Record</span>, <span class="ident">serializer</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">Serializer</span>) <span class="op">-&gt;</span> <span class="ident">slog</span>::<span class="prelude-ty">Result</span> {
+    <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_record</span>: <span class="kw-2">&amp;</span><span class="ident">Record</span>, <span class="ident">serializer</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">Serializer</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">slog</span>::<span class="prelude-ty">Result</span> {
         <span class="ident">serializer</span>.<span class="ident">emit_str</span>(
             <span class="string">&quot;modify_func_count&quot;</span>,
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">get_modify_func_count</span>().<span class="ident">to_string</span>(),
@@ -265,21 +265,21 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ArgminKV</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ArgminSlogKV</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ArgminKV</span>) <span class="op">-&gt;</span> <span class="ident">ArgminSlogKV</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ArgminKV</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ArgminSlogKV</span> {
         <span class="ident">ArgminSlogKV</span> { <span class="ident">kv</span>: <span class="ident">i</span>.<span class="ident">kv</span>.<span class="ident">clone</span>() }
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>: <span class="ident">ArgminOp</span><span class="op">&gt;</span> <span class="ident">Observe</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ArgminSlogLogger</span> {
     <span class="doccomment">/// Log general info</span>
-    <span class="kw">fn</span> <span class="ident">observe_init</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">kv</span>: <span class="kw-2">&amp;</span><span class="ident">ArgminKV</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">observe_init</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">kv</span>: <span class="kw-2">&amp;</span><span class="ident">ArgminKV</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="macro">info</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">logger</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">msg</span>; <span class="ident">ArgminSlogKV</span>::<span class="ident">from</span>(<span class="ident">kv</span>));
         <span class="prelude-val">Ok</span>(())
     }
 
     <span class="doccomment">/// This should be used to log iteration data only (because this is what may be saved in a CSV</span>
     <span class="doccomment">/// file or a database)</span>
-    <span class="kw">fn</span> <span class="ident">observe_iter</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>, <span class="ident">kv</span>: <span class="kw-2">&amp;</span><span class="ident">ArgminKV</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">observe_iter</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">IterState</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>, <span class="ident">kv</span>: <span class="kw-2">&amp;</span><span class="ident">ArgminKV</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="macro">info</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">logger</span>, <span class="string">&quot;&quot;</span>; <span class="ident">state</span>, <span class="ident">ArgminSlogKV</span>::<span class="ident">from</span>(<span class="ident">kv</span>));
         <span class="prelude-val">Ok</span>(())
     }

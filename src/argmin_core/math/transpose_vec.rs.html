@@ -137,9 +137,9 @@
 <span class="kw">use</span> <span class="ident">num_complex</span>::<span class="ident">Complex</span>;
 
 <span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">make_transpose</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>) <span class="op">=&gt;</span> {
-        <span class="kw">impl</span> <span class="ident">ArgminTranspose</span> <span class="kw">for</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;&gt;</span> {
-            <span class="kw">fn</span> <span class="ident">t</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="kw">impl</span> <span class="ident">ArgminTranspose</span> <span class="kw">for</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">t</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
                 <span class="kw">let</span> <span class="ident">n1</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>();
                 <span class="kw">let</span> <span class="ident">n2</span> <span class="op">=</span> <span class="self">self</span>[<span class="number">0</span>].<span class="ident">len</span>();
                 <span class="comment">// let mut out: Vec&lt;Vec&lt;$t&gt;&gt; = vec![vec![0; n1]; n2];</span>
@@ -190,7 +190,7 @@
     <span class="kw">use</span> <span class="ident">paste</span>::<span class="ident">item</span>;
 
     <span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">make_test</span> {
-        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>) <span class="op">=&gt;</span> {
+        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>) <span class="op">=</span><span class="op">&gt;</span> {
             <span class="macro">item</span><span class="macro">!</span> {
                 <span class="attribute">#[<span class="ident">test</span>]</span>
                 <span class="kw">fn</span> [<span class="op">&lt;</span><span class="ident">test_transpose_2d_1_</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span>]() {

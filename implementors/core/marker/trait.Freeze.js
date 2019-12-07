@@ -6,5 +6,4 @@ implementors["argmin_core"] = [{text:"impl&lt;O&gt; Freeze for <a class=\"struct
             } else {
                 window.pending_implementors = implementors;
             }
-        
-})()
+        })()

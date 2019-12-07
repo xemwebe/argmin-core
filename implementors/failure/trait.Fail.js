@@ -6,5 +6,4 @@ implementors["argmin_core"] = [{text:"impl Fail for <a class=\"enum\" href=\"arg
             } else {
                 window.pending_implementors = implementors;
             }
-        
-})()
+        })()
