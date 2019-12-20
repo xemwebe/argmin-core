@@ -14,10 +14,12 @@
 //!     would allow implementers of solvers to define their own `TerminationReason`s. However, this
 //!     would require a lot of work.
 
+#[cfg(serde1)]
 use serde::{Deserialize, Serialize};
 
 /// Indicates why the optimization algorithm stopped
-#[derive(Debug, Clone, Copy, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize, Deserialize)]
+#[cfg_attr(serde1, derive(Serialize, Deserialize))]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub enum TerminationReason {
     /// In case it has not terminated yet
     NotTerminated,

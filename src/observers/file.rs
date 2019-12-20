@@ -14,7 +14,7 @@ use std::fs::File;
 use std::io::BufWriter;
 use std::path::Path;
 
-#[derive(Copy, Clone, Serialize, Deserialize, Debug, Eq, PartialEq, Ord, PartialOrd)]
+#[derive(Copy, Clone, Debug, Serialize, Deserialize, Eq, PartialEq, Ord, PartialOrd)]
 pub enum WriteToFileSerializer {
     Bincode,
     JSON,
@@ -26,7 +26,7 @@ impl Default for WriteToFileSerializer {
     }
 }
 
-#[derive(Clone, Serialize, Deserialize, Debug, Eq, PartialEq, Ord, PartialOrd)]
+#[derive(Clone, Debug, Serialize, Deserialize, Eq, PartialEq, Ord, PartialOrd)]
 pub struct WriteToFile<O> {
     dir: String,
     prefix: String,

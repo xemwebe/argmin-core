@@ -37,6 +37,7 @@ mod opwrapper;
 /// Definition of the return type of the solvers
 mod result;
 /// Serialization of `ArgminSolver`s
+#[cfg(serde1)]
 mod serialization;
 /// Definition of termination reasons
 mod termination;
@@ -52,8 +53,11 @@ pub use crate::opwrapper::*;
 pub use crate::result::ArgminResult;
 pub use crate::termination::TerminationReason;
 pub use failure::Error;
+#[cfg(serde1)]
 use serde::de::DeserializeOwned;
+#[cfg(serde1)]
 use serde::Serialize;
+#[cfg(serde1)]
 pub use serialization::*;
 
 pub mod finitediff {
@@ -69,17 +73,17 @@ pub mod finitediff {
 /// implementation which is essentially returning an error which indicates that the method has not
 /// been implemented. Those methods (`gradient` and `modify`) only need to be implemented if the
 /// uses solver requires it.
-pub trait ArgminOp: Clone + Send + Sync + Serialize {
+pub trait ArgminOp: Clone + Send + Sync {
     // TODO: Once associated type defaults are stable, it hopefully will be possible to define
     // default types for `Hessian` and `Jacobian`.
     /// Type of the parameter vector
-    type Param: Clone + Serialize + DeserializeOwned;
+    type Param: Clone;
     /// Output of the operator
-    type Output: Clone + Serialize + DeserializeOwned;
+    type Output: Clone;
     /// Type of Hessian
-    type Hessian: Clone + Serialize + DeserializeOwned;
+    type Hessian: Clone;
     /// Type of Jacobian
-    type Jacobian: Clone + Serialize + DeserializeOwned;
+    type Jacobian: Clone;
 
     /// Applies the operator/cost function to parameters
     fn apply(&self, _param: &Self::Param) -> Result<Self::Output, Error> {
@@ -123,7 +127,7 @@ pub trait ArgminOp: Clone + Send + Sync + Serialize {
     }
 }
 
-pub trait Solver<O: ArgminOp>: Serialize {
+pub trait Solver<O: ArgminOp> {
     const NAME: &'static str = "UNDEFINED";
 
     /// Computes one iteration of the algorithm.
@@ -177,7 +181,8 @@ pub trait Solver<O: ArgminOp>: Serialize {
 /// The datastructure which is returned by the `next_iter` method of the `Solver` trait.
 ///
 /// TODO: Rename to IterResult?
-#[derive(Clone, Serialize, Debug, Default)]
+#[cfg_attr(serde1, derive(Serialize))]
+#[derive(Clone, Debug, Default)]
 pub struct ArgminIterData<O: ArgminOp> {
     /// Current parameter vector
     param: Option<O::Param>,
@@ -306,7 +311,7 @@ impl<O: ArgminOp> ArgminIterData<O> {
 }
 
 /// Defines a common interface for line search methods.
-pub trait ArgminLineSearch<P>: Serialize {
+pub trait ArgminLineSearch<P> {
     /// Set the search direction
     fn set_search_direction(&mut self, direction: P);
 
@@ -316,13 +321,13 @@ pub trait ArgminLineSearch<P>: Serialize {
 
 /// Defines a common interface to methods which calculate approximate steps for trust region
 /// methods.
-pub trait ArgminTrustRegion: Clone + Serialize {
+pub trait ArgminTrustRegion: Clone {
     /// Set the initial step length
     fn set_radius(&mut self, radius: f64);
 }
 //
 /// Common interface for beta update methods (Nonlinear-CG)
-pub trait ArgminNLCGBetaUpdate<T>: Serialize {
+pub trait ArgminNLCGBetaUpdate<T> {
     /// Update beta
     /// Parameter 1: \nabla f_k
     /// Parameter 2: \nabla f_{k+1}

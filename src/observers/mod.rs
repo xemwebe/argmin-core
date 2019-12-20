@@ -11,16 +11,19 @@
 //! the current state of the optimization. This can be used for logging or writing the current
 //! parameter vector to disk.
 
+#[cfg(feature = "serde1")]
 pub mod file;
 pub mod slog_logger;
 #[cfg(feature = "visualizer")]
 pub mod visualizer;
 
 use crate::{ArgminKV, ArgminOp, Error, IterState};
+#[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 use std::default::Default;
 use std::sync::{Arc, Mutex};
 
+#[cfg(feature = "serde1")]
 pub use file::*;
 pub use slog_logger::*;
 #[cfg(feature = "visualizer")]
@@ -109,7 +112,8 @@ impl<O: ArgminOp> Observe<O> for Observer<O> {
 /// This is used to indicate how often the observer will observe the status. `Never` deactivates
 /// the observer, `Always` and `Every(i)` will call the observer in every or every ith iteration,
 /// respectively. `NewBest` will call the observer only, if a new best solution is found.
-#[derive(Copy, Clone, Serialize, Deserialize, Debug, Eq, PartialEq, Ord, PartialOrd)]
+#[cfg_attr(serde1, derive(Serialize, Deserialize))]
+#[derive(Copy, Clone, Debug, Eq, PartialEq, Ord, PartialOrd)]
 pub enum ObserverMode {
     Never,
     Always,
