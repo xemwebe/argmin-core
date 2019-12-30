@@ -6,14 +6,14 @@
 // copied, modified, or distributed except according to those terms.
 
 use crate::{ArgminOp, Error};
-#[cfg(feature="serde1")]
+#[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 
 /// This wraps an operator and keeps track of how often the cost, gradient and Hessian have been
 /// computed and how often the modify function has been called. Usually, this is an implementation
 /// detail unless a solver is needed within another solver (such as a line search within a gradient
 /// descent method), then it may be necessary to wrap the operator in an OpWrapper.
-#[cfg_attr(feature="serde1", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 #[derive(Clone, Debug)]
 pub struct OpWrapper<O: ArgminOp> {
     op: O,

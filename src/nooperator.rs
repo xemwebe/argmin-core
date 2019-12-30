@@ -6,19 +6,17 @@
 // copied, modified, or distributed except according to those terms.
 
 use crate::{ArgminOp, Error};
-#[cfg(feature="serde1")]
+#[cfg(feature = "serde1")]
 use serde::de::DeserializeOwned;
-#[cfg(feature="serde1")]
+#[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 use std::fmt::{Debug, Display};
 
 /// Fake Operators for testing
 
 /// No-op operator with free choice of the types
-#[cfg_attr(feature="serde1", derive(Serialize, Deserialize))]
-#[derive(
-    Clone, Default, Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Copy,
-)]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
+#[derive(Clone, Default, Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Copy)]
 pub struct NoOperator<T, U, H, J> {
     /// Fake parameter
     param: std::marker::PhantomData<T>,
@@ -49,7 +47,7 @@ impl<T, U, H, J> Display for NoOperator<T, U, H, J> {
     }
 }
 
-#[cfg(feature="serde1")]
+#[cfg(feature = "serde1")]
 impl<T, U, H, J> ArgminOp for NoOperator<T, U, H, J>
 where
     T: Clone + Default + Debug + Send + Sync + Serialize + DeserializeOwned,
@@ -83,7 +81,7 @@ where
     }
 }
 
-#[cfg(not(feature="serde1"))]
+#[cfg(not(feature = "serde1"))]
 impl<T, U, H, J> ArgminOp for NoOperator<T, U, H, J>
 where
     T: Clone + Default + Debug + Send + Sync,
@@ -117,10 +115,8 @@ where
     }
 }
 
-#[cfg_attr(feature="serde1", derive(Serialize, Deserialize))]
-#[derive(
-    Clone, Default, Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Copy,
-)]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
+#[derive(Clone, Default, Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Copy)]
 pub struct MinimalNoOperator {}
 
 /// No-op operator with fixed types (See `ArgminOp` impl on `MinimalNoOperator`)

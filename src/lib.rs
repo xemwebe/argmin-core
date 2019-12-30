@@ -37,7 +37,7 @@ mod opwrapper;
 /// Definition of the return type of the solvers
 mod result;
 /// Serialization of `ArgminSolver`s
-#[cfg(feature="serde1")]
+#[cfg(feature = "serde1")]
 mod serialization;
 /// Definition of termination reasons
 mod termination;
@@ -53,11 +53,11 @@ pub use crate::opwrapper::*;
 pub use crate::result::ArgminResult;
 pub use crate::termination::TerminationReason;
 pub use failure::Error;
-#[cfg(feature="serde1")]
+#[cfg(feature = "serde1")]
 use serde::de::DeserializeOwned;
-#[cfg(feature="serde1")]
+#[cfg(feature = "serde1")]
 use serde::Serialize;
-#[cfg(feature="serde1")]
+#[cfg(feature = "serde1")]
 pub use serialization::*;
 
 pub mod finitediff {
@@ -73,7 +73,7 @@ pub mod finitediff {
 /// implementation which is essentially returning an error which indicates that the method has not
 /// been implemented. Those methods (`gradient` and `modify`) only need to be implemented if the
 /// uses solver requires it.
-#[cfg(feature="serde1")]
+#[cfg(feature = "serde1")]
 pub trait ArgminOp: Clone + Send + Sync + Serialize {
     // TODO: Once associated type defaults are stable, it hopefully will be possible to define
     // default types for `Hessian` and `Jacobian`.
@@ -128,7 +128,7 @@ pub trait ArgminOp: Clone + Send + Sync + Serialize {
     }
 }
 
-#[cfg(not(feature="serde1"))]
+#[cfg(not(feature = "serde1"))]
 pub trait ArgminOp: Clone + Send + Sync {
     // TODO: Once associated type defaults are stable, it hopefully will be possible to define
     // default types for `Hessian` and `Jacobian`.
@@ -183,7 +183,7 @@ pub trait ArgminOp: Clone + Send + Sync {
     }
 }
 
-#[cfg(feature="serde1")]
+#[cfg(feature = "serde1")]
 pub trait Solver<O: ArgminOp>: Serialize {
     const NAME: &'static str = "UNDEFINED";
 
@@ -235,7 +235,7 @@ pub trait Solver<O: ArgminOp>: Serialize {
     }
 }
 
-#[cfg(not(feature="serde1"))]
+#[cfg(not(feature = "serde1"))]
 pub trait Solver<O: ArgminOp> {
     const NAME: &'static str = "UNDEFINED";
 
@@ -290,7 +290,7 @@ pub trait Solver<O: ArgminOp> {
 /// The datastructure which is returned by the `next_iter` method of the `Solver` trait.
 ///
 /// TODO: Rename to IterResult?
-#[cfg_attr(feature="serde1", derive(Serialize))]
+#[cfg_attr(feature = "serde1", derive(Serialize))]
 #[derive(Clone, Debug, Default)]
 pub struct ArgminIterData<O: ArgminOp> {
     /// Current parameter vector
@@ -420,7 +420,7 @@ impl<O: ArgminOp> ArgminIterData<O> {
 }
 
 /// Defines a common interface for line search methods.
-#[cfg(feature="serde1")]
+#[cfg(feature = "serde1")]
 pub trait ArgminLineSearch<P>: Serialize {
     /// Set the search direction
     fn set_search_direction(&mut self, direction: P);
@@ -429,7 +429,7 @@ pub trait ArgminLineSearch<P>: Serialize {
     fn set_init_alpha(&mut self, step_length: f64) -> Result<(), Error>;
 }
 
-#[cfg(not(feature="serde1"))]
+#[cfg(not(feature = "serde1"))]
 pub trait ArgminLineSearch<P> {
     /// Set the search direction
     fn set_search_direction(&mut self, direction: P);
@@ -440,21 +440,20 @@ pub trait ArgminLineSearch<P> {
 
 /// Defines a common interface to methods which calculate approximate steps for trust region
 /// methods.
-#[cfg(feature="serde1")]
+#[cfg(feature = "serde1")]
 pub trait ArgminTrustRegion: Clone + Serialize {
     /// Set the initial step length
     fn set_radius(&mut self, radius: f64);
 }
 
-#[cfg(not(feature="serde1"))]
+#[cfg(not(feature = "serde1"))]
 pub trait ArgminTrustRegion: Clone {
     /// Set the initial step length
     fn set_radius(&mut self, radius: f64);
 }
 
-
 /// Common interface for beta update methods (Nonlinear-CG)
-#[cfg(feature="serde1")]
+#[cfg(feature = "serde1")]
 pub trait ArgminNLCGBetaUpdate<T>: Serialize {
     /// Update beta
     /// Parameter 1: \nabla f_k
@@ -463,7 +462,7 @@ pub trait ArgminNLCGBetaUpdate<T>: Serialize {
     fn update(&self, nabla_f_k: &T, nabla_f_k_p_1: &T, p_k: &T) -> f64;
 }
 
-#[cfg(not(feature="serde1"))]
+#[cfg(not(feature = "serde1"))]
 pub trait ArgminNLCGBetaUpdate<T> {
     /// Update beta
     /// Parameter 1: \nabla f_k

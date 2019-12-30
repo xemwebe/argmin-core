@@ -7,10 +7,10 @@
 
 use crate::{ArgminOp, OpWrapper, TerminationReason};
 use paste::item;
-#[cfg(feature="serde1")]
+#[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 
-#[cfg_attr(feature="serde1", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 #[derive(Clone, Debug)]
 pub struct IterState<O: ArgminOp> {
     /// Current parameter vector

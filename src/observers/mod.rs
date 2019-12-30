@@ -112,7 +112,7 @@ impl<O: ArgminOp> Observe<O> for Observer<O> {
 /// This is used to indicate how often the observer will observe the status. `Never` deactivates
 /// the observer, `Always` and `Every(i)` will call the observer in every or every ith iteration,
 /// respectively. `NewBest` will call the observer only, if a new best solution is found.
-#[cfg_attr(feature="serde1", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Ord, PartialOrd)]
 pub enum ObserverMode {
     Never,
