@@ -11,14 +11,14 @@
 //! iterations, whether it terminated and the reason of termination.
 
 use crate::{ArgminOp, IterState};
-#[cfg(serde1)]
+#[cfg(feature="serde1")]
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 
 /// This is returned by the `Executor` after the solver is run on the operator.
 ///
 /// TODO: Think about removing this, as returning the IterState may be much better
-#[cfg_attr(serde1, derive(Deserialize, Serialize))]
+#[cfg_attr(feature="serde1", derive(Deserialize, Serialize))]
 #[derive(Clone)]
 pub struct ArgminResult<O: ArgminOp> {
     /// operator

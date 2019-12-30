@@ -37,7 +37,7 @@ mod opwrapper;
 /// Definition of the return type of the solvers
 mod result;
 /// Serialization of `ArgminSolver`s
-#[cfg(serde1)]
+#[cfg(feature="serde1")]
 mod serialization;
 /// Definition of termination reasons
 mod termination;
@@ -53,11 +53,11 @@ pub use crate::opwrapper::*;
 pub use crate::result::ArgminResult;
 pub use crate::termination::TerminationReason;
 pub use failure::Error;
-#[cfg(serde1)]
+#[cfg(feature="serde1")]
 use serde::de::DeserializeOwned;
-#[cfg(serde1)]
+#[cfg(feature="serde1")]
 use serde::Serialize;
-#[cfg(serde1)]
+#[cfg(feature="serde1")]
 pub use serialization::*;
 
 pub mod finitediff {
@@ -73,6 +73,62 @@ pub mod finitediff {
 /// implementation which is essentially returning an error which indicates that the method has not
 /// been implemented. Those methods (`gradient` and `modify`) only need to be implemented if the
 /// uses solver requires it.
+#[cfg(feature="serde1")]
+pub trait ArgminOp: Clone + Send + Sync + Serialize {
+    // TODO: Once associated type defaults are stable, it hopefully will be possible to define
+    // default types for `Hessian` and `Jacobian`.
+    /// Type of the parameter vector
+    type Param: Clone + Serialize + DeserializeOwned;
+    /// Output of the operator
+    type Output: Clone + Serialize + DeserializeOwned;
+    /// Type of Hessian
+    type Hessian: Clone + Serialize + DeserializeOwned;
+    /// Type of Jacobian
+    type Jacobian: Clone + Serialize + DeserializeOwned;
+
+    /// Applies the operator/cost function to parameters
+    fn apply(&self, _param: &Self::Param) -> Result<Self::Output, Error> {
+        Err(ArgminError::NotImplemented {
+            text: "Method `apply` of ArgminOp trait not implemented!".to_string(),
+        }
+        .into())
+    }
+
+    /// Computes the gradient at the given parameters
+    fn gradient(&self, _param: &Self::Param) -> Result<Self::Param, Error> {
+        Err(ArgminError::NotImplemented {
+            text: "Method `gradient` of ArgminOp trait not implemented!".to_string(),
+        }
+        .into())
+    }
+
+    /// Computes the Hessian at the given parameters
+    fn hessian(&self, _param: &Self::Param) -> Result<Self::Hessian, Error> {
+        Err(ArgminError::NotImplemented {
+            text: "Method `hessian` of ArgminOp trait not implemented!".to_string(),
+        }
+        .into())
+    }
+
+    /// Computes the Hessian at the given parameters
+    fn jacobian(&self, _param: &Self::Param) -> Result<Self::Jacobian, Error> {
+        Err(ArgminError::NotImplemented {
+            text: "Method `jacobian` of ArgminOp trait not implemented!".to_string(),
+        }
+        .into())
+    }
+
+    /// Modifies a parameter vector. Comes with a variable that indicates the "degree" of the
+    /// modification.
+    fn modify(&self, _param: &Self::Param, _extent: f64) -> Result<Self::Param, Error> {
+        Err(ArgminError::NotImplemented {
+            text: "Method `modify` of ArgminOp trait not implemented!".to_string(),
+        }
+        .into())
+    }
+}
+
+#[cfg(not(feature="serde1"))]
 pub trait ArgminOp: Clone + Send + Sync {
     // TODO: Once associated type defaults are stable, it hopefully will be possible to define
     // default types for `Hessian` and `Jacobian`.
@@ -127,6 +183,59 @@ pub trait ArgminOp: Clone + Send + Sync {
     }
 }
 
+#[cfg(feature="serde1")]
+pub trait Solver<O: ArgminOp>: Serialize {
+    const NAME: &'static str = "UNDEFINED";
+
+    /// Computes one iteration of the algorithm.
+    fn next_iter(
+        &mut self,
+        op: &mut OpWrapper<O>,
+        state: &IterState<O>,
+    ) -> Result<ArgminIterData<O>, Error>;
+
+    /// Initializes the algorithm
+    ///
+    /// This is executed before any iterations are performed. It can be used to perform
+    /// precomputations. The default implementation corresponds to doing nothing.
+    fn init(
+        &mut self,
+        _op: &mut OpWrapper<O>,
+        _state: &IterState<O>,
+    ) -> Result<Option<ArgminIterData<O>>, Error> {
+        Ok(None)
+    }
+
+    /// Checks whether basic termination reasons apply.
+    ///
+    /// Terminate if
+    ///
+    /// 1) algorithm was terminated somewhere else in the Executor
+    /// 2) iteration count exceeds maximum number of iterations
+    /// 3) cost is lower than target cost
+    ///
+    /// This can be overwritten in a `Solver` implementation; however it is not advised.
+    fn terminate_internal(&mut self, state: &IterState<O>) -> TerminationReason {
+        let solver_terminate = self.terminate(state);
+        if solver_terminate.terminated() {
+            return solver_terminate;
+        }
+        if state.get_iter() >= state.get_max_iters() {
+            return TerminationReason::MaxItersReached;
+        }
+        if state.get_cost() <= state.get_target_cost() {
+            return TerminationReason::TargetCostReached;
+        }
+        TerminationReason::NotTerminated
+    }
+
+    /// Checks whether the algorithm must be terminated
+    fn terminate(&mut self, _state: &IterState<O>) -> TerminationReason {
+        TerminationReason::NotTerminated
+    }
+}
+
+#[cfg(not(feature="serde1"))]
 pub trait Solver<O: ArgminOp> {
     const NAME: &'static str = "UNDEFINED";
 
@@ -181,7 +290,7 @@ pub trait Solver<O: ArgminOp> {
 /// The datastructure which is returned by the `next_iter` method of the `Solver` trait.
 ///
 /// TODO: Rename to IterResult?
-#[cfg_attr(serde1, derive(Serialize))]
+#[cfg_attr(feature="serde1", derive(Serialize))]
 #[derive(Clone, Debug, Default)]
 pub struct ArgminIterData<O: ArgminOp> {
     /// Current parameter vector
@@ -311,6 +420,16 @@ impl<O: ArgminOp> ArgminIterData<O> {
 }
 
 /// Defines a common interface for line search methods.
+#[cfg(feature="serde1")]
+pub trait ArgminLineSearch<P>: Serialize {
+    /// Set the search direction
+    fn set_search_direction(&mut self, direction: P);
+
+    /// Set the initial step length
+    fn set_init_alpha(&mut self, step_length: f64) -> Result<(), Error>;
+}
+
+#[cfg(not(feature="serde1"))]
 pub trait ArgminLineSearch<P> {
     /// Set the search direction
     fn set_search_direction(&mut self, direction: P);
@@ -321,12 +440,30 @@ pub trait ArgminLineSearch<P> {
 
 /// Defines a common interface to methods which calculate approximate steps for trust region
 /// methods.
+#[cfg(feature="serde1")]
+pub trait ArgminTrustRegion: Clone + Serialize {
+    /// Set the initial step length
+    fn set_radius(&mut self, radius: f64);
+}
+
+#[cfg(not(feature="serde1"))]
 pub trait ArgminTrustRegion: Clone {
     /// Set the initial step length
     fn set_radius(&mut self, radius: f64);
 }
-//
+
+
 /// Common interface for beta update methods (Nonlinear-CG)
+#[cfg(feature="serde1")]
+pub trait ArgminNLCGBetaUpdate<T>: Serialize {
+    /// Update beta
+    /// Parameter 1: \nabla f_k
+    /// Parameter 2: \nabla f_{k+1}
+    /// Parameter 3: p_k
+    fn update(&self, nabla_f_k: &T, nabla_f_k_p_1: &T, p_k: &T) -> f64;
+}
+
+#[cfg(not(feature="serde1"))]
 pub trait ArgminNLCGBetaUpdate<T> {
     /// Update beta
     /// Parameter 1: \nabla f_k

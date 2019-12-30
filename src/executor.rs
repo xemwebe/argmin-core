@@ -7,24 +7,24 @@
 
 // TODO: Logging of "initial info"
 
-#[cfg(serde1)]
+#[cfg(feature="serde1")]
 use crate::serialization::*;
-#[cfg(serde1)]
+#[cfg(feature="serde1")]
 use crate::ArgminCheckpoint;
 use crate::{
     ArgminIterData, ArgminKV, ArgminOp, ArgminResult, Error, IterState, Observe,
     Observer, ObserverMode, OpWrapper, Solver, TerminationReason,
 };
-#[cfg(serde1)]
+#[cfg(feature="serde1")]
 use serde::de::DeserializeOwned;
-#[cfg(serde1)]
+#[cfg(feature="serde1")]
 use serde::{Deserialize, Serialize};
-#[cfg(serde1)]
+#[cfg(feature="serde1")]
 use std::path::Path;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 
-#[cfg_attr(serde, derive(Serialize, Deserialize))]
+#[cfg_attr(feature="serde1", derive(Serialize, Deserialize))]
 #[derive(Clone)]
 pub struct Executor<O: ArgminOp, S> {
     /// solver
@@ -34,10 +34,10 @@ pub struct Executor<O: ArgminOp, S> {
     /// State
     state: IterState<O>,
     /// Storage for observers
-    #[cfg_attr(serde1, serde(skip))]
+    #[cfg_attr(feature="serde1", serde(skip))]
     observers: Observer<O>,
     /// Checkpoint
-    #[cfg(serde1)]
+    #[cfg(feature="serde1")]
     checkpoint: ArgminCheckpoint,
     /// Indicates whether Ctrl-C functionality should be active or not
     ctrlc: bool,
@@ -57,16 +57,16 @@ where
             op: OpWrapper::new(&op),
             state,
             observers: Observer::new(),
-            #[cfg(serde1)]
+            #[cfg(feature="serde1")]
             checkpoint: ArgminCheckpoint::default(),
             ctrlc: true,
         }
     }
 
-    #[cfg(serde1)]
+    #[cfg(feature="serde1")]
     pub fn from_checkpoint<P: AsRef<Path>>(path: P) -> Result<Self, Error>
     where
-        Self: Sized,
+        Self: Sized + DeserializeOwned,
     {
         load_checkpoint(path)
     }
@@ -184,7 +184,7 @@ where
             // increment iteration number
             self.state.increment_iter();
 
-            #[cfg(serde1)]
+            #[cfg(feature="serde1")]
             self.checkpoint.store_cond(&self, self.state.get_iter())?;
 
             self.state.time(total_time.elapsed());
@@ -251,20 +251,20 @@ where
     }
 
     /// Set checkpoint directory
-    #[cfg(serde1)]
+    #[cfg(feature="serde1")]
     pub fn checkpoint_dir(mut self, dir: &str) -> Self {
         self.checkpoint.set_dir(dir);
         self
     }
 
     /// Set checkpoint name
-    #[cfg(serde1)]
+    #[cfg(feature="serde1")]
     pub fn checkpoint_name(mut self, dir: &str) -> Self {
         self.checkpoint.set_name(dir);
         self
     }
 
-    #[cfg(serde1)]
+    #[cfg(feature="serde1")]
     pub fn checkpoint_mode(mut self, mode: CheckpointMode) -> Self {
         self.checkpoint.set_mode(mode);
         self
