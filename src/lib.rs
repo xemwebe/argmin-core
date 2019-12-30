@@ -304,7 +304,7 @@ pub struct ArgminIterData<O: ArgminOp> {
     /// Current Jacobian
     jacobian: Option<O::Jacobian>,
     population: Option<Vec<(O::Param, f64)>>,
-    /// terminationreason
+    /// termination reason
     termination_reason: Option<TerminationReason>,
     /// Key value pairs which are used to provide additional information for the Observers
     kv: ArgminKV,
