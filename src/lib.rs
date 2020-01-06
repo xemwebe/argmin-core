@@ -60,7 +60,6 @@ use serde::Serialize;
 #[cfg(feature = "serde1")]
 pub use serialization::*;
 
-
 // serde feature is on
 #[cfg(feature = "serde1")]
 pub trait SerializeAlias: Serialize {}
@@ -147,7 +146,6 @@ pub trait ArgminOp: Clone + Send + Sync + SerializeAlias {
         .into())
     }
 }
-
 
 pub trait Solver<O: ArgminOp>: SerializeAlias {
     const NAME: &'static str = "UNDEFINED";

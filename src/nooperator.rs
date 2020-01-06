@@ -5,7 +5,7 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use crate::{ArgminOp, Error, SerializeAlias, DeserializeOwnedAlias};
+use crate::{ArgminOp, DeserializeOwnedAlias, Error, SerializeAlias};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 use std::fmt::{Debug, Display};
