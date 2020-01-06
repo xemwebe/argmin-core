@@ -5,9 +5,7 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use crate::{ArgminOp, Error};
-#[cfg(feature = "serde1")]
-use serde::de::DeserializeOwned;
+use crate::{ArgminOp, Error, SerializeAlias, DeserializeOwnedAlias};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 use std::fmt::{Debug, Display};
@@ -47,47 +45,12 @@ impl<T, U, H, J> Display for NoOperator<T, U, H, J> {
     }
 }
 
-#[cfg(feature = "serde1")]
 impl<T, U, H, J> ArgminOp for NoOperator<T, U, H, J>
 where
-    T: Clone + Default + Debug + Send + Sync + Serialize + DeserializeOwned,
-    U: Clone + Default + Debug + Send + Sync + Serialize + DeserializeOwned,
-    H: Clone + Default + Debug + Send + Sync + Serialize + DeserializeOwned,
-    J: Clone + Default + Debug + Send + Sync + Serialize + DeserializeOwned,
-{
-    type Param = T;
-    type Output = U;
-    type Hessian = H;
-    type Jacobian = J;
-
-    /// Do nothing, really.
-    fn apply(&self, _p: &Self::Param) -> Result<Self::Output, Error> {
-        Ok(Self::Output::default())
-    }
-
-    /// Do nothing, really.
-    fn gradient(&self, _p: &Self::Param) -> Result<Self::Param, Error> {
-        Ok(Self::Param::default())
-    }
-
-    /// Do nothing, really.
-    fn hessian(&self, _p: &Self::Param) -> Result<Self::Hessian, Error> {
-        Ok(Self::Hessian::default())
-    }
-
-    /// Do nothing, really.
-    fn modify(&self, _p: &Self::Param, _t: f64) -> Result<Self::Param, Error> {
-        Ok(Self::Param::default())
-    }
-}
-
-#[cfg(not(feature = "serde1"))]
-impl<T, U, H, J> ArgminOp for NoOperator<T, U, H, J>
-where
-    T: Clone + Default + Debug + Send + Sync,
-    U: Clone + Default + Debug + Send + Sync,
-    H: Clone + Default + Debug + Send + Sync,
-    J: Clone + Default + Debug + Send + Sync,
+    T: Clone + Default + Debug + Send + Sync + SerializeAlias + DeserializeOwnedAlias,
+    U: Clone + Default + Debug + Send + Sync + SerializeAlias + DeserializeOwnedAlias,
+    H: Clone + Default + Debug + Send + Sync + SerializeAlias + DeserializeOwnedAlias,
+    J: Clone + Default + Debug + Send + Sync + SerializeAlias + DeserializeOwnedAlias,
 {
     type Param = T;
     type Output = U;
