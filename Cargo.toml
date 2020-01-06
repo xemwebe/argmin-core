@@ -27,7 +27,7 @@ slog-json = "2.3.0"
 serde = { version = "1.0", features = ["derive", "rc"], optional = true }
 serde_json = { version = "1.0", optional = true }
 erased-serde = { version = "0.3", optional = true }
-bincode = "1.1.4"
+bincode = {version = "1.1.4", optional = true }
 rand = "0.7.2"
 modcholesky = "0.1.2"
 finitediff = "0.1.2"
@@ -43,7 +43,7 @@ num-complex = "0.2"
 default = []
 ndarrayl = ["ndarray", "ndarray-linalg", "ndarray-rand", "finitediff/ndarray"]
 visualizer = ["gnuplot"]
-serde1 = ["serde", "serde_json", "erased-serde"]
+serde1 = ["serde", "serde_json", "erased-serde", "bincode", "num-complex/serde"]
 
 [dev-dependencies]
 ndarray-linalg = { version = "0.12", features = ["openblas"] }
